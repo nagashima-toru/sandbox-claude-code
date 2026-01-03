@@ -1,0 +1,38 @@
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Maven
+backend/target/
+!backend/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+
+# IDE - Eclipse
+.classpath
+.project
+.settings/
+
+# IDE - VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-local.properties
+
+# Environment
+.env
+*.env.local
