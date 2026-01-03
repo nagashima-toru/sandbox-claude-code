@@ -36,3 +36,6 @@ backend/src/main/resources/application-local.properties
 # Environment
 .env
 *.env.local
+
+# jenv
+.java-version
