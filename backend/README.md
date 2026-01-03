@@ -2,10 +2,31 @@
 
 Spring Boot API application with PostgreSQL, MyBatis, and Flyway.
 
+## Technology Stack
+
+- **Framework**: Spring Boot 3.4.1
+- **Java Version**: 23
+- **Build Tool**: Maven
+- **Database**: PostgreSQL 16
+- **ORM**: MyBatis
+- **Migration**: Flyway
+- **Testing**: JUnit 5, Testcontainers
+- **Package**: `com.sandbox.api`
+- **Port**: 8080
+
+## Architecture
+
+This project follows **Clean Architecture** principles with the following layers:
+
+- **Domain layer** - Core business logic and entities (no external dependencies)
+- **Application layer** - Use cases and application services
+- **Infrastructure layer** - Database access (MyBatis mappers, repository implementations)
+- **Presentation layer** - REST controllers
+
 ## Requirements
 
 - Java 23
-- Docker
+- Docker (or Colima on macOS)
 
 ## Docker Setup
 
