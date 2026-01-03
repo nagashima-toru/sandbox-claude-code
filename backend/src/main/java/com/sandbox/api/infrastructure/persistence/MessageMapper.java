@@ -1,6 +1,6 @@
-package com.sandbox.api.mapper;
+package com.sandbox.api.infrastructure.persistence;
 
-import com.sandbox.api.entity.Message;
+import com.sandbox.api.domain.model.Message;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

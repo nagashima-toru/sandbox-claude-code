@@ -1,9 +1,18 @@
-package com.sandbox.api.entity;
+package com.sandbox.api.domain.model;
 
 public class Message {
     private Long id;
     private String code;
     private String content;
+
+    public Message() {
+    }
+
+    public Message(Long id, String code, String content) {
+        this.id = id;
+        this.code = code;
+        this.content = content;
+    }
 
     public Long getId() {
         return id;

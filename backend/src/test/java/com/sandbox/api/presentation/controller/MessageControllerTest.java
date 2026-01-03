@@ -1,4 +1,4 @@
-package com.sandbox.api.controller;
+package com.sandbox.api.presentation.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
