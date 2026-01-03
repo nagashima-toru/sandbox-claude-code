@@ -84,6 +84,8 @@ com.sandbox.api
 
 ## Testing
 
+**IMPORTANT**: When writing tests, follow the comprehensive test strategy documented in `docs/TEST_STRATEGY.md`.
+
 Tests use Testcontainers to automatically start a PostgreSQL container.
 
 ### macOS Setup (Colima required)
