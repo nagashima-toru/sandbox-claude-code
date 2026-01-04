@@ -1,0 +1,26 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Message
+  description: メッセージ管理API
+paths:
+  /api/message:
+    get:
+      tags:
+      - Message
+      summary: メッセージ取得
+      description: データベースからメッセージを取得します
+      operationId: getMessage
+      responses:
+        "200":
+          description: メッセージ取得成功
+          content:
+            '*/*':
+              schema:
+                type: string
+components: {}
