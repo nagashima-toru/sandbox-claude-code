@@ -41,43 +41,6 @@ class MessageControllerTest {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    void getMessage_whenMessageExists_returns200WithContent() throws Exception {
-        // Arrange: test-data.sql contains 'hello' message
-
-        // Act & Assert
-        mockMvc.perform(get("/api/message"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-                .andExpect(content().string("Hello, World!"));
-    }
-
-    @Test
-    void getMessage_whenMessageNotFound_returnsNotFoundMessage() throws Exception {
-        // Arrange: Delete the 'hello' message to simulate not found scenario
-        jdbcTemplate.update("DELETE FROM messages WHERE code = ?", "hello");
-
-        // Act & Assert
-        mockMvc.perform(get("/api/message"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Message not found"));
-    }
-
-    @Test
-    void getMessage_withGetRequest_succeeds() throws Exception {
-        // Arrange & Act & Assert
-        mockMvc.perform(get("/api/message")
-                        .accept(MediaType.TEXT_PLAIN))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void getMessage_checkEndpointPath() throws Exception {
-        // Arrange & Act & Assert
-        mockMvc.perform(get("/api/message"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     void getAllMessages_returnsAllMessages() throws Exception {
         mockMvc.perform(get("/api/messages"))
                 .andExpect(status().isOk())

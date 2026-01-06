@@ -21,7 +21,6 @@ import java.util.List;
 @Tag(name = "Message", description = "メッセージ管理API")
 public class MessageController {
 
-    private final GetMessageUseCase getMessageUseCase;
     private final GetAllMessagesUseCase getAllMessagesUseCase;
     private final GetMessageByIdUseCase getMessageByIdUseCase;
     private final CreateMessageUseCase createMessageUseCase;
@@ -29,29 +28,16 @@ public class MessageController {
     private final DeleteMessageUseCase deleteMessageUseCase;
 
     public MessageController(
-            GetMessageUseCase getMessageUseCase,
             GetAllMessagesUseCase getAllMessagesUseCase,
             GetMessageByIdUseCase getMessageByIdUseCase,
             CreateMessageUseCase createMessageUseCase,
             UpdateMessageUseCase updateMessageUseCase,
             DeleteMessageUseCase deleteMessageUseCase) {
-        this.getMessageUseCase = getMessageUseCase;
         this.getAllMessagesUseCase = getAllMessagesUseCase;
         this.getMessageByIdUseCase = getMessageByIdUseCase;
         this.createMessageUseCase = createMessageUseCase;
         this.updateMessageUseCase = updateMessageUseCase;
         this.deleteMessageUseCase = deleteMessageUseCase;
-    }
-
-    @Operation(summary = "メッセージ取得", description = "データベースからメッセージを取得します")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "メッセージ取得成功")
-    })
-    @GetMapping("/message")
-    public String getMessage() {
-        return getMessageUseCase.execute("hello")
-                .map(Message::getContent)
-                .orElse("Message not found");
     }
 
     @Operation(summary = "全メッセージ取得", description = "すべてのメッセージを取得します")
