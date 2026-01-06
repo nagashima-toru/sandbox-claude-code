@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig, AxiosError } from 'axios';
  * Axios instance with base configuration
  */
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
   },
