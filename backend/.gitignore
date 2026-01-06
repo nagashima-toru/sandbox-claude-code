@@ -1,0 +1,74 @@
+# ===========================
+# Backend .gitignore
+# Java/Maven/Spring Boot specific rules
+# ===========================
+#
+# 管理ルールについては ../docs/GITIGNORE_RULES.md を参照
+# このファイルには Java、Maven、Spring Boot 固有のルールを記述
+
+# Compiled class files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Spring Boot
+spring-boot-*.log
+*.pid
+*.gz
+
+# Application-specific
+src/main/resources/application-local.yml
+src/main/resources/application-local.properties
+src/main/resources/application-secret.yml
+src/main/resources/application-secret.properties
+
+# Test results
+*.log
+hs_err_pid*
+replay_pid*
+
+# JVM Crash logs
+hs_err_pid*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# virtual machine crash logs
+hs_err_pid*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3

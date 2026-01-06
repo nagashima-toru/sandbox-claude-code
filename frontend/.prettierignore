@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+build
+coverage
+.cache
+.vercel
+.turbo
+dist
+
+# Orval generated files
+src/lib/api/generated

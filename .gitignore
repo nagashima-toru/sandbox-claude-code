@@ -1,41 +1,54 @@
-# Compiled class files
-*.class
-
-# Package files
-*.jar
-*.war
-*.ear
-
-# Maven
-backend/target/
-!backend/.mvn/wrapper/maven-wrapper.jar
-
-# Logs
-*.log
+# ===========================
+# Root .gitignore
+# Common rules for the entire project
+# ===========================
+#
+# 管理ルールについては docs/GITIGNORE_RULES.md を参照
+# このファイルには IDE、OS、全体設定など、技術スタックに依存しないルールを記述
 
 # IDE - IntelliJ IDEA
 .idea/
 *.iml
+*.ipr
+*.iws
 
 # IDE - Eclipse
 .classpath
 .project
 .settings/
+.metadata/
 
 # IDE - VS Code
 .vscode/
 
-# OS
+# OS Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+*~
 
-# Spring Boot
-backend/src/main/resources/application-local.yml
-backend/src/main/resources/application-local.properties
+# Git
+*.orig
 
-# Environment
+# Environment Files (project-wide)
 .env
-*.env.local
+.env.local
+.env.*.local
+
+# Logs (project-wide)
+*.log
+logs/
 
 # jenv
 .java-version
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~.nib

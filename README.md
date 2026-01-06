@@ -6,8 +6,14 @@ A sandbox repository for experimenting with Claude Code.
 
 ```
 sandbox-claude-code/
-├── backend/          # Spring Boot API application
-└── CLAUDE.md        # Project guidance for Claude Code
+├── backend/          # Spring Boot API application (Java 23, Maven)
+├── frontend/         # Next.js application (TypeScript, pnpm)
+├── docs/             # Project documentation
+│   └── GITIGNORE_RULES.md
+├── CLAUDE.md         # Root project guidance for Claude Code
+├── .gitignore        # Common rules (IDE, OS)
+├── backend/.gitignore    # Backend-specific rules
+└── frontend/.gitignore   # Frontend-specific rules
 ```
 
 ## Components
@@ -16,11 +22,29 @@ sandbox-claude-code/
 
 Spring Boot API application with PostgreSQL, MyBatis, and Flyway.
 
-See [backend/README.md](backend/README.md) for detailed setup and usage instructions.
+- **Tech Stack**: Java 23, Spring Boot 3.4.1, PostgreSQL, MyBatis, Flyway
+- **API**: RESTful CRUD for Message management
+- **Docs**: [backend/CLAUDE.md](backend/CLAUDE.md)
+
+See [backend/README.md](backend/README.md) for setup instructions.
+
+### Frontend
+
+Next.js-based message management application with full CRUD functionality.
+
+- **Tech Stack**: Next.js 15+, TypeScript, shadcn/ui, TanStack Query, Orval
+- **API Client**: Auto-generated from OpenAPI spec
+- **Docs**: [frontend/CLAUDE.md](frontend/CLAUDE.md)
+
+See [frontend/README.md](frontend/README.md) for setup instructions.
+
+## Documentation
+
+- [GITIGNORE_RULES.md](docs/GITIGNORE_RULES.md) - `.gitignore` management rules and guidelines
 
 ## Development
 
-This project is configured for IntelliJ IDEA with Java 23.
+This project is configured for IntelliJ IDEA with Java 23 and Node.js 20+.
 
 ## Repository
 
