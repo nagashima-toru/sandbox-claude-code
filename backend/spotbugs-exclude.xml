@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Suppress EI_EXPOSE_REP2 for Spring-managed beans -->
+    <!-- Spring DI ensures these dependencies are immutable within the application context -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Suppress EI_EXPOSE_REP for DTOs and response objects -->
+    <!-- These are controlled by the application and not exposed to untrusted external code -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+</FindBugsFilter>

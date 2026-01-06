@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!--
+    This file is used to suppress false positives detected by OWASP Dependency-Check.
+    Add suppression entries here when you've verified that a CVE is not applicable to your project.
+
+    Example:
+    <suppress>
+       <notes><![CDATA[
+       file name: some-library-1.0.jar
+       Reason: This vulnerability does not affect our usage of the library.
+       ]]></notes>
+       <cve>CVE-2023-12345</cve>
+    </suppress>
+    -->
+</suppressions>
