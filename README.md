@@ -1,5 +1,8 @@
 # Sandbox Claude Code
 
+[![Backend CI](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/backend-ci.yml)
+[![CodeQL](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/codeql.yml/badge.svg)](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/codeql.yml)
+
 A sandbox repository for experimenting with Claude Code.
 
 ## Project Structure
