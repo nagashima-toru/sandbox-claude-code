@@ -216,6 +216,7 @@
                     <threshold>Medium</threshold>
                     <failOnError>false</failOnError>
                     <xmlOutput>true</xmlOutput>
+                    <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
                 <executions>
                     <execution>
@@ -259,6 +260,8 @@
                     <suppressionFiles>
                         <suppressionFile>dependency-check-suppressions.xml</suppressionFile>
                     </suppressionFiles>
+                    <!-- Disable NVD API due to CVSSv4 parsing issues -->
+                    <nvdApiServicesEnabled>false</nvdApiServicesEnabled>
                 </configuration>
                 <executions>
                     <execution>
