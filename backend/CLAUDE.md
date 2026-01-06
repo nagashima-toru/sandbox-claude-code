@@ -31,9 +31,15 @@ Spring Boot REST API application with PostgreSQL, MyBatis, and Flyway.
 # Test (uses Testcontainers - requires Docker/Colima)
 ./mvnw test
 
+# Integration test with OpenAPI generation (IMPORTANT: use verify, not integration-test)
+./mvnw verify
+
 # Compile only
 ./mvnw compile
 ```
+
+**IMPORTANT**: To run integration tests and generate OpenAPI documentation, **always use `./mvnw verify`**.
+Do NOT use `./mvnw integration-test` as it will not stop the server properly, causing port conflicts on subsequent runs.
 
 ## Architecture
 

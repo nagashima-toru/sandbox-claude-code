@@ -6,4 +6,39 @@
         FROM messages
         WHERE code = #{code}
     </select>
+
+    <select id="findAll" resultType="com.sandbox.api.domain.model.Message">
+        SELECT id, code, content
+        FROM messages
+        ORDER BY id ASC
+    </select>
+
+    <select id="findById" resultType="com.sandbox.api.domain.model.Message">
+        SELECT id, code, content
+        FROM messages
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO messages (code, content)
+        VALUES (#{code}, #{content})
+    </insert>
+
+    <update id="update">
+        UPDATE messages
+        SET code = #{code},
+            content = #{content}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM messages
+        WHERE id = #{id}
+    </delete>
+
+    <select id="existsByCode" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM messages
+        WHERE code = #{code}
+    </select>
 </mapper>
