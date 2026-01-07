@@ -7,17 +7,12 @@ interface ErrorMessageProps {
   variant?: 'inline' | 'card';
 }
 
-export function ErrorMessage({
-  message,
-  className,
-  variant = 'inline'
-}: ErrorMessageProps) {
+export function ErrorMessage({ message, className, variant = 'inline' }: ErrorMessageProps) {
   if (variant === 'card') {
     return (
-      <div className={cn(
-        'rounded-lg border border-destructive/50 bg-destructive/10 p-4',
-        className
-      )}>
+      <div
+        className={cn('rounded-lg border border-destructive/50 bg-destructive/10 p-4', className)}
+      >
         <div className="flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
           <div className="flex-1">

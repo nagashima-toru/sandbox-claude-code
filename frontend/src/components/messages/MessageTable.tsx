@@ -33,10 +33,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
 
   if (error) {
     return (
-      <ErrorMessage
-        message="Failed to load messages. Please try again later."
-        variant="card"
-      />
+      <ErrorMessage message="Failed to load messages. Please try again later." variant="card" />
     );
   }
 
@@ -67,13 +64,9 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
             <TableRow key={message.id}>
               <TableCell className="font-medium">{message.id}</TableCell>
               <TableCell>
-                <code className="bg-muted px-2 py-1 rounded text-sm">
-                  {message.code}
-                </code>
+                <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
               </TableCell>
-              <TableCell className="max-w-md truncate">
-                {message.content}
-              </TableCell>
+              <TableCell className="max-w-md truncate">{message.content}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   <Button

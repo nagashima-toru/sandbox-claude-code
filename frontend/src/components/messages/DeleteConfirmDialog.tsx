@@ -40,45 +40,30 @@ export default function DeleteConfirmDialog({
             Delete Message
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this message? This action cannot be
-            undone.
+            Are you sure you want to delete this message? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
 
         {message && (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 space-y-2">
             <div>
-              <span className="text-sm font-medium text-muted-foreground">
-                Code:
-              </span>
+              <span className="text-sm font-medium text-muted-foreground">Code:</span>
               <div className="mt-1">
-                <code className="bg-background px-2 py-1 rounded text-sm">
-                  {message.code}
-                </code>
+                <code className="bg-background px-2 py-1 rounded text-sm">{message.code}</code>
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-muted-foreground">
-                Content:
-              </span>
+              <span className="text-sm font-medium text-muted-foreground">Content:</span>
               <p className="mt-1 text-sm">{message.content}</p>
             </div>
           </div>
         )}
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            disabled={isDeleting}
-          >
+          <Button variant="outline" onClick={handleCancel} disabled={isDeleting}>
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={isDeleting}
-          >
+          <Button variant="destructive" onClick={onConfirm} disabled={isDeleting}>
             {isDeleting ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogFooter>
