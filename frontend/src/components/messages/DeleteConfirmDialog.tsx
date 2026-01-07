@@ -18,6 +18,7 @@ interface DeleteConfirmDialogProps {
   onConfirm: () => void;
   message: MessageResponse | null;
   isDeleting?: boolean;
+  error?: any;
 }
 
 export default function DeleteConfirmDialog({
@@ -26,10 +27,32 @@ export default function DeleteConfirmDialog({
   onConfirm,
   message,
   isDeleting = false,
+  error,
 }: DeleteConfirmDialogProps) {
   const handleCancel = () => {
     onOpenChange(false);
   };
+
+  const getErrorMessage = () => {
+    if (!error) return null;
+
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || error?.message;
+
+    if (status === 404) {
+      return 'Message not found. It may have already been deleted.';
+    }
+    if (status === 500) {
+      return 'Server error. Please try again later.';
+    }
+    if (error?.code === 'ECONNABORTED' || error?.code === 'ERR_NETWORK') {
+      return 'Network error. Please check your connection and try again.';
+    }
+
+    return message || 'Failed to delete message. Please try again.';
+  };
+
+  const errorMessage = getErrorMessage();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,6 +67,12 @@ export default function DeleteConfirmDialog({
             undone.
           </DialogDescription>
         </DialogHeader>
+
+        {errorMessage && (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
+            {errorMessage}
+          </div>
+        )}
 
         {message && (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 space-y-2">

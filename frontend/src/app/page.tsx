@@ -29,6 +29,12 @@ export default function Home() {
         queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
         setIsCreateModalOpen(false);
       },
+      onError: (error: any) => {
+        console.error('Failed to create message:', error);
+        if (error?.response?.status === 409) {
+          console.error('Duplicate code error');
+        }
+      },
     },
   });
 
@@ -39,6 +45,12 @@ export default function Home() {
         setIsEditModalOpen(false);
         setSelectedMessage(null);
       },
+      onError: (error: any) => {
+        console.error('Failed to update message:', error);
+        if (error?.response?.status === 404) {
+          console.error('Message not found');
+        }
+      },
     },
   });
 
@@ -48,6 +60,12 @@ export default function Home() {
         queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
         setIsDeleteDialogOpen(false);
         setSelectedMessage(null);
+      },
+      onError: (error: any) => {
+        console.error('Failed to delete message:', error);
+        if (error?.response?.status === 404) {
+          console.error('Message not found');
+        }
       },
     },
   });
@@ -99,6 +117,7 @@ export default function Home() {
           onSubmit={handleCreateMessage}
           isSubmitting={createMutation.isPending}
           mode="create"
+          error={createMutation.error}
         />
 
         <MessageModal
@@ -108,6 +127,7 @@ export default function Home() {
           initialData={selectedMessage || undefined}
           isSubmitting={updateMutation.isPending}
           mode="edit"
+          error={updateMutation.error}
         />
 
         <DeleteConfirmDialog
@@ -116,6 +136,7 @@ export default function Home() {
           onConfirm={handleDeleteConfirm}
           message={selectedMessage}
           isDeleting={deleteMutation.isPending}
+          error={deleteMutation.error}
         />
       </div>
     </main>
