@@ -2,7 +2,9 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - master
+      - main
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
@@ -43,7 +45,7 @@ jobs:
         run: pnpm lint
 
       - name: Run Prettier check
-        run: pnpm prettier --check .
+        run: pnpm format:check
 
   type-check:
     runs-on: ubuntu-latest
