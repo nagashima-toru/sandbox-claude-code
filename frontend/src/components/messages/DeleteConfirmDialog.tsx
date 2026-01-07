@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { AlertCircle } from 'lucide-react';
+import { getApiErrorMessage } from '@/lib/utils/errorHandling';
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -33,26 +34,7 @@ export default function DeleteConfirmDialog({
     onOpenChange(false);
   };
 
-  const getErrorMessage = () => {
-    if (!error) return null;
-
-    const status = error?.response?.status;
-    const message = error?.response?.data?.message || error?.message;
-
-    if (status === 404) {
-      return 'Message not found. It may have already been deleted.';
-    }
-    if (status === 500) {
-      return 'Server error. Please try again later.';
-    }
-    if (error?.code === 'ECONNABORTED' || error?.code === 'ERR_NETWORK') {
-      return 'Network error. Please check your connection and try again.';
-    }
-
-    return message || 'Failed to delete message. Please try again.';
-  };
-
-  const errorMessage = getErrorMessage();
+  const errorMessage = getApiErrorMessage(error);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
