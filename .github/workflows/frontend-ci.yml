@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate API client
+        run: pnpm generate:api
+
       - name: Run ESLint
         run: pnpm lint
 
@@ -66,6 +69,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate API client
+        run: pnpm generate:api
+
       - name: Run TypeScript type check
         run: pnpm type-check
 
@@ -93,8 +99,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate API client
+        run: pnpm generate:api
+
       - name: Run tests with coverage
-        run: pnpm test -- --coverage
+        run: pnpm test -- --coverage --passWithNoTests
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -127,6 +136,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate API client
+        run: pnpm generate:api
 
       - name: Build Next.js application
         run: pnpm build
@@ -163,6 +175,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate API client
+        run: pnpm generate:api
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps

@@ -102,7 +102,7 @@ export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosReq
     cancelToken: source.token,
   }).then(({ data }) => data);
 
-  // @ts-ignore
+  // @ts-expect-error
   promise.cancel = () => {
     source.cancel('Query was cancelled');
   };
