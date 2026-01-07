@@ -102,7 +102,7 @@ export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosReq
     cancelToken: source.token,
   }).then(({ data }) => data);
 
-  // @ts-expect-error
+  // @ts-expect-error - cancel method is dynamically added for React Query compatibility
   promise.cancel = () => {
     source.cancel('Query was cancelled');
   };
