@@ -107,6 +107,49 @@ jobs:
       - name: Run tests with coverage
         run: pnpm test -- --coverage --passWithNoTests
 
+      - name: Generate coverage summary
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Coverage | Threshold | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "| ------ | -------- | --------- | ------ |" >> $GITHUB_STEP_SUMMARY
+
+            # Extract coverage data using jq
+            STATEMENTS=$(jq -r '.total.statements.pct' coverage/coverage-summary.json)
+            BRANCHES=$(jq -r '.total.branches.pct' coverage/coverage-summary.json)
+            FUNCTIONS=$(jq -r '.total.functions.pct' coverage/coverage-summary.json)
+            LINES=$(jq -r '.total.lines.pct' coverage/coverage-summary.json)
+
+            # Define thresholds
+            STATEMENTS_THRESHOLD=80
+            BRANCHES_THRESHOLD=70
+            FUNCTIONS_THRESHOLD=80
+            LINES_THRESHOLD=80
+
+            # Function to check if coverage meets threshold
+            check_coverage() {
+              local coverage=$1
+              local threshold=$2
+              if (( $(echo "$coverage >= $threshold" | bc -l) )); then
+                echo "✅"
+              else
+                echo "❌"
+              fi
+            }
+
+            # Add rows to summary
+            echo "| Statements | ${STATEMENTS}% | ${STATEMENTS_THRESHOLD}% | $(check_coverage $STATEMENTS $STATEMENTS_THRESHOLD) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Branches | ${BRANCHES}% | ${BRANCHES_THRESHOLD}% | $(check_coverage $BRANCHES $BRANCHES_THRESHOLD) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Functions | ${FUNCTIONS}% | ${FUNCTIONS_THRESHOLD}% | $(check_coverage $FUNCTIONS $FUNCTIONS_THRESHOLD) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Lines | ${LINES}% | ${LINES_THRESHOLD}% | $(check_coverage $LINES $LINES_THRESHOLD) |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Full coverage report available in artifacts" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Coverage summary file not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
