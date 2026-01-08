@@ -18,7 +18,7 @@ interface MessageModalProps {
   initialData?: MessageResponse;
   isSubmitting?: boolean;
   mode: 'create' | 'edit';
-  error?: any;
+  error?: unknown;
 }
 
 export default function MessageModal({

@@ -28,7 +28,6 @@ type SortField = 'id' | 'code' | 'content';
 type SortDirection = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
-const MAX_VISIBLE_PAGES = 5;
 const SEARCH_DEBOUNCE_MS = 300;
 
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {

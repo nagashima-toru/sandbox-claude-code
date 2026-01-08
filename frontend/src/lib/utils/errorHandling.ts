@@ -1,11 +1,17 @@
 /**
  * Extract user-friendly error message from API error
  */
-export function getApiErrorMessage(error: any): string | null {
+export function getApiErrorMessage(error: unknown): string | null {
   if (!error) return null;
 
-  const status = error?.response?.status;
-  const message = error?.response?.data?.message || error?.message;
+  // Type guard for axios-like error structure
+  const hasResponse = error && typeof error === 'object' && 'response' in error;
+  const response = hasResponse ? (error as { response?: { status?: number; data?: { message?: string } } }).response : undefined;
+  const status = response?.status;
+
+  const hasMessage = error && typeof error === 'object' && 'message' in error;
+  const errorMessage = hasMessage ? (error as { message?: string }).message : undefined;
+  const message = response?.data?.message || errorMessage;
 
   if (status === 409) {
     return 'A message with this code already exists. Please use a different code.';
@@ -19,7 +25,9 @@ export function getApiErrorMessage(error: any): string | null {
   if (status === 500) {
     return 'Server error. Please try again later.';
   }
-  if (error?.code === 'ECONNABORTED' || error?.code === 'ERR_NETWORK') {
+  const hasCode = error && typeof error === 'object' && 'code' in error;
+  const code = hasCode ? (error as { code?: string }).code : undefined;
+  if (code === 'ECONNABORTED' || code === 'ERR_NETWORK') {
     return 'Network error. Please check your connection and try again.';
   }
 

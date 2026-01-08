@@ -29,10 +29,13 @@ export default function Home() {
         queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
         setIsCreateModalOpen(false);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error('Failed to create message:', error);
-        if (error?.response?.status === 409) {
-          console.error('Duplicate code error');
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status === 409) {
+            console.error('Duplicate code error');
+          }
         }
       },
     },
@@ -45,10 +48,13 @@ export default function Home() {
         setIsEditModalOpen(false);
         setSelectedMessage(null);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error('Failed to update message:', error);
-        if (error?.response?.status === 404) {
-          console.error('Message not found');
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status === 404) {
+            console.error('Message not found');
+          }
         }
       },
     },
@@ -61,10 +67,13 @@ export default function Home() {
         setIsDeleteDialogOpen(false);
         setSelectedMessage(null);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error('Failed to delete message:', error);
-        if (error?.response?.status === 404) {
-          console.error('Message not found');
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status === 404) {
+            console.error('Message not found');
+          }
         }
       },
     },

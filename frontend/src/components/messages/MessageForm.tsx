@@ -21,7 +21,7 @@ interface MessageFormProps {
   initialData?: MessageResponse;
   isSubmitting?: boolean;
   onCancel: () => void;
-  error?: any;
+  error?: unknown;
 }
 
 export default function MessageForm({

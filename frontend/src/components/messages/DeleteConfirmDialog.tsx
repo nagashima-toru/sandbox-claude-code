@@ -19,7 +19,7 @@ interface DeleteConfirmDialogProps {
   onConfirm: () => void;
   message: MessageResponse | null;
   isDeleting?: boolean;
-  error?: any;
+  error?: unknown;
 }
 
 export default function DeleteConfirmDialog({
