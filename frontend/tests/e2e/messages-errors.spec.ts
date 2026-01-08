@@ -112,7 +112,9 @@ test.describe('Messages Error Handling', () => {
     await page.waitForTimeout(1000);
 
     // Delete the message
-    const row = page.locator(`tr:has-text("${code}"), [data-testid="message-row"]:has-text("${code}")`);
+    const row = page.locator(
+      `tr:has-text("${code}"), [data-testid="message-row"]:has-text("${code}")`
+    );
     const deleteButton = row.getByRole('button', { name: /delete/i });
     await deleteButton.click();
 

@@ -15,7 +15,9 @@ test.describe('Messages Search and Filter', () => {
 
     for (const msg of testMessages) {
       await page.getByRole('button', { name: /new message|create|add/i }).click();
-      const modal = page.locator('[role="dialog"]').or(page.locator('[data-testid="message-modal"]'));
+      const modal = page
+        .locator('[role="dialog"]')
+        .or(page.locator('[data-testid="message-modal"]'));
       await expect(modal).toBeVisible();
 
       await page.fill('input[name="code"], input[placeholder*="code" i]', msg.code);
@@ -110,9 +112,7 @@ test.describe('Messages Search and Filter', () => {
     await expect(page.locator('text=/SEARCH_TEST/i')).not.toBeVisible();
 
     // Check for "no results" or "not found" message
-    const noResultsMessage = page.locator(
-      'text=/no results|not found|no messages|empty/i'
-    );
+    const noResultsMessage = page.locator('text=/no results|not found|no messages|empty/i');
     await expect(noResultsMessage).toBeVisible({ timeout: 5000 });
   });
 

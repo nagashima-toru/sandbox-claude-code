@@ -12,7 +12,9 @@ test.describe('Messages CRUD Operations', () => {
     await expect(page).toHaveTitle(/Messages/i);
 
     // Check if the table or messages container is visible
-    const messagesContainer = page.locator('[data-testid="messages-table"]').or(page.locator('table'));
+    const messagesContainer = page
+      .locator('[data-testid="messages-table"]')
+      .or(page.locator('table'));
     await expect(messagesContainer).toBeVisible();
   });
 
@@ -73,7 +75,9 @@ test.describe('Messages CRUD Operations', () => {
     await expect(page.locator(`text=${originalCode}`)).toBeVisible();
 
     // Find and click the edit button for this message
-    const row = page.locator(`tr:has-text("${originalCode}"), [data-testid="message-row"]:has-text("${originalCode}")`);
+    const row = page.locator(
+      `tr:has-text("${originalCode}"), [data-testid="message-row"]:has-text("${originalCode}")`
+    );
     const editButton = row.getByRole('button', { name: /edit/i });
     await editButton.click();
 
@@ -122,7 +126,9 @@ test.describe('Messages CRUD Operations', () => {
     await expect(page.locator(`text=${code}`)).toBeVisible();
 
     // Find and click the delete button for this message
-    const row = page.locator(`tr:has-text("${code}"), [data-testid="message-row"]:has-text("${code}")`);
+    const row = page.locator(
+      `tr:has-text("${code}"), [data-testid="message-row"]:has-text("${code}")`
+    );
     const deleteButton = row.getByRole('button', { name: /delete/i });
     await deleteButton.click();
 
