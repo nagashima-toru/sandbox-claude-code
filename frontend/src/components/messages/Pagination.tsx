@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const MAX_VISIBLE_PAGES = 5;
 
 interface PaginationProps {
   currentPage: number;
@@ -21,11 +24,10 @@ export function Pagination({
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
-  const getPageNumbers = () => {
+  const pageNumbers = useMemo(() => {
     const pages: (number | string)[] = [];
-    const maxVisible = 5;
 
-    if (totalPages <= maxVisible) {
+    if (totalPages <= MAX_VISIBLE_PAGES) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
@@ -54,7 +56,7 @@ export function Pagination({
     }
 
     return pages;
-  };
+  }, [currentPage, totalPages]);
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
@@ -93,7 +95,7 @@ export function Pagination({
         </Button>
 
         <div className="flex gap-1">
-          {getPageNumbers().map((page, index) =>
+          {pageNumbers.map((page, index) =>
             typeof page === 'number' ? (
               <Button
                 key={index}

@@ -81,11 +81,13 @@ export default function Home() {
   };
 
   const handleEditClick = (message: MessageResponse) => {
+    updateMutation.reset(); // Clear previous errors
     setSelectedMessage(message);
     setIsEditModalOpen(true);
   };
 
   const handleDeleteClick = (message: MessageResponse) => {
+    deleteMutation.reset(); // Clear previous errors
     setSelectedMessage(message);
     setIsDeleteDialogOpen(true);
   };
@@ -103,7 +105,10 @@ export default function Home() {
           title="Message Management"
           description="Manage all your messages in one place"
           action={
-            <Button onClick={() => setIsCreateModalOpen(true)}>
+            <Button onClick={() => {
+              createMutation.reset(); // Clear previous errors
+              setIsCreateModalOpen(true);
+            }}>
               <Plus className="h-4 w-4 mr-2" />
               New Message
             </Button>

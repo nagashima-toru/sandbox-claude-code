@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useGetAllMessages } from '@/lib/api/generated/message/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { Loading } from '@/components/common/Loading';
@@ -27,14 +27,23 @@ interface MessageTableProps {
 type SortField = 'id' | 'code' | 'content';
 type SortDirection = 'asc' | 'desc';
 
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_VISIBLE_PAGES = 5;
+const SEARCH_DEBOUNCE_MS = 300;
+
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   const { data: messages, isLoading, error } = useGetAllMessages();
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearch = useDebounce(searchQuery, 300);
+  const debouncedSearch = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -45,7 +54,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
     }
   };
 
-  const getSortIcon = (field: SortField) => {
+  const getSortIcon = useCallback((field: SortField) => {
     if (sortField !== field) {
       return <ArrowUpDown className="h-4 w-4 ml-1 inline" />;
     }
@@ -54,7 +63,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
     ) : (
       <ArrowDown className="h-4 w-4 ml-1 inline" />
     );
-  };
+  }, [sortField, sortDirection]);
 
   const filteredAndSortedMessages = useMemo(() => {
     if (!messages) return [];
@@ -75,8 +84,8 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       let bValue: string | number = b[sortField] ?? '';
 
       if (sortField === 'id') {
-        aValue = Number(aValue);
-        bValue = Number(bValue);
+        aValue = Number(aValue ?? 0);
+        bValue = Number(bValue ?? 0);
       }
 
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
