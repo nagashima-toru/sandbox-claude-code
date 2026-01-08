@@ -14,12 +14,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { MessageResponse } from '@/lib/api/generated/models';
+import { getApiErrorMessage } from '@/lib/utils/errorHandling';
 
 interface MessageFormProps {
   onSubmit: (data: MessageFormData) => void;
   initialData?: MessageResponse;
   isSubmitting?: boolean;
   onCancel: () => void;
+  error?: unknown;
 }
 
 export default function MessageForm({
@@ -27,6 +29,7 @@ export default function MessageForm({
   initialData,
   isSubmitting = false,
   onCancel,
+  error,
 }: MessageFormProps) {
   const form = useForm<MessageFormData>({
     resolver: zodResolver(messageSchema),
@@ -40,9 +43,16 @@ export default function MessageForm({
     onSubmit(data);
   };
 
+  const errorMessage = getApiErrorMessage(error);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {errorMessage && (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
+            {errorMessage}
+          </div>
+        )}
         <FormField
           control={form.control}
           name="code"

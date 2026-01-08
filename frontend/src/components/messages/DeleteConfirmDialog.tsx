@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { AlertCircle } from 'lucide-react';
+import { getApiErrorMessage } from '@/lib/utils/errorHandling';
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface DeleteConfirmDialogProps {
   onConfirm: () => void;
   message: MessageResponse | null;
   isDeleting?: boolean;
+  error?: unknown;
 }
 
 export default function DeleteConfirmDialog({
@@ -26,10 +28,13 @@ export default function DeleteConfirmDialog({
   onConfirm,
   message,
   isDeleting = false,
+  error,
 }: DeleteConfirmDialogProps) {
   const handleCancel = () => {
     onOpenChange(false);
   };
+
+  const errorMessage = getApiErrorMessage(error);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,6 +48,12 @@ export default function DeleteConfirmDialog({
             Are you sure you want to delete this message? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
+
+        {errorMessage && (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
+            {errorMessage}
+          </div>
+        )}
 
         {message && (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 space-y-2">

@@ -18,6 +18,7 @@ interface MessageModalProps {
   initialData?: MessageResponse;
   isSubmitting?: boolean;
   mode: 'create' | 'edit';
+  error?: unknown;
 }
 
 export default function MessageModal({
@@ -27,6 +28,7 @@ export default function MessageModal({
   initialData,
   isSubmitting = false,
   mode,
+  error,
 }: MessageModalProps) {
   const handleCancel = () => {
     onOpenChange(false);
@@ -48,6 +50,7 @@ export default function MessageModal({
           initialData={initialData}
           isSubmitting={isSubmitting}
           onCancel={handleCancel}
+          error={error}
         />
       </DialogContent>
     </Dialog>
