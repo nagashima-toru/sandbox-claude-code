@@ -6,7 +6,9 @@ export function getApiErrorMessage(error: unknown): string | null {
 
   // Type guard for axios-like error structure
   const hasResponse = error && typeof error === 'object' && 'response' in error;
-  const response = hasResponse ? (error as { response?: { status?: number; data?: { message?: string } } }).response : undefined;
+  const response = hasResponse
+    ? (error as { response?: { status?: number; data?: { message?: string } } }).response
+    : undefined;
   const status = response?.status;
 
   const hasMessage = error && typeof error === 'object' && 'message' in error;

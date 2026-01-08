@@ -114,10 +114,12 @@ export default function Home() {
           title="Message Management"
           description="Manage all your messages in one place"
           action={
-            <Button onClick={() => {
-              createMutation.reset(); // Clear previous errors
-              setIsCreateModalOpen(true);
-            }}>
+            <Button
+              onClick={() => {
+                createMutation.reset(); // Clear previous errors
+                setIsCreateModalOpen(true);
+              }}
+            >
               <Plus className="h-4 w-4 mr-2" />
               New Message
             </Button>

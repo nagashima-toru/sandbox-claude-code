@@ -53,16 +53,19 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
     }
   };
 
-  const getSortIcon = useCallback((field: SortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="h-4 w-4 ml-1 inline" />;
-    }
-    return sortDirection === 'asc' ? (
-      <ArrowUp className="h-4 w-4 ml-1 inline" />
-    ) : (
-      <ArrowDown className="h-4 w-4 ml-1 inline" />
-    );
-  }, [sortField, sortDirection]);
+  const getSortIcon = useCallback(
+    (field: SortField) => {
+      if (sortField !== field) {
+        return <ArrowUpDown className="h-4 w-4 ml-1 inline" />;
+      }
+      return sortDirection === 'asc' ? (
+        <ArrowUp className="h-4 w-4 ml-1 inline" />
+      ) : (
+        <ArrowDown className="h-4 w-4 ml-1 inline" />
+      );
+    },
+    [sortField, sortDirection]
+  );
 
   const filteredAndSortedMessages = useMemo(() => {
     if (!messages) return [];
@@ -73,8 +76,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       const query = debouncedSearch.toLowerCase();
       result = result.filter(
         (msg) =>
-          msg.code?.toLowerCase().includes(query) ||
-          msg.content?.toLowerCase().includes(query)
+          msg.code?.toLowerCase().includes(query) || msg.content?.toLowerCase().includes(query)
       );
     }
 
@@ -148,9 +150,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       {filteredAndSortedMessages.length === 0 ? (
         <div className="text-center py-12 border rounded-lg">
           <p className="text-muted-foreground text-lg">No messages match your search.</p>
-          <p className="text-muted-foreground text-sm mt-2">
-            Try a different search term.
-          </p>
+          <p className="text-muted-foreground text-sm mt-2">Try a different search term.</p>
         </div>
       ) : (
         <>
@@ -194,13 +194,9 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
                     <TableRow key={message.id}>
                       <TableCell className="font-medium">{message.id}</TableCell>
                       <TableCell>
-                        <code className="bg-muted px-2 py-1 rounded text-sm">
-                          {message.code}
-                        </code>
+                        <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
                       </TableCell>
-                      <TableCell className="max-w-md truncate">
-                        {message.content}
-                      </TableCell>
+                      <TableCell className="max-w-md truncate">{message.content}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
@@ -238,9 +234,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">Code:</span>
-                        <code className="bg-muted px-2 py-1 rounded text-sm">
-                          {message.code}
-                        </code>
+                        <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
                       </div>
                     </div>
                     <div className="flex gap-2">
