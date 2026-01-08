@@ -62,8 +62,8 @@ test.describe('Messages CRUD Operations', () => {
     const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
 
-    await modal.locator('input[name="code"]').fill(originalCode);
-    await modal.locator('input[name="content"]').fill(originalContent);
+    await page.locator('input[name="code"]').fill(originalCode);
+    await page.locator('input[name="content"]').fill(originalContent);
     await modal.getByRole('button', { name: /save/i }).click();
     await expect(modal).not.toBeVisible({ timeout: 15000 });
 
@@ -80,7 +80,7 @@ test.describe('Messages CRUD Operations', () => {
 
     // Update the content
     const updatedContent = `Updated ${Date.now()}`;
-    const contentInput = modal.locator('input[name="content"]');
+    const contentInput = page.locator('input[name="content"]');
     await contentInput.clear();
     await contentInput.fill(updatedContent);
 
@@ -104,8 +104,8 @@ test.describe('Messages CRUD Operations', () => {
     const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
 
-    await modal.locator('input[name="code"]').fill(code);
-    await modal.locator('input[name="content"]').fill(content);
+    await page.locator('input[name="code"]').fill(code);
+    await page.locator('input[name="content"]').fill(content);
     await modal.getByRole('button', { name: /save/i }).click();
     await expect(modal).not.toBeVisible({ timeout: 15000 });
 
@@ -159,8 +159,8 @@ test.describe('Messages CRUD Operations', () => {
     const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
 
-    await modal.locator('input[name="code"]').fill(duplicateCode);
-    await modal.locator('input[name="content"]').fill('First message');
+    await page.locator('input[name="code"]').fill(duplicateCode);
+    await page.locator('input[name="content"]').fill('First message');
     await modal.getByRole('button', { name: /save/i }).click();
     await expect(modal).not.toBeVisible({ timeout: 15000 });
 
@@ -171,8 +171,8 @@ test.describe('Messages CRUD Operations', () => {
     await page.getByRole('button', { name: /new message/i }).click();
     await expect(modal).toBeVisible();
 
-    await modal.locator('input[name="code"]').fill(duplicateCode);
-    await modal.locator('input[name="content"]').fill('Second message');
+    await page.locator('input[name="code"]').fill(duplicateCode);
+    await page.locator('input[name="content"]').fill('Second message');
     await modal.getByRole('button', { name: /save/i }).click();
 
     // Modal should stay open due to duplicate error

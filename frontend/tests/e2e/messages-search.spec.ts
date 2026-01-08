@@ -18,9 +18,9 @@ test.describe('Messages Search and Filter', () => {
       const modal = page.locator('[role="dialog"]');
       await expect(modal).toBeVisible();
 
-      await modal.locator('input[name="code"]').fill(msg.code);
-      await modal.locator('input[name="content"]').fill(msg.content);
-      await modal.getByRole('button', { name: /save/i }).click();
+      await page.locator('input[name="code"]').fill(msg.code);
+      await page.locator('input[name="content"]').fill(msg.content);
+      await page.getByRole('button', { name: /save/i }).click();
       await expect(modal).not.toBeVisible({ timeout: 15000 });
       await page.waitForTimeout(2000);
     }

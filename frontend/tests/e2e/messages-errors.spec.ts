@@ -14,10 +14,10 @@ test.describe('Messages Error Handling', () => {
     await expect(modal).toBeVisible();
 
     // Fill only content, leave code empty
-    await modal.locator('input[name="content"]').fill('Test content');
+    await page.locator('input[name="content"]').fill('Test content');
 
     // Try to submit
-    await modal.getByRole('button', { name: /save/i }).click();
+    await page.getByRole('button', { name: /save/i }).click();
 
     // Modal should stay open due to validation error
     await expect(modal).toBeVisible();
@@ -30,7 +30,7 @@ test.describe('Messages Error Handling', () => {
     await expect(modal).toBeVisible();
 
     // Fill only code, leave content empty
-    await modal.locator('input[name="code"]').fill(`TEST_${Date.now()}`);
+    await page.locator('input[name="code"]').fill(`TEST_${Date.now()}`);
 
     // Try to submit
     await modal.getByRole('button', { name: /save/i }).click();
@@ -47,8 +47,8 @@ test.describe('Messages Error Handling', () => {
 
     // Fill with code that's too long (max is 50 characters)
     const longCode = 'A'.repeat(51);
-    await modal.locator('input[name="code"]').fill(longCode);
-    await modal.locator('input[name="content"]').fill('Test content');
+    await page.locator('input[name="code"]').fill(longCode);
+    await page.locator('input[name="content"]').fill('Test content');
 
     // Try to submit
     await modal.getByRole('button', { name: /save/i }).click();
@@ -65,8 +65,8 @@ test.describe('Messages Error Handling', () => {
 
     // Fill with content that's too long (max is 255 characters based on OpenAPI spec)
     const longContent = 'A'.repeat(256);
-    await modal.locator('input[name="code"]').fill(`TEST_${Date.now()}`);
-    await modal.locator('input[name="content"]').fill(longContent);
+    await page.locator('input[name="code"]').fill(`TEST_${Date.now()}`);
+    await page.locator('input[name="content"]').fill(longContent);
 
     // Try to submit
     await modal.getByRole('button', { name: /save/i }).click();
@@ -88,8 +88,8 @@ test.describe('Messages Error Handling', () => {
     const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
 
-    await modal.locator('input[name="code"]').fill(code);
-    await modal.locator('input[name="content"]').fill('Test content');
+    await page.locator('input[name="code"]').fill(code);
+    await page.locator('input[name="content"]').fill('Test content');
     await modal.getByRole('button', { name: /save/i }).click();
     await expect(modal).not.toBeVisible({ timeout: 15000 });
 
@@ -121,8 +121,8 @@ test.describe('Messages Error Handling', () => {
     await expect(modal).toBeVisible();
 
     // Fill in data
-    await modal.locator('input[name="code"]').fill(`CANCEL_${Date.now()}`);
-    await modal.locator('input[name="content"]').fill('This should not be saved');
+    await page.locator('input[name="code"]').fill(`CANCEL_${Date.now()}`);
+    await page.locator('input[name="content"]').fill('This should not be saved');
 
     // Click cancel - use first() to avoid strict mode violation
     const cancelButton = modal.getByRole('button', { name: /cancel/i });
@@ -146,8 +146,8 @@ test.describe('Messages Error Handling', () => {
     const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
 
-    await modal.locator('input[name="code"]').fill(`OFFLINE_${Date.now()}`);
-    await modal.locator('input[name="content"]').fill('Test content');
+    await page.locator('input[name="code"]').fill(`OFFLINE_${Date.now()}`);
+    await page.locator('input[name="content"]').fill('Test content');
     await modal.getByRole('button', { name: /save/i }).click();
 
     // Wait for error to potentially appear
@@ -168,8 +168,8 @@ test.describe('Messages Error Handling', () => {
 
     // Try to use invalid characters in code (based on OpenAPI pattern: ^[a-zA-Z0-9_-]+$)
     const invalidCode = `INVALID CODE WITH SPACES!@#`;
-    await modal.locator('input[name="code"]').fill(invalidCode);
-    await modal.locator('input[name="content"]').fill('Test content');
+    await page.locator('input[name="code"]').fill(invalidCode);
+    await page.locator('input[name="content"]').fill('Test content');
 
     // Try to submit
     await modal.getByRole('button', { name: /save/i }).click();
