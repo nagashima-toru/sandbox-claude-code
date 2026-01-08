@@ -14,20 +14,15 @@ test.describe('Messages Search and Filter', () => {
     ];
 
     for (const msg of testMessages) {
-      await page.getByRole('button', { name: /new message|create|add/i }).click();
-      const modal = page
-        .locator('[role="dialog"]')
-        .or(page.locator('[data-testid="message-modal"]'));
+      await page.getByRole('button', { name: /new message/i }).click();
+      const modal = page.locator('[role="dialog"]');
       await expect(modal).toBeVisible();
 
-      await page.fill('input[name="code"], input[placeholder*="code" i]', msg.code);
-      await page.fill(
-        'input[name="content"], textarea[name="content"], input[placeholder*="content" i]',
-        msg.content
-      );
-      await page.getByRole('button', { name: /save|submit|create/i }).click();
-      await expect(modal).not.toBeVisible({ timeout: 10000 });
-      await page.waitForTimeout(500);
+      await modal.locator('input[name="code"]').fill(msg.code);
+      await modal.locator('input[name="content"]').fill(msg.content);
+      await modal.getByRole('button', { name: /save/i }).click();
+      await expect(modal).not.toBeVisible({ timeout: 15000 });
+      await page.waitForTimeout(2000);
     }
 
     // Reload to ensure all messages are loaded
