@@ -43,7 +43,10 @@ AXIOS_INSTANCE.interceptors.response.use(
   (response) => {
     // Log response in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, response.status);
+      console.log(
+        `[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`,
+        response.status
+      );
     }
     return response;
   },
@@ -93,7 +96,10 @@ AXIOS_INSTANCE.interceptors.response.use(
  * Custom instance for Orval
  * This function is used as the mutator in orval.config.ts
  */
-export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosRequestConfig): Promise<T> => {
+export const customInstance = <T>(
+  config: AxiosRequestConfig,
+  options?: AxiosRequestConfig
+): Promise<T> => {
   const source = axios.CancelToken.source();
 
   const promise = AXIOS_INSTANCE({
@@ -102,7 +108,7 @@ export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosReq
     cancelToken: source.token,
   }).then(({ data }) => data);
 
-  // @ts-ignore
+  // @ts-expect-error - cancel method is dynamically added for React Query compatibility
   promise.cancel = () => {
     source.cancel('Query was cancelled');
   };

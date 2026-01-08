@@ -84,11 +84,7 @@ export default function MessageForm({
             <FormItem>
               <FormLabel>Code</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Enter message code"
-                  {...field}
-                  disabled={isSubmitting}
-                />
+                <Input placeholder="Enter message code" {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,12 +111,7 @@ export default function MessageForm({
         />
 
         <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>

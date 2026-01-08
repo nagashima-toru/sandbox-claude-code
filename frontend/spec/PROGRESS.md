@@ -13,16 +13,19 @@
 ### 完了したタスク
 
 #### 1.1 Node.js 20+ のインストール確認 ✅
+
 - 確認コマンド: `node --version`
 - インストール済みバージョン: **v24.12.0**
 - 状態: ✅ 要件を満たしている (20+)
 
 #### 1.2 pnpm のインストール ✅
+
 - インストールコマンド: `npm install -g pnpm`
 - インストール済みバージョン: **v10.27.0**
 - 状態: ✅ 正常にインストール完了
 
 #### 1.3 依存関係のインストール ✅
+
 - 実行コマンド: `pnpm install`
 - インストールされたパッケージ数: **693 パッケージ**
 - 問題: `tailwind-merge` のバージョン不一致
@@ -31,39 +34,40 @@
 
 **インストールされた主要パッケージ:**
 
-| カテゴリ | パッケージ | バージョン |
-|---------|-----------|-----------|
-| Framework | next | 15.5.9 |
-| | react | 19.2.3 |
-| | react-dom | 19.2.3 |
-| State Management | @tanstack/react-query | 5.90.16 |
-| Forms | react-hook-form | 7.70.0 |
-| | zod | 3.25.76 |
-| | @hookform/resolvers | 3.10.0 |
-| HTTP Client | axios | 1.13.2 |
-| Styling | tailwindcss | 3.4.19 |
-| | tailwind-merge | 3.4.0 |
-| | clsx | 2.1.1 |
-| | class-variance-authority | 0.7.1 |
-| Icons | lucide-react | 0.468.0 |
-| Code Generation | orval | 7.17.2 |
-| TypeScript | typescript | 5.9.3 |
-| | @types/node | 22.19.3 |
-| | @types/react | 19.2.7 |
-| | @types/react-dom | 19.2.3 |
-| Testing | vitest | 2.1.9 |
-| | @testing-library/react | 16.3.1 |
-| | @testing-library/jest-dom | 6.9.1 |
-| | @playwright/test | 1.57.0 |
-| | msw | 2.12.7 |
-| Build Tools | @vitejs/plugin-react | 4.7.0 |
-| | postcss | 8.5.6 |
-| | autoprefixer | 10.4.23 |
-| Linting | eslint | 9.39.2 |
-| | eslint-config-next | 15.5.9 |
-| | prettier | 3.7.4 |
+| カテゴリ         | パッケージ                | バージョン |
+| ---------------- | ------------------------- | ---------- |
+| Framework        | next                      | 15.5.9     |
+|                  | react                     | 19.2.3     |
+|                  | react-dom                 | 19.2.3     |
+| State Management | @tanstack/react-query     | 5.90.16    |
+| Forms            | react-hook-form           | 7.70.0     |
+|                  | zod                       | 3.25.76    |
+|                  | @hookform/resolvers       | 3.10.0     |
+| HTTP Client      | axios                     | 1.13.2     |
+| Styling          | tailwindcss               | 3.4.19     |
+|                  | tailwind-merge            | 3.4.0      |
+|                  | clsx                      | 2.1.1      |
+|                  | class-variance-authority  | 0.7.1      |
+| Icons            | lucide-react              | 0.468.0    |
+| Code Generation  | orval                     | 7.17.2     |
+| TypeScript       | typescript                | 5.9.3      |
+|                  | @types/node               | 22.19.3    |
+|                  | @types/react              | 19.2.7     |
+|                  | @types/react-dom          | 19.2.3     |
+| Testing          | vitest                    | 2.1.9      |
+|                  | @testing-library/react    | 16.3.1     |
+|                  | @testing-library/jest-dom | 6.9.1      |
+|                  | @playwright/test          | 1.57.0     |
+|                  | msw                       | 2.12.7     |
+| Build Tools      | @vitejs/plugin-react      | 4.7.0      |
+|                  | postcss                   | 8.5.6      |
+|                  | autoprefixer              | 10.4.23    |
+| Linting          | eslint                    | 9.39.2     |
+|                  | eslint-config-next        | 15.5.9     |
+|                  | prettier                  | 3.7.4      |
 
 #### 1.4 環境変数ファイルの作成 ✅
+
 - 実行コマンド: `cp .env.local.example .env.local`
 - 作成ファイル: `frontend/.env.local`
 - 設定内容:
@@ -74,6 +78,7 @@
 - 状態: ✅ 正常に作成
 
 #### 1.5 バックエンド API の起動確認 ✅
+
 - 確認内容: OpenAPI 仕様ファイルの存在確認
 - ファイルパス: `backend/src/main/resources/api/openapi.yaml`
 - ファイルサイズ: 4.7KB
@@ -82,6 +87,7 @@
 - 備考: バックエンド API は起動していないが、Phase 2 に進むために必要なファイルは存在
 
 #### 1.6 OpenAPI 仕様の生成 ✅
+
 - 状態: ✅ 既に存在しているため、追加作業不要
 
 ### Phase 1 のまとめ
@@ -100,6 +106,7 @@
 ### 完了したタスク
 
 #### 2.1 Orval 設定の確認 ✅
+
 - 設定ファイル: `orval.config.ts`
 - 確認内容:
   - ✅ OpenAPI 入力パス: `../backend/src/main/resources/api/openapi.yaml`
@@ -114,11 +121,13 @@
 - 状態: ✅ 設定確認完了
 
 #### 2.2 API クライアントの生成 ✅
+
 - 実行コマンド: `pnpm generate:api`
 - 出力メッセージ: `🎉 api - Your OpenAPI spec has been converted into ready to use orval!`
 - 生成されたファイル:
 
 **ディレクトリ構造:**
+
 ```
 src/lib/api/generated/
 ├── message/
@@ -131,6 +140,7 @@ src/lib/api/generated/
 ```
 
 **生成された API 関数:**
+
 - `getMessageById(id)` - ID でメッセージ取得
 - `getAllMessages()` - 全メッセージ取得
 - `createMessage(data)` - メッセージ作成
@@ -138,6 +148,7 @@ src/lib/api/generated/
 - `deleteMessage(id)` - メッセージ削除
 
 **生成された React Query Hooks:**
+
 - `useGetMessageById(id)` - ID でメッセージ取得
 - `useGetAllMessages()` - 全メッセージ取得
 - `useCreateMessage()` - メッセージ作成
@@ -145,12 +156,14 @@ src/lib/api/generated/
 - `useDeleteMessage()` - メッセージ削除
 
 **生成された型定義:**
+
 - `MessageRequest` - リクエストボディ型
 - `MessageResponse` - レスポンスボディ型
 
 - 状態: ✅ API クライアント生成成功
 
 #### 2.3 axios インスタンスの動作確認 ✅
+
 - 確認ファイル: `src/lib/api/client.ts`
 - 確認内容:
   - ✅ axios インスタンス作成
@@ -162,6 +175,7 @@ src/lib/api/generated/
 - 状態: ✅ 正常に動作することを確認
 
 #### 2.4 Query Client Provider の作成 ✅
+
 - 作成ファイル: `src/lib/query-client.ts`
 - 実装内容:
   - ✅ `makeQueryClient()` 関数
@@ -182,6 +196,7 @@ src/lib/api/generated/
 - 状態: ✅ 作成完了
 
 #### 2.5 Root Layout への Provider 追加 ✅
+
 - 作成ファイル: `src/app/layout.tsx`
 - 実装内容:
   - ✅ メタデータ設定（title, description）
@@ -206,12 +221,13 @@ src/lib/api/generated/
 
 ### 追加インストールパッケージ
 
-| パッケージ | バージョン | 用途 |
-|-----------|-----------|------|
-| @tanstack/react-query-devtools | 5.91.2 | React Query 開発ツール |
-| @faker-js/faker | 10.2.0 | MSW モック用フェイクデータ |
+| パッケージ                     | バージョン | 用途                       |
+| ------------------------------ | ---------- | -------------------------- |
+| @tanstack/react-query-devtools | 5.91.2     | React Query 開発ツール     |
+| @faker-js/faker                | 10.2.0     | MSW モック用フェイクデータ |
 
 **インストール理由:**
+
 - `@tanstack/react-query-devtools`: 開発中のクエリ状態を可視化するため
 - `@faker-js/faker`: Orval が生成した MSW ハンドラーで必要
 
@@ -232,9 +248,11 @@ src/lib/api/generated/
 ## 作成されたファイル一覧
 
 ### Phase 1
+
 1. `frontend/.env.local` - 環境変数（Git 管理外）
 
 ### Phase 2
+
 1. `frontend/src/lib/query-client.ts` - QueryClient 設定
 2. `frontend/src/app/providers.tsx` - QueryClientProvider コンポーネント
 3. `frontend/src/app/layout.tsx` - Root Layout
@@ -243,6 +261,7 @@ src/lib/api/generated/
 6. `frontend/src/lib/api/generated/**/*.ts` - Orval 生成ファイル（自動生成）
 
 ### Phase 3
+
 1. `frontend/components.json` - shadcn/ui 設定ファイル
 2. `frontend/src/lib/utils.ts` - ユーティリティ関数（cn 関数）
 3. `frontend/src/components/ui/button.tsx` - ボタンコンポーネント（shadcn/ui）
@@ -258,6 +277,7 @@ src/lib/api/generated/
 13. `frontend/src/components/common/PageHeader.tsx` - ページヘッダーコンポーネント
 
 ### Phase 4
+
 1. `frontend/src/lib/validations/message.ts` - Zod バリデーションスキーマ
 2. `frontend/src/components/messages/MessageTable.tsx` - メッセージ一覧テーブル
 3. `frontend/src/components/messages/MessageForm.tsx` - メッセージフォーム（作成・編集）
@@ -266,6 +286,7 @@ src/lib/api/generated/
 6. `backend/src/main/java/com/sandbox/api/config/WebConfig.java` - CORS 設定
 
 ### 修正されたファイル
+
 1. `frontend/package.json` - tailwind-merge バージョン修正 (^2.7.0 → ^3.4.0)
 2. `frontend/src/app/page.tsx` - CRUD 機能統合（Phase 4）
 3. `frontend/src/lib/api/client.ts` - ベースURL 修正（Phase 4）
@@ -278,6 +299,7 @@ src/lib/api/generated/
 ### 問題 1: tailwind-merge バージョン不一致
 
 **問題:**
+
 ```
 ERR_PNPM_NO_MATCHING_VERSION  No matching version found for tailwind-merge@^2.7.0
 The latest release of tailwind-merge is "3.4.0".
@@ -288,6 +310,7 @@ The latest release of tailwind-merge is "3.4.0".
 
 **解決方法:**
 `package.json` の該当行を修正
+
 ```json
 "tailwind-merge": "^3.4.0"
 ```
@@ -297,6 +320,7 @@ The latest release of tailwind-merge is "3.4.0".
 ### 問題 2: @faker-js/faker が見つからない
 
 **問題:**
+
 ```
 error TS2307: Cannot find module '@faker-js/faker' or its corresponding type declarations.
 ```
@@ -305,6 +329,7 @@ error TS2307: Cannot find module '@faker-js/faker' or its corresponding type dec
 Orval が生成した MSW ハンドラー (`message.msw.ts`) が `@faker-js/faker` を使用しているが、インストールされていない
 
 **解決方法:**
+
 ```bash
 pnpm add -D @faker-js/faker
 ```
@@ -321,6 +346,7 @@ pnpm add -D @faker-js/faker
 ### 完了したタスク
 
 #### 3.1 グローバルスタイルの設定 ✅
+
 - 作成ファイル: `src/app/globals.css`
 - 実装内容:
   - ✅ Tailwind CSS ディレクティブ (`@tailwind base/components/utilities`)
@@ -331,6 +357,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ Phase 2 で作成済み
 
 #### 3.2 Root Layout の実装 ✅
+
 - 作成ファイル: `src/app/layout.tsx`
 - 実装内容:
   - ✅ メタデータ設定（title: "Message Management", description）
@@ -340,6 +367,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ Phase 2 で作成済み
 
 #### 3.3 shadcn/ui の初期化 ✅
+
 - 作成ファイル: `components.json`
 - 実装内容:
   - ✅ スタイル: Default
@@ -353,6 +381,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 初期化完了
 
 #### 3.4 必要なコンポーネントの追加 ✅
+
 - 実行コマンド: `npx shadcn@latest add button table dialog form input label card badge --yes`
 - 追加されたコンポーネント:
   - ✅ `src/components/ui/button.tsx` - ボタンコンポーネント
@@ -367,8 +396,10 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 8 つのコンポーネント追加完了
 
 #### 3.5 ユーティリティ関数の作成 ✅
+
 - 作成ファイル: `src/lib/utils.ts`
 - 実装内容:
+
   ```typescript
   import { clsx, type ClassValue } from 'clsx';
   import { twMerge } from 'tailwind-merge';
@@ -377,10 +408,12 @@ pnpm add -D @faker-js/faker
     return twMerge(clsx(inputs));
   }
   ```
+
 - 機能: Tailwind CSS クラス名の条件付き結合とマージ
 - 状態: ✅ 作成完了
 
 #### 3.6 Loading コンポーネント作成 ✅
+
 - 作成ファイル: `src/components/common/Loading.tsx`
 - 実装内容:
   - ✅ lucide-react の `Loader2` アイコンを使用
@@ -396,6 +429,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 作成完了
 
 #### 3.7 ErrorMessage コンポーネント作成 ✅
+
 - 作成ファイル: `src/components/common/ErrorMessage.tsx`
 - 実装内容:
   - ✅ lucide-react の `AlertCircle` アイコンを使用
@@ -413,6 +447,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 作成完了
 
 #### 3.8 PageHeader コンポーネント作成 ✅
+
 - 作成ファイル: `src/components/common/PageHeader.tsx`
 - 実装内容:
   - ✅ ページタイトル表示
@@ -461,6 +496,7 @@ pnpm add -D @faker-js/faker
 ### 完了したタスク
 
 #### 4.1 Zod バリデーションスキーマの作成 ✅
+
 - 作成ファイル: `src/lib/validations/message.ts`
 - 実装内容:
   - ✅ `messageSchema` の定義
@@ -470,6 +506,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 作成完了
 
 #### 4.2-4.4 メッセージ一覧画面（基本） ✅
+
 - 作成ファイル: `src/components/messages/MessageTable.tsx`
 - 実装内容:
   - ✅ `useGetAllMessages` フックでデータ取得
@@ -490,6 +527,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 更新完了
 
 #### 4.5-4.9 メッセージ作成機能 ✅
+
 - 作成ファイル: `src/components/messages/MessageForm.tsx`
 - 実装内容:
   - ✅ React Hook Form のセットアップ
@@ -522,6 +560,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 更新完了
 
 #### 4.10-4.13 メッセージ編集機能 ✅
+
 - 更新ファイル: `src/components/messages/MessageTable.tsx`
 - 実装内容:
   - ✅ 編集ボタンに `onEdit` コールバック接続
@@ -539,6 +578,7 @@ pnpm add -D @faker-js/faker
 - 状態: ✅ 更新完了
 
 #### 4.14-4.17 メッセージ削除機能 ✅
+
 - 作成ファイル: `src/components/messages/DeleteConfirmDialog.tsx`
 - 実装内容:
   - ✅ shadcn/ui Dialog コンポーネント使用
@@ -561,15 +601,16 @@ pnpm add -D @faker-js/faker
 
 ### 追加インストールパッケージ
 
-| パッケージ | バージョン | 用途 |
-|-----------|-----------|------|
-| tailwindcss-animate | 1.0.7 | shadcn/ui アニメーション用 |
+| パッケージ          | バージョン | 用途                       |
+| ------------------- | ---------- | -------------------------- |
+| tailwindcss-animate | 1.0.7      | shadcn/ui アニメーション用 |
 
 ### トラブルシューティング
 
 #### 問題 1: tailwindcss-animate が見つからない
 
 **問題:**
+
 ```
 Error: Cannot find module 'tailwindcss-animate'
 ```
@@ -578,6 +619,7 @@ Error: Cannot find module 'tailwindcss-animate'
 shadcn/ui が依存する `tailwindcss-animate` がインストールされていない
 
 **解決方法:**
+
 ```bash
 pnpm add -D tailwindcss-animate
 ```
@@ -587,6 +629,7 @@ pnpm add -D tailwindcss-animate
 #### 問題 2: CORS エラー
 
 **問題:**
+
 ```
 [API Error] No response received "Network Error"
 ```
@@ -596,6 +639,7 @@ pnpm add -D tailwindcss-animate
 
 **解決方法:**
 バックエンドに CORS 設定を追加
+
 - 作成ファイル: `backend/src/main/java/com/sandbox/api/config/WebConfig.java`
 - 実装内容:
   ```java
@@ -618,16 +662,19 @@ pnpm add -D tailwindcss-animate
 #### 問題 3: 404 Not Found エラー
 
 **問題:**
+
 ```
 [API Error] Not Found
 ```
 
 **原因:**
 ベースURL の二重設定により、実際のリクエストURL が `http://localhost:8080/api/api/messages` になっていた
+
 - `baseURL: http://localhost:8080/api` + `/api/messages` = `/api/api/messages` ❌
 
 **解決方法:**
 ベースURL から `/api` を削除
+
 - 修正ファイル: `src/lib/api/client.ts`
   ```typescript
   // Before: baseURL: 'http://localhost:8080/api'
@@ -675,16 +722,16 @@ pnpm add -D tailwindcss-animate
 
 ## 進捗サマリー
 
-| Phase | 状態 | 完了タスク | 全タスク | 進捗率 |
-|-------|------|-----------|---------|--------|
-| Phase 1 | ✅ 完了 | 6 | 6 | 100% |
-| Phase 2 | ✅ 完了 | 5 | 5 | 100% |
-| Phase 3 | ✅ 完了 | 8 | 8 | 100% |
-| Phase 4 | ✅ 完了 | 17 | 17 | 100% |
-| Phase 5 | ⏸️ 未着手 | 0 | 17 | 0% |
-| Phase 6 | ⏸️ 未着手 | 0 | 9 | 0% |
-| Phase 7 | ⏸️ 未着手 | 0 | 10 | 0% |
-| **合計** | **🚧 進行中** | **36** | **72** | **50.0%** |
+| Phase    | 状態          | 完了タスク | 全タスク | 進捗率    |
+| -------- | ------------- | ---------- | -------- | --------- |
+| Phase 1  | ✅ 完了       | 6          | 6        | 100%      |
+| Phase 2  | ✅ 完了       | 5          | 5        | 100%      |
+| Phase 3  | ✅ 完了       | 8          | 8        | 100%      |
+| Phase 4  | ✅ 完了       | 17         | 17       | 100%      |
+| Phase 5  | ⏸️ 未着手     | 0          | 17       | 0%        |
+| Phase 6  | ⏸️ 未着手     | 0          | 9        | 0%        |
+| Phase 7  | ⏸️ 未着手     | 0          | 10       | 0%        |
+| **合計** | **🚧 進行中** | **36**     | **72**   | **50.0%** |
 
 ---
 

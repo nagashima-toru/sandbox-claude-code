@@ -161,6 +161,7 @@ frontend/
 This project uses **Orval** to automatically generate TypeScript API client code and React Query hooks from the backend's OpenAPI specification.
 
 **Benefits**:
+
 - Type-safe API calls with zero manual typing
 - Automatic React Query hooks generation
 - Synced with backend API changes
@@ -273,29 +274,49 @@ export const getMessageById = (id: number, options?: AxiosRequestConfig) =>
   customInstance<MessageResponse>({ url: `/messages/${id}`, method: 'GET', ...options });
 
 export const createMessage = (messageRequest: MessageRequest, options?: AxiosRequestConfig) =>
-  customInstance<MessageResponse>({ url: '/messages', method: 'POST', data: messageRequest, ...options });
+  customInstance<MessageResponse>({
+    url: '/messages',
+    method: 'POST',
+    data: messageRequest,
+    ...options,
+  });
 
-export const updateMessage = (id: number, messageRequest: MessageRequest, options?: AxiosRequestConfig) =>
-  customInstance<MessageResponse>({ url: `/messages/${id}`, method: 'PUT', data: messageRequest, ...options });
+export const updateMessage = (
+  id: number,
+  messageRequest: MessageRequest,
+  options?: AxiosRequestConfig
+) =>
+  customInstance<MessageResponse>({
+    url: `/messages/${id}`,
+    method: 'PUT',
+    data: messageRequest,
+    ...options,
+  });
 
 export const deleteMessage = (id: number, options?: AxiosRequestConfig) =>
   customInstance<void>({ url: `/messages/${id}`, method: 'DELETE', ...options });
 
 // React Query hooks (auto-generated)
-export const useGetAllMessages = <TData = MessageResponse[]>(options?: UseQueryOptions<MessageResponse[], Error, TData>) =>
-  useQuery(['getAllMessages'], () => getAllMessages(), options);
+export const useGetAllMessages = <TData = MessageResponse[]>(
+  options?: UseQueryOptions<MessageResponse[], Error, TData>
+) => useQuery(['getAllMessages'], () => getAllMessages(), options);
 
-export const useGetMessageById = <TData = MessageResponse>(id: number, options?: UseQueryOptions<MessageResponse, Error, TData>) =>
-  useQuery(['getMessageById', id], () => getMessageById(id), options);
+export const useGetMessageById = <TData = MessageResponse>(
+  id: number,
+  options?: UseQueryOptions<MessageResponse, Error, TData>
+) => useQuery(['getMessageById', id], () => getMessageById(id), options);
 
-export const useCreateMessage = <TError = Error>(options?: UseMutationOptions<MessageResponse, TError, { data: MessageRequest }>) =>
-  useMutation((params) => createMessage(params.data), options);
+export const useCreateMessage = <TError = Error>(
+  options?: UseMutationOptions<MessageResponse, TError, { data: MessageRequest }>
+) => useMutation((params) => createMessage(params.data), options);
 
-export const useUpdateMessage = <TError = Error>(options?: UseMutationOptions<MessageResponse, TError, { id: number; data: MessageRequest }>) =>
-  useMutation((params) => updateMessage(params.id, params.data), options);
+export const useUpdateMessage = <TError = Error>(
+  options?: UseMutationOptions<MessageResponse, TError, { id: number; data: MessageRequest }>
+) => useMutation((params) => updateMessage(params.id, params.data), options);
 
-export const useDeleteMessage = <TError = Error>(options?: UseMutationOptions<void, TError, { id: number }>) =>
-  useMutation((params) => deleteMessage(params.id), options);
+export const useDeleteMessage = <TError = Error>(
+  options?: UseMutationOptions<void, TError, { id: number }>
+) => useMutation((params) => deleteMessage(params.id), options);
 ```
 
 ### Usage in Components
@@ -344,10 +365,9 @@ export function MessageTable() {
 import { z } from 'zod';
 
 export const messageSchema = z.object({
-  code: z.string()
-    .min(1, 'Code is required')
-    .max(50, 'Code must be 50 characters or less'),
-  content: z.string()
+  code: z.string().min(1, 'Code is required').max(50, 'Code must be 50 characters or less'),
+  content: z
+    .string()
     .min(1, 'Content is required')
     .max(500, 'Content must be 500 characters or less'),
 });
@@ -456,12 +476,14 @@ export type MessageFormData = z.infer<typeof messageSchema>;
 ### After Backend API Changes
 
 1. **Backend**: Regenerate OpenAPI spec
+
    ```bash
    cd backend
    ./mvnw verify
    ```
 
 2. **Frontend**: Regenerate API client
+
    ```bash
    cd frontend
    pnpm generate:api

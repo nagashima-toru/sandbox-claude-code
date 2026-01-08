@@ -114,10 +114,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
 
   if (error) {
     return (
-      <ErrorMessage
-        message="Failed to load messages. Please try again later."
-        variant="card"
-      />
+      <ErrorMessage message="Failed to load messages. Please try again later." variant="card" />
     );
   }
 
