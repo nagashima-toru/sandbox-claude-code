@@ -1,5 +1,9 @@
 # Frontend - Message Management Application
 
+[![Frontend CI](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/frontend-ci.yml)
+[![Coverage: Statements](https://img.shields.io/badge/Coverage-Statements%20%E2%89%A5%2080%25-brightgreen)](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/frontend-ci.yml)
+[![Coverage: Branches](https://img.shields.io/badge/Coverage-Branches%20%E2%89%A5%2070%25-brightgreen)](https://github.com/nagashima-toru/sandbox-claude-code/actions/workflows/frontend-ci.yml)
+
 Next.js-based message management application with full CRUD functionality.
 
 ## Quick Start
