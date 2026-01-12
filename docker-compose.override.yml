@@ -1,0 +1,34 @@
+# Development overrides for docker-compose.yml
+# This file is automatically used when running `docker-compose up`
+# It enables hot-reload and debugging features for local development
+
+services:
+  backend:
+    environment:
+      # Spring Boot DevTools configuration
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+    volumes:
+      # Mount source code for hot reload (optional - rebuild required for code changes)
+      - ./backend/src:/app/src:ro
+    command: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "app.jar"]
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # Debug port
+
+  frontend:
+    build:
+      target: development
+    environment:
+      # Development mode
+      NODE_ENV: development
+      # Enable hot reload
+      WATCHPACK_POLLING: "true"
+    volumes:
+      # Mount source code for hot reload
+      - ./frontend/src:/app/src:ro
+      - ./frontend/public:/app/public:ro
+      - ./frontend/next.config.js:/app/next.config.js:ro
+      - ./frontend/tailwind.config.ts:/app/tailwind.config.ts:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+    command: ["pnpm", "dev"]
