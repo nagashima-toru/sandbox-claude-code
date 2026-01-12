@@ -1,10 +1,17 @@
 import { test, expect } from '@playwright/test';
+import {
+  waitForFrontend,
+  createMessage,
+  getSearchInput,
+  performSearch,
+  clearSearch,
+} from './helpers';
 
 test.describe('Messages Search and Filter', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the messages page
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await waitForFrontend(page);
 
     // Create test messages for searching
     const testMessages = [
@@ -14,34 +21,17 @@ test.describe('Messages Search and Filter', () => {
     ];
 
     for (const msg of testMessages) {
-      await page.getByRole('button', { name: /new message/i }).click();
-      const modal = page.locator('[role="dialog"]');
-      await expect(modal).toBeVisible();
-
-      await page.locator('input[name="code"]').fill(msg.code);
-      await page.locator('input[name="content"]').fill(msg.content);
-      await page.getByRole('button', { name: /save/i }).click();
-      await expect(modal).not.toBeVisible({ timeout: 15000 });
-      await page.waitForTimeout(2000);
+      await createMessage(page, msg.code, msg.content);
     }
 
     // Reload to ensure all messages are loaded
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await waitForFrontend(page);
   });
 
   test('should search messages by code', async ({ page }) => {
-    // Find the search input
-    const searchInput = page.locator(
-      'input[type="search"], input[placeholder*="search" i], input[name="search"]'
-    );
-    await expect(searchInput).toBeVisible();
-
-    // Search for "SEARCH_TEST_1"
-    await searchInput.fill('SEARCH_TEST_1');
-
-    // Wait for search to complete (debounced)
-    await page.waitForTimeout(500);
+    // Perform search using helper
+    await performSearch(page, 'SEARCH_TEST_1');
 
     // Verify only matching messages are visible
     await expect(page.locator('text=/SEARCH_TEST_1/i')).toBeVisible();
@@ -50,17 +40,8 @@ test.describe('Messages Search and Filter', () => {
   });
 
   test('should search messages by content', async ({ page }) => {
-    // Find the search input
-    const searchInput = page.locator(
-      'input[type="search"], input[placeholder*="search" i], input[name="search"]'
-    );
-    await expect(searchInput).toBeVisible();
-
-    // Search for "Apple"
-    await searchInput.fill('Apple');
-
-    // Wait for search to complete (debounced)
-    await page.waitForTimeout(500);
+    // Perform search using helper
+    await performSearch(page, 'Apple');
 
     // Verify only matching messages are visible
     await expect(page.locator('text=/Apple/i')).toBeVisible();
@@ -69,22 +50,14 @@ test.describe('Messages Search and Filter', () => {
   });
 
   test('should show all messages when search is cleared', async ({ page }) => {
-    // Find the search input
-    const searchInput = page.locator(
-      'input[type="search"], input[placeholder*="search" i], input[name="search"]'
-    );
-    await expect(searchInput).toBeVisible();
-
     // Perform a search
-    await searchInput.fill('SEARCH_TEST_1');
-    await page.waitForTimeout(500);
+    await performSearch(page, 'SEARCH_TEST_1');
 
     // Verify filtered results
     await expect(page.locator('text=/SEARCH_TEST_1/i')).toBeVisible();
 
     // Clear the search
-    await searchInput.clear();
-    await page.waitForTimeout(500);
+    await clearSearch(page);
 
     // Verify all test messages are visible again
     await expect(page.locator('text=/SEARCH_TEST_1/i')).toBeVisible();
@@ -93,15 +66,8 @@ test.describe('Messages Search and Filter', () => {
   });
 
   test('should show no results message for non-existent search', async ({ page }) => {
-    // Find the search input
-    const searchInput = page.locator(
-      'input[type="search"], input[placeholder*="search" i], input[name="search"]'
-    );
-    await expect(searchInput).toBeVisible();
-
     // Search for non-existent message
-    await searchInput.fill('NONEXISTENT_MESSAGE_12345');
-    await page.waitForTimeout(500);
+    await performSearch(page, 'NONEXISTENT_MESSAGE_12345');
 
     // Verify no test messages are visible
     await expect(page.locator('text=/SEARCH_TEST/i')).not.toBeVisible();
@@ -112,33 +78,22 @@ test.describe('Messages Search and Filter', () => {
   });
 
   test('should handle case-insensitive search', async ({ page }) => {
-    // Find the search input
-    const searchInput = page.locator(
-      'input[type="search"], input[placeholder*="search" i], input[name="search"]'
-    );
-    await expect(searchInput).toBeVisible();
-
     // Search with lowercase
-    await searchInput.fill('apple');
-    await page.waitForTimeout(500);
+    await performSearch(page, 'apple');
 
     // Verify the message with "Apple" (capitalized) is still found
     await expect(page.locator('text=/Apple/i')).toBeVisible();
   });
 
   test('should debounce search input', async ({ page }) => {
-    // Find the search input
-    const searchInput = page.locator(
-      'input[type="search"], input[placeholder*="search" i], input[name="search"]'
-    );
-    await expect(searchInput).toBeVisible();
+    // Get search input
+    const searchInput = await getSearchInput(page);
 
     // Type rapidly without waiting
     await searchInput.pressSequentially('SEARCH_TEST_1', { delay: 50 });
 
-    // Immediately check that results may not be filtered yet (debounce in action)
-    // Then wait for debounce to complete
-    await page.waitForTimeout(500);
+    // Wait for debounce to complete
+    await page.waitForTimeout(600);
 
     // Verify results are now filtered
     await expect(page.locator('text=/SEARCH_TEST_1/i')).toBeVisible();

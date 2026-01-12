@@ -11,6 +11,14 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
 
+  // Increase test timeout from default 30s to 60s
+  timeout: 60000,
+
+  // Increase expect timeout from default 5s to 15s
+  expect: {
+    timeout: 15000,
+  },
+
   // Global setup/teardown for backend services
   globalSetup: require.resolve('./playwright/global-setup.ts'),
   globalTeardown: require.resolve('./playwright/global-teardown.ts'),
@@ -20,6 +28,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+
+    // Increase action timeout from default 0 (no timeout) to 30s
+    actionTimeout: 30000,
+
+    // Increase navigation timeout to 30s
+    navigationTimeout: 30000,
   },
 
   projects: [

@@ -1,53 +1,48 @@
 import { test, expect } from '@playwright/test';
+import {
+  waitForFrontend,
+  waitForModal,
+  fillFormField,
+  fillMessageForm,
+  openCreateModal,
+  saveModalForm,
+  waitForModalToClose,
+  createMessage,
+  editMessage,
+  deleteMessage,
+} from './helpers';
 
 test.describe('Messages CRUD Operations', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the messages page
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await waitForFrontend(page);
   });
 
   test('should display messages list', async ({ page }) => {
-    // Wait for the page to load
-    await expect(page).toHaveTitle(/Message Management/i);
-
     // Check if the page header is visible
     await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
   });
 
   test('should create a new message', async ({ page }) => {
-    // Click the "New Message" button
-    const newButton = page.getByRole('button', { name: /new message/i });
-    await newButton.click();
-
-    // Wait for modal to open
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
-
-    // Fill in the form
     const timestamp = Date.now();
     const code = `TEST_${timestamp}`;
     const content = `Test message ${timestamp}`;
 
-    // Wait for form fields and fill them
-    const codeInput = modal.locator('input[name="code"]');
-    const contentInput = modal.locator('input[name="content"]');
+    // Open create modal
+    await openCreateModal(page);
 
-    await expect(codeInput).toBeVisible();
-    await expect(contentInput).toBeVisible();
-
-    await codeInput.fill(code);
-    await contentInput.fill(content);
+    // Fill in the form using helper function
+    await fillMessageForm(page, { code, content });
 
     // Submit the form
-    const saveButton = modal.getByRole('button', { name: /save/i });
-    await saveButton.click();
+    await saveModalForm(page);
 
     // Wait for modal to close
-    await expect(modal).not.toBeVisible({ timeout: 15000 });
+    await waitForModalToClose(page);
 
     // Verify the message appears in the list
-    await page.waitForTimeout(2000); // Wait for the list to update
+    await page.waitForTimeout(2000);
     await expect(page.getByText(code)).toBeVisible({ timeout: 5000 });
   });
 
@@ -57,39 +52,14 @@ test.describe('Messages CRUD Operations', () => {
     const originalCode = `EDIT_${timestamp}`;
     const originalContent = `Original ${timestamp}`;
 
-    // Create message via UI
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    // Create message using helper
+    await createMessage(page, originalCode, originalContent);
 
-    await page.locator('input[name="code"]').fill(originalCode);
-    await page.locator('input[name="content"]').fill(originalContent);
-    await modal.getByRole('button', { name: /save/i }).click();
-    await expect(modal).not.toBeVisible({ timeout: 15000 });
-
-    // Wait for message to appear
-    await page.waitForTimeout(2000);
-    await expect(page.getByText(originalCode)).toBeVisible();
-
-    // Find and click the edit button for this message
-    const row = page.locator(`tr:has-text("${originalCode}")`);
-    await row.getByRole('button', { name: /edit/i }).click();
-
-    // Wait for edit modal
-    await expect(modal).toBeVisible();
-
-    // Update the content
+    // Edit the message using helper
     const updatedContent = `Updated ${Date.now()}`;
-    const contentInput = page.locator('input[name="content"]');
-    await contentInput.clear();
-    await contentInput.fill(updatedContent);
-
-    // Save changes
-    await modal.getByRole('button', { name: /save/i }).click();
-    await expect(modal).not.toBeVisible({ timeout: 15000 });
+    await editMessage(page, originalCode, updatedContent);
 
     // Verify the updated content appears
-    await page.waitForTimeout(2000);
     await expect(page.getByText(updatedContent)).toBeVisible();
   });
 
@@ -99,54 +69,25 @@ test.describe('Messages CRUD Operations', () => {
     const code = `DELETE_${timestamp}`;
     const content = `Delete ${timestamp}`;
 
-    // Create message via UI
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    // Create message using helper
+    await createMessage(page, code, content);
 
-    await page.locator('input[name="code"]').fill(code);
-    await page.locator('input[name="content"]').fill(content);
-    await modal.getByRole('button', { name: /save/i }).click();
-    await expect(modal).not.toBeVisible({ timeout: 15000 });
-
-    // Wait for message to appear
-    await page.waitForTimeout(2000);
-    await expect(page.getByText(code)).toBeVisible();
-
-    // Find and click the delete button for this message
-    const row = page.locator(`tr:has-text("${code}")`);
-    await row.getByRole('button', { name: /delete/i }).click();
-
-    // Wait for confirmation dialog
-    const confirmDialog = page.locator('[role="alertdialog"]').or(page.locator('[role="dialog"]'));
-    await expect(confirmDialog).toBeVisible();
-
-    // Confirm deletion
-    await page
-      .getByRole('button', { name: /delete/i })
-      .last()
-      .click();
-
-    // Wait for dialog to close
-    await expect(confirmDialog).not.toBeVisible({ timeout: 15000 });
+    // Delete the message using helper
+    await deleteMessage(page, code);
 
     // Verify the message is no longer visible
-    await page.waitForTimeout(2000);
     await expect(page.getByText(code)).not.toBeVisible();
   });
 
   test('should validate required fields', async ({ page }) => {
-    // Click the "New Message" button
-    await page.getByRole('button', { name: /new message/i }).click();
-
-    // Wait for modal
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    // Open create modal
+    await openCreateModal(page);
 
     // Try to submit without filling fields
-    await modal.getByRole('button', { name: /save/i }).click();
+    await saveModalForm(page);
 
     // Modal should stay open due to validation errors
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 
@@ -155,28 +96,16 @@ test.describe('Messages CRUD Operations', () => {
     const timestamp = Date.now();
     const duplicateCode = `DUP_${timestamp}`;
 
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
-
-    await page.locator('input[name="code"]').fill(duplicateCode);
-    await page.locator('input[name="content"]').fill('First message');
-    await modal.getByRole('button', { name: /save/i }).click();
-    await expect(modal).not.toBeVisible({ timeout: 15000 });
-
-    // Wait for creation
-    await page.waitForTimeout(2000);
+    await createMessage(page, duplicateCode, 'First message');
 
     // Try to create another message with same code
-    await page.getByRole('button', { name: /new message/i }).click();
-    await expect(modal).toBeVisible();
-
-    await page.locator('input[name="code"]').fill(duplicateCode);
-    await page.locator('input[name="content"]').fill('Second message');
-    await modal.getByRole('button', { name: /save/i }).click();
+    await openCreateModal(page);
+    await fillMessageForm(page, { code: duplicateCode, content: 'Second message' });
+    await saveModalForm(page);
 
     // Modal should stay open due to duplicate error
     await page.waitForTimeout(1000);
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 });

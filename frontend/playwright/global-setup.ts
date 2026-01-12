@@ -28,8 +28,7 @@ async function globalSetup(config: FullConfig) {
 
         if (response?.ok()) {
           console.log('✅ Backend health check passed');
-          await browser.close();
-          return;
+          break;
         }
       } catch (error) {
         retries++;
@@ -38,8 +37,43 @@ async function globalSetup(config: FullConfig) {
       }
     }
 
+    if (retries >= maxRetries) {
+      await browser.close();
+      throw new Error('Backend health check failed after max retries');
+    }
+
+    // Verify frontend is accessible
+    console.log('🌐 Checking frontend availability...');
+    retries = 0;
+    const frontendMaxRetries = 10;
+
+    while (retries < frontendMaxRetries) {
+      try {
+        const response = await page.goto('http://localhost:3000', {
+          timeout: 10000,
+          waitUntil: 'domcontentloaded',
+        });
+
+        if (response?.ok()) {
+          // Check if the page has the expected title
+          const title = await page.title();
+          if (title.match(/Message Management/i)) {
+            console.log('✅ Frontend health check passed');
+            await browser.close();
+            return;
+          } else {
+            console.log(`⚠️  Frontend loaded but unexpected title: ${title}`);
+          }
+        }
+      } catch (error) {
+        retries++;
+        console.log(`⏳ Waiting for frontend... (${retries}/${frontendMaxRetries})`);
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    }
+
     await browser.close();
-    throw new Error('Backend health check failed after max retries');
+    throw new Error('Frontend health check failed after max retries');
   } catch (error) {
     console.error('❌ Failed to start backend services:', error);
     throw error;

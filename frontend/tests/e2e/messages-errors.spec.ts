@@ -1,111 +1,94 @@
 import { test, expect } from '@playwright/test';
+import {
+  waitForFrontend,
+  openCreateModal,
+  fillFormField,
+  fillMessageForm,
+  saveModalForm,
+  cancelModalForm,
+  waitForModalToClose,
+  createMessage,
+  deleteMessage,
+} from './helpers';
 
 test.describe('Messages Error Handling', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the messages page
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await waitForFrontend(page);
   });
 
   test('should show validation error for empty code field', async ({ page }) => {
     // Open create modal
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
     // Fill only content, leave code empty
-    await page.locator('input[name="content"]').fill('Test content');
+    await fillFormField(page, 'content', 'Test content');
 
     // Try to submit
-    await page.getByRole('button', { name: /save/i }).click();
+    await saveModalForm(page);
 
     // Modal should stay open due to validation error
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 
   test('should show validation error for empty content field', async ({ page }) => {
     // Open create modal
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
     // Fill only code, leave content empty
-    await page.locator('input[name="code"]').fill(`TEST_${Date.now()}`);
+    await fillFormField(page, 'code', `TEST_${Date.now()}`);
 
     // Try to submit
-    await modal.getByRole('button', { name: /save/i }).click();
+    await saveModalForm(page);
 
     // Modal should stay open due to validation error
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 
   test('should show error for code exceeding max length', async ({ page }) => {
     // Open create modal
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
     // Fill with code that's too long (max is 50 characters)
     const longCode = 'A'.repeat(51);
-    await page.locator('input[name="code"]').fill(longCode);
-    await page.locator('input[name="content"]').fill('Test content');
+    await fillMessageForm(page, { code: longCode, content: 'Test content' });
 
     // Try to submit
-    await modal.getByRole('button', { name: /save/i }).click();
+    await saveModalForm(page);
 
     // Modal should stay open due to validation error
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 
   test('should show error for content exceeding max length', async ({ page }) => {
     // Open create modal
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
     // Fill with content that's too long (max is 255 characters based on OpenAPI spec)
     const longContent = 'A'.repeat(256);
-    await page.locator('input[name="code"]').fill(`TEST_${Date.now()}`);
-    await page.locator('input[name="content"]').fill(longContent);
+    await fillMessageForm(page, { code: `TEST_${Date.now()}`, content: longContent });
 
     // Try to submit
-    await modal.getByRole('button', { name: /save/i }).click();
+    await saveModalForm(page);
 
     // Modal should stay open due to validation error
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 
   test('should show error when trying to edit non-existent message', async ({ page }) => {
-    // Try to navigate to a non-existent message ID
-    // This test assumes the app handles 404 errors properly
-    // The actual implementation may vary based on routing
-
     // Create a valid message first
     const timestamp = Date.now();
     const code = `TEST_${timestamp}`;
 
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
-
-    await page.locator('input[name="code"]').fill(code);
-    await page.locator('input[name="content"]').fill('Test content');
-    await modal.getByRole('button', { name: /save/i }).click();
-    await expect(modal).not.toBeVisible({ timeout: 15000 });
-
-    await page.waitForTimeout(2000);
+    await createMessage(page, code, 'Test content');
 
     // Delete the message
-    const row = page.locator(`tr:has-text("${code}")`);
-    await row.getByRole('button', { name: /delete/i }).click();
-
-    const confirmDialog = page.locator('[role="alertdialog"]').or(page.locator('[role="dialog"]'));
-    await expect(confirmDialog).toBeVisible();
-    await page
-      .getByRole('button', { name: /delete/i })
-      .last()
-      .click();
-    await expect(confirmDialog).not.toBeVisible({ timeout: 15000 });
+    await deleteMessage(page, code);
 
     // If there's an edit button for a deleted message ID in the UI, this would trigger a 404
     // This is a simplified test - adjust based on actual implementation
@@ -116,19 +99,19 @@ test.describe('Messages Error Handling', () => {
     const initialRows = await page.locator('tr').count();
 
     // Open create modal
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
     // Fill in data
-    await page.locator('input[name="code"]').fill(`CANCEL_${Date.now()}`);
-    await page.locator('input[name="content"]').fill('This should not be saved');
+    await fillMessageForm(page, {
+      code: `CANCEL_${Date.now()}`,
+      content: 'This should not be saved',
+    });
 
-    // Click cancel - use first() to avoid strict mode violation
-    const cancelButton = modal.getByRole('button', { name: /cancel/i });
-    await cancelButton.click();
+    // Click cancel
+    await cancelModalForm(page);
 
     // Modal should close
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).not.toBeVisible();
 
     // Message count should remain the same
@@ -142,18 +125,20 @@ test.describe('Messages Error Handling', () => {
     await context.setOffline(true);
 
     // Try to create a message
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
-    await page.locator('input[name="code"]').fill(`OFFLINE_${Date.now()}`);
-    await page.locator('input[name="content"]').fill('Test content');
-    await modal.getByRole('button', { name: /save/i }).click();
+    await fillMessageForm(page, {
+      code: `OFFLINE_${Date.now()}`,
+      content: 'Test content',
+    });
+
+    await saveModalForm(page);
 
     // Wait for error to potentially appear
     await page.waitForTimeout(2000);
 
     // Modal should stay open due to network error
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
 
     // Restore online mode
@@ -162,19 +147,17 @@ test.describe('Messages Error Handling', () => {
 
   test('should show validation error for invalid code pattern', async ({ page }) => {
     // Open create modal
-    await page.getByRole('button', { name: /new message/i }).click();
-    const modal = page.locator('[role="dialog"]');
-    await expect(modal).toBeVisible();
+    await openCreateModal(page);
 
     // Try to use invalid characters in code (based on OpenAPI pattern: ^[a-zA-Z0-9_-]+$)
     const invalidCode = `INVALID CODE WITH SPACES!@#`;
-    await page.locator('input[name="code"]').fill(invalidCode);
-    await page.locator('input[name="content"]').fill('Test content');
+    await fillMessageForm(page, { code: invalidCode, content: 'Test content' });
 
     // Try to submit
-    await modal.getByRole('button', { name: /save/i }).click();
+    await saveModalForm(page);
 
     // Modal should stay open due to validation error
+    const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible();
   });
 });
