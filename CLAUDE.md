@@ -8,12 +8,12 @@ This is a sandbox repository for experimenting with Claude Code.
 
 ## Project Structure
 
-- `backend/` - Spring Boot API application (Java 23, Maven)
+- `backend/` - Spring Boot API application (Java 21, Maven)
 
 ## Backend API
 
 - **Framework**: Spring Boot 3.4.1
-- **Java Version**: 23
+- **Java Version**: 21
 - **Package**: `com.sandbox.api`
 - **Port**: 8080
 
@@ -37,7 +37,7 @@ cd backend && ./mvnw test
 ## Development Environment
 
 - **IDE**: IntelliJ IDEA
-- **Java**: JDK 23
+- **Java**: JDK 21
 
 ## Repository
 
