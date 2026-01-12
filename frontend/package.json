@@ -14,7 +14,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "prepare": "cd .. && git config core.hooksPath .husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -49,7 +50,9 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.0",
+    "husky": "^9.1.7",
     "jsdom": "^25.0.1",
+    "lint-staged": "^16.2.7",
     "msw": "^2.7.0",
     "orval": "^7.3.0",
     "postcss": "^8.4.49",
