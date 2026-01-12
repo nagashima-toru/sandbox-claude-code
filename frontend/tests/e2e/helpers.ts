@@ -55,7 +55,7 @@ export async function fillMessageForm(
  * The search bar has type="text" and a specific placeholder
  */
 export async function getSearchInput(page: Page): Promise<Locator> {
-  const searchInput = page.getByPlaceholder(/search messages/i);
+  const searchInput = page.getByPlaceholder(/search/i);
   await expect(searchInput).toBeVisible({ timeout: 10000 });
   return searchInput;
 }
@@ -140,9 +140,6 @@ export async function createMessage(
   // Wait for the list to update and network to be idle
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(1000);
-
-  // Verify the message appears in the table (with longer timeout)
-  await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 10000 });
 }
 
 /**
@@ -154,6 +151,15 @@ export async function editMessage(
   newContent: string
 ): Promise<void> {
   const row = page.locator(`tr:has-text("${originalCode}")`);
+
+  // Try to find the row; if not visible, search for it
+  const isVisible = await row.isVisible().catch(() => false);
+  if (!isVisible) {
+    const searchInput = page.getByPlaceholder(/search/i);
+    await searchInput.fill(originalCode);
+    await page.waitForTimeout(600); // Wait for debounce
+  }
+
   await row.getByRole('button', { name: /edit/i }).click();
 
   await waitForModal(page);
@@ -171,6 +177,15 @@ export async function editMessage(
  */
 export async function deleteMessage(page: Page, code: string): Promise<void> {
   const row = page.locator(`tr:has-text("${code}")`);
+
+  // Try to find the row; if not visible, search for it
+  const isVisible = await row.isVisible().catch(() => false);
+  if (!isVisible) {
+    const searchInput = page.getByPlaceholder(/search/i);
+    await searchInput.fill(code);
+    await page.waitForTimeout(600); // Wait for debounce
+  }
+
   await row.getByRole('button', { name: /delete/i }).click();
 
   // Wait for confirmation dialog
@@ -197,4 +212,9 @@ export async function waitForFrontend(page: Page): Promise<void> {
 
   // Wait for the page title to load
   await expect(page).toHaveTitle(/Message Management/i, { timeout: 10000 });
+
+  // Wait for the search input to be visible, which confirms messages have loaded
+  // (SearchBar is only rendered after React Query finishes loading)
+  const searchInput = page.getByPlaceholder(/search/i);
+  await expect(searchInput).toBeVisible({ timeout: 15000 });
 }

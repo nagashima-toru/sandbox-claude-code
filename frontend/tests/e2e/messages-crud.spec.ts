@@ -39,10 +39,17 @@ test.describe('Messages CRUD Operations', () => {
     // Wait for modal to close
     await waitForModalToClose(page);
 
-    // Verify the message appears in the list
+    // Wait for the list to update
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
-    await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 10000 });
+
+    // Search for the message to verify it was created (handles pagination)
+    const searchInput = page.getByPlaceholder(/search/i);
+    await searchInput.fill(code);
+    await page.waitForTimeout(600);
+
+    const row = page.locator(`tr:has-text("${code}")`);
+    await expect(row).toBeVisible({ timeout: 10000 });
   });
 
   test('should edit an existing message', async ({ page }) => {
@@ -58,8 +65,14 @@ test.describe('Messages CRUD Operations', () => {
     const updatedContent = `Updated ${Date.now()}`;
     await editMessage(page, originalCode, updatedContent);
 
+    // Search for the message by code to verify it was updated (handles pagination)
+    const searchInput = page.getByPlaceholder(/search/i);
+    await searchInput.fill(originalCode);
+    await page.waitForTimeout(600);
+
     // Verify the updated content appears in the table
-    await expect(page.getByRole('table').getByText(updatedContent).first()).toBeVisible();
+    const rowWithUpdatedContent = page.locator(`tr:has-text("${updatedContent}")`);
+    await expect(rowWithUpdatedContent).toBeVisible();
   });
 
   test('should delete a message', async ({ page }) => {
@@ -74,8 +87,14 @@ test.describe('Messages CRUD Operations', () => {
     // Delete the message using helper
     await deleteMessage(page, code);
 
-    // Verify the message is no longer visible in the table
-    await expect(page.getByRole('table').getByText(code)).not.toBeVisible();
+    // Search for the deleted message to verify it's gone (handles pagination)
+    const searchInput = page.getByPlaceholder(/search/i);
+    await searchInput.fill(code);
+    await page.waitForTimeout(600);
+
+    // Verify the message is no longer in the table
+    const deletedRow = page.locator(`tr:has-text("${code}")`);
+    await expect(deletedRow).not.toBeVisible();
   });
 
   test('should validate required fields', async ({ page }) => {
