@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@faker-js/faker": "^10.2.0",
+    "@next/bundle-analyzer": "^16.1.1",
     "@playwright/test": "^1.49.1",
     "@tanstack/react-query-devtools": "^5.91.2",
     "@testing-library/jest-dom": "^6.6.3",
