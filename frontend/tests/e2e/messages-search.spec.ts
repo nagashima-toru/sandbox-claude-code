@@ -34,7 +34,9 @@ test.describe('Messages Search and Filter', () => {
     await page.waitForTimeout(600);
 
     // Should see at least one search test message
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST/i }).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('tr', { hasText: /SEARCH_TEST/i }).first()).toBeVisible({
+      timeout: 10000,
+    });
 
     // Clear search to return to normal view
     await clearSearch(page);

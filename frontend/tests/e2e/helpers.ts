@@ -21,9 +21,8 @@ export async function fillFormField(
   value: string
 ): Promise<void> {
   // For 'content' field, it's a textarea; for 'code' it's an input
-  const selector = fieldName === 'content'
-    ? `textarea[name="${fieldName}"]`
-    : `input[name="${fieldName}"]`;
+  const selector =
+    fieldName === 'content' ? `textarea[name="${fieldName}"]` : `input[name="${fieldName}"]`;
 
   const field = page.locator(selector).first();
 
@@ -127,11 +126,7 @@ export async function waitForModalToClose(page: Page): Promise<void> {
 /**
  * Create a message via UI (complete flow)
  */
-export async function createMessage(
-  page: Page,
-  code: string,
-  content: string
-): Promise<void> {
+export async function createMessage(page: Page, code: string, content: string): Promise<void> {
   await openCreateModal(page);
   await fillMessageForm(page, { code, content });
   await saveModalForm(page);
@@ -193,7 +188,10 @@ export async function deleteMessage(page: Page, code: string): Promise<void> {
   await expect(confirmDialog).toBeVisible({ timeout: 5000 });
 
   // Confirm deletion (use last() to get the delete button in the dialog, not the table)
-  await page.getByRole('button', { name: /delete/i }).last().click();
+  await page
+    .getByRole('button', { name: /delete/i })
+    .last()
+    .click();
 
   // Wait for dialog to close
   await expect(confirmDialog).not.toBeVisible({ timeout: 15000 });
