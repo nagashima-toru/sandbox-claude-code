@@ -40,8 +40,9 @@ test.describe('Messages CRUD Operations', () => {
     await waitForModalToClose(page);
 
     // Verify the message appears in the list
-    await page.waitForTimeout(2000);
-    await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 5000 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should edit an existing message', async ({ page }) => {

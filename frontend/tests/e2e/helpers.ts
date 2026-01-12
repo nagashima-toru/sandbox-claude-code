@@ -137,11 +137,12 @@ export async function createMessage(
   await saveModalForm(page);
   await waitForModalToClose(page);
 
-  // Wait for the list to update
-  await page.waitForTimeout(2000);
+  // Wait for the list to update and network to be idle
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
 
-  // Verify the message appears in the table
-  await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 5000 });
+  // Verify the message appears in the table (with longer timeout)
+  await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 10000 });
 }
 
 /**
@@ -160,8 +161,9 @@ export async function editMessage(
   await saveModalForm(page);
   await waitForModalToClose(page);
 
-  // Wait for update
-  await page.waitForTimeout(2000);
+  // Wait for update and network to be idle
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
 }
 
 /**
@@ -181,8 +183,9 @@ export async function deleteMessage(page: Page, code: string): Promise<void> {
   // Wait for dialog to close
   await expect(confirmDialog).not.toBeVisible({ timeout: 15000 });
 
-  // Wait for list update
-  await page.waitForTimeout(2000);
+  // Wait for list update and network to be idle
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
 }
 
 /**
