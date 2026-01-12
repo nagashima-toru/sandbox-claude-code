@@ -41,7 +41,7 @@ test.describe('Messages CRUD Operations', () => {
 
     // Verify the message appears in the list
     await page.waitForTimeout(2000);
-    await expect(page.getByText(code)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 5000 });
   });
 
   test('should edit an existing message', async ({ page }) => {
@@ -57,8 +57,8 @@ test.describe('Messages CRUD Operations', () => {
     const updatedContent = `Updated ${Date.now()}`;
     await editMessage(page, originalCode, updatedContent);
 
-    // Verify the updated content appears
-    await expect(page.getByText(updatedContent)).toBeVisible();
+    // Verify the updated content appears in the table
+    await expect(page.getByRole('table').getByText(updatedContent).first()).toBeVisible();
   });
 
   test('should delete a message', async ({ page }) => {
@@ -73,8 +73,8 @@ test.describe('Messages CRUD Operations', () => {
     // Delete the message using helper
     await deleteMessage(page, code);
 
-    // Verify the message is no longer visible
-    await expect(page.getByText(code)).not.toBeVisible();
+    // Verify the message is no longer visible in the table
+    await expect(page.getByRole('table').getByText(code)).not.toBeVisible();
   });
 
   test('should validate required fields', async ({ page }) => {

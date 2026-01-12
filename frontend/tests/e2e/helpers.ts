@@ -140,8 +140,8 @@ export async function createMessage(
   // Wait for the list to update
   await page.waitForTimeout(2000);
 
-  // Verify the message appears
-  await expect(page.getByText(code)).toBeVisible({ timeout: 5000 });
+  // Verify the message appears in the table
+  await expect(page.getByRole('table').getByText(code).first()).toBeVisible({ timeout: 5000 });
 }
 
 /**
