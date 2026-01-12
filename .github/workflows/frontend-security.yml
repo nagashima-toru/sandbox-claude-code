@@ -1,0 +1,252 @@
+name: Frontend Security Checks
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'frontend/package.json'
+      - 'frontend/pnpm-lock.yaml'
+      - '.github/workflows/frontend-security.yml'
+  pull_request:
+    paths:
+      - 'frontend/package.json'
+      - 'frontend/pnpm-lock.yaml'
+      - '.github/workflows/frontend-security.yml'
+  schedule:
+    # 毎週月曜日の深夜0時（UTC）に実行
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # 手動実行を許可
+
+jobs:
+  audit:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        id: audit
+        run: |
+          echo "## Security Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # pnpm audit の出力を取得（エラーを無視）
+          AUDIT_OUTPUT=$(pnpm audit --json 2>&1 || true)
+
+          # 脆弱性の統計を抽出
+          if echo "$AUDIT_OUTPUT" | jq -e '.metadata' > /dev/null 2>&1; then
+            CRITICAL=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.critical // 0')
+            HIGH=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.high // 0')
+            MODERATE=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.moderate // 0')
+            LOW=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.low // 0')
+
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "| -------- | ----- |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔴 Critical | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟠 High | $HIGH |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟡 Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⚪ Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Critical または High の脆弱性がある場合は失敗
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "❌ **Action Required**: Critical or High severity vulnerabilities found!" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "Please run \`pnpm audit\` locally to see details and fix the vulnerabilities." >> $GITHUB_STEP_SUMMARY
+              exit 1
+            elif [ "$MODERATE" -gt 0 ] || [ "$LOW" -gt 0 ]; then
+              echo "⚠️ **Warning**: Moderate or Low severity vulnerabilities found." >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "Consider reviewing and updating dependencies when possible." >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ **No vulnerabilities found!**" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ Unable to parse audit results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "$AUDIT_OUTPUT" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Create audit report artifact
+        if: always()
+        run: |
+          pnpm audit --json > audit-report.json || true
+          pnpm audit > audit-report.txt || true
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-report
+          path: |
+            frontend/audit-report.json
+            frontend/audit-report.txt
+          retention-days: 30
+
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check licenses
+        id: license-check
+        run: |
+          echo "## License Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # 使用しているパッケージのライセンス一覧を取得
+          pnpm licenses list --json > licenses.json || true
+
+          # 禁止ライセンスのリスト（GPL系など、プロジェクトポリシーに応じて調整）
+          FORBIDDEN_LICENSES=("GPL-1.0" "GPL-2.0" "GPL-3.0" "AGPL-1.0" "AGPL-3.0")
+
+          # ライセンスチェック（簡易版）
+          FOUND_FORBIDDEN=0
+          for license in "${FORBIDDEN_LICENSES[@]}"; do
+            if grep -q "$license" licenses.json 2>/dev/null; then
+              echo "⚠️ Found potentially problematic license: $license" >> $GITHUB_STEP_SUMMARY
+              FOUND_FORBIDDEN=1
+            fi
+          done
+
+          if [ $FOUND_FORBIDDEN -eq 0 ]; then
+            echo "✅ No forbidden licenses detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Warning**: Some packages may have licenses that require review." >> $GITHUB_STEP_SUMMARY
+            echo "Please review the license report artifact for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 統計情報
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### License Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Total packages checked: $(jq '. | length' licenses.json 2>/dev/null || echo 'N/A')" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: license-report
+          path: frontend/licenses.json
+          retention-days: 30
+
+  unused-dependencies:
+    name: Unused Dependencies Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install depcheck
+        run: pnpm add -D depcheck
+
+      - name: Check for unused dependencies
+        id: depcheck
+        continue-on-error: true
+        run: |
+          echo "## Unused Dependencies Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # depcheck を実行
+          npx depcheck --json > depcheck-report.json || true
+
+          # 未使用の依存関係を抽出
+          UNUSED_DEPS=$(jq -r '.dependencies[]' depcheck-report.json 2>/dev/null || echo "")
+          UNUSED_DEV_DEPS=$(jq -r '.devDependencies[]' depcheck-report.json 2>/dev/null || echo "")
+
+          if [ -z "$UNUSED_DEPS" ] && [ -z "$UNUSED_DEV_DEPS" ]; then
+            echo "✅ No unused dependencies detected" >> $GITHUB_STEP_SUMMARY
+          else
+            if [ -n "$UNUSED_DEPS" ]; then
+              echo "### Unused Dependencies" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "$UNUSED_DEPS" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            if [ -n "$UNUSED_DEV_DEPS" ]; then
+              echo "### Unused Dev Dependencies" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "$UNUSED_DEV_DEPS" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            echo "ℹ️ Consider removing unused dependencies to reduce bundle size and attack surface." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload depcheck report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: depcheck-report
+          path: frontend/depcheck-report.json
+          retention-days: 30
