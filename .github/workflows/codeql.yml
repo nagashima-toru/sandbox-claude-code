@@ -5,18 +5,27 @@ on:
     branches: [ master, main ]
     paths:
       - 'backend/**/*.java'
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+      - 'frontend/**/*.js'
+      - 'frontend/**/*.jsx'
       - '.github/workflows/codeql.yml'
   pull_request:
     branches: [ master, main ]
     paths:
       - 'backend/**/*.java'
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+      - 'frontend/**/*.js'
+      - 'frontend/**/*.jsx'
       - '.github/workflows/codeql.yml'
   schedule:
     - cron: '0 0 * * 1'  # 毎週月曜日の深夜0時（UTC）に実行
+  workflow_dispatch: # 手動実行を許可
 
 jobs:
   analyze:
-    name: Analyze Java code
+    name: Analyze ${{ matrix.language }} code
     runs-on: ubuntu-latest
     timeout-minutes: 360
     permissions:
@@ -27,18 +36,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'java' ]
+        language: [ 'java', 'javascript-typescript' ]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Java のビルド設定
       - name: Set up JDK 23
+        if: matrix.language == 'java'
         uses: actions/setup-java@v4
         with:
           java-version: '23'
           distribution: 'temurin'
           cache: 'maven'
+
+      # JavaScript/TypeScript のビルド設定
+      - name: Setup pnpm
+        if: matrix.language == 'javascript-typescript'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        if: matrix.language == 'javascript-typescript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -46,7 +72,9 @@ jobs:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
 
+      # Java のビルド
       - name: Cache Maven packages
+        if: matrix.language == 'java'
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
@@ -55,8 +83,25 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build with Maven
+        if: matrix.language == 'java'
         working-directory: ./backend
         run: ./mvnw clean compile -DskipTests
+
+      # JavaScript/TypeScript のビルド
+      - name: Install frontend dependencies
+        if: matrix.language == 'javascript-typescript'
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API client
+        if: matrix.language == 'javascript-typescript'
+        working-directory: ./frontend
+        run: pnpm generate:api || echo "API generation skipped"
+
+      - name: Build Next.js
+        if: matrix.language == 'javascript-typescript'
+        working-directory: ./frontend
+        run: pnpm build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
