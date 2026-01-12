@@ -1,8 +1,6 @@
 import { test, expect } from '@playwright/test';
 import {
   waitForFrontend,
-  waitForModal,
-  fillFormField,
   fillMessageForm,
   openCreateModal,
   saveModalForm,

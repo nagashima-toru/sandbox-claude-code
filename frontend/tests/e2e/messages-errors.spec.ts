@@ -6,7 +6,6 @@ import {
   fillMessageForm,
   saveModalForm,
   cancelModalForm,
-  waitForModalToClose,
   createMessage,
   deleteMessage,
 } from './helpers';
