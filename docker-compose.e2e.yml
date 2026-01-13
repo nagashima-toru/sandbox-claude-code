@@ -1,3 +1,6 @@
+# Docker Compose configuration for E2E testing
+# Use with: docker-compose -f docker-compose.e2e.yml up
+
 services:
   postgres:
     image: postgres:16
@@ -7,14 +10,14 @@ services:
       POSTGRES_USER: sandbox
       POSTGRES_PASSWORD: sandbox
     ports:
-      - "5433:5432"
+      - "5433:5432"  # Use different port to avoid conflict with dev environment
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sandbox"]
       interval: 5s
       timeout: 5s
       retries: 5
     tmpfs:
-      - /var/lib/postgresql/data
+      - /var/lib/postgresql/data  # Use tmpfs for faster tests and auto cleanup
 
   backend:
     build:
@@ -27,13 +30,27 @@ services:
       SPRING_DATASOURCE_PASSWORD: sandbox
       SPRING_FLYWAY_ENABLED: "true"
     ports:
-      - "8080:8080"
+      - "8081:8080"  # Use different port to avoid conflict with dev environment
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: sandbox-frontend-e2e
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8081/api  # Point to E2E backend port
+    ports:
+      - "3001:3000"  # Use different port to avoid conflict with dev environment
+    depends_on:
+      backend:
+        condition: service_healthy
