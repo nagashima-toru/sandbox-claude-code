@@ -21,7 +21,7 @@ MAX_RETRIES=30
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-  if curl -f http://localhost:8080/actuator/health > /dev/null 2>&1; then
+  if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
     echo "✅ Backend is ready!"
     exit 0
   fi
