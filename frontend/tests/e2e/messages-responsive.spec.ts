@@ -1,11 +1,10 @@
-import { test, expect, devices } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { waitForFrontend, createMessage, openCreateModal } from './helpers';
 
 test.describe('Messages Responsive Behavior', () => {
   test.describe('Desktop viewport', () => {
-    test.use({ viewport: { width: 1280, height: 720 } });
-
     test('should display table layout on desktop', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 });
       await page.goto('/');
       await waitForFrontend(page);
 
@@ -22,9 +21,9 @@ test.describe('Messages Responsive Behavior', () => {
   });
 
   test.describe('Mobile viewport', () => {
-    test.use(devices['iPhone 12']);
-
     test('should display card layout on mobile', async ({ page }) => {
+      // iPhone 12 viewport
+      await page.setViewportSize({ width: 390, height: 844 });
       await page.goto('/');
       await waitForFrontend(page);
 
@@ -49,6 +48,8 @@ test.describe('Messages Responsive Behavior', () => {
     });
 
     test('should have touch-friendly buttons on mobile', async ({ page }) => {
+      // iPhone 12 viewport
+      await page.setViewportSize({ width: 390, height: 844 });
       await page.goto('/');
       await waitForFrontend(page);
 
@@ -75,6 +76,8 @@ test.describe('Messages Responsive Behavior', () => {
     });
 
     test('should display modal in full screen on mobile', async ({ page }) => {
+      // iPhone 12 viewport
+      await page.setViewportSize({ width: 390, height: 844 });
       await page.goto('/');
       await waitForFrontend(page);
 
@@ -98,9 +101,9 @@ test.describe('Messages Responsive Behavior', () => {
   });
 
   test.describe('Tablet viewport', () => {
-    test.use(devices['iPad']);
-
     test('should display appropriate layout on tablet', async ({ page }) => {
+      // iPad viewport
+      await page.setViewportSize({ width: 768, height: 1024 });
       await page.goto('/');
       await waitForFrontend(page);
 
@@ -129,9 +132,9 @@ test.describe('Messages Responsive Behavior', () => {
   });
 
   test.describe('Small mobile viewport', () => {
-    test.use(devices['iPhone SE']);
-
     test('should be usable on small screens', async ({ page }) => {
+      // iPhone SE viewport
+      await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/');
       await waitForFrontend(page);
 
