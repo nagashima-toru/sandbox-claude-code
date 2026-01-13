@@ -67,7 +67,7 @@ export default defineConfig({
 
   // Run local dev server before starting tests
   webServer: {
-    command: 'pnpm dev',
+    command: 'NEXT_PUBLIC_API_URL=http://localhost:8081 pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000, // Wait up to 2 minutes for dev server to start
