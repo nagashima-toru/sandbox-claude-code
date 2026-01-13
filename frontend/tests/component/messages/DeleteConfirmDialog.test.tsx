@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
@@ -36,9 +36,7 @@ describe('DeleteConfirmDialog', () => {
     it('確認メッセージが表示される', () => {
       render(<DeleteConfirmDialog {...defaultProps} />);
 
-      expect(
-        screen.getByText(/are you sure you want to delete this message/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/are you sure you want to delete this message/i)).toBeInTheDocument();
     });
 
     it('メッセージのcodeが表示される', () => {

@@ -192,12 +192,9 @@ describe('useDebounce', () => {
   });
 
   it('遅延時間が変更された場合、新しい遅延時間を使用する', async () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      {
-        initialProps: { value: 'initial', delay: 300 },
-      }
-    );
+    const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
+      initialProps: { value: 'initial', delay: 300 },
+    });
 
     // 値と遅延時間を同時に変更
     await act(async () => {
