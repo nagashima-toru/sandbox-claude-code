@@ -1,6 +1,18 @@
 import '@testing-library/jest-dom';
-import { expect, afterEach, vi } from 'vitest';
+import { afterEach, vi, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
+
+// Setup global timer methods for fake timers
+beforeEach(() => {
+  if (!globalThis.setTimeout) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    globalThis.setTimeout = vi.fn() as any;
+  }
+  if (!globalThis.clearTimeout) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    globalThis.clearTimeout = vi.fn() as any;
+  }
+});
 
 // Cleanup after each test
 afterEach(() => {
