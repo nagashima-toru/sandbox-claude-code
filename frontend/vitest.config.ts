@@ -20,19 +20,26 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
       exclude: [
+        // Dependencies and generated files
         'node_modules/',
         'tests/',
         '**/*.config.*',
-        '**/generated/**',
+        '**/generated/**', // Orval auto-generated API client
         '**/*.d.ts',
-        '.next/**',
-        'playwright/**',
-        '.lintstagedrc.js',
-        'src/app/layout.tsx',
-        'src/app/page.tsx',
-        'src/app/providers.tsx',
-        'src/lib/api/client.ts',
-        'src/lib/query-client.ts',
+        '.next/**', // Next.js build output
+        'playwright/**', // E2E test setup files
+        '.lintstagedrc.js', // Lint-staged configuration
+
+        // Next.js entry points (covered by E2E tests)
+        'src/app/layout.tsx', // Root layout - framework setup
+        'src/app/page.tsx', // Main page - integration tested in E2E
+        'src/app/providers.tsx', // React Query provider wrapper
+
+        // Infrastructure configuration (environment-dependent, minimal logic)
+        'src/lib/api/client.ts', // Axios instance configuration
+        'src/lib/query-client.ts', // React Query client setup
+
+        // Unused UI components (not currently utilized in the application)
         'src/components/ui/badge.tsx',
         'src/components/ui/card.tsx',
         'src/components/common/PageHeader.tsx',
