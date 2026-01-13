@@ -10,6 +10,11 @@ const nextConfig = {
 
   // API proxy for development
   async rewrites() {
+    // Disable rewrites if NEXT_PUBLIC_API_URL is set (use client-side requests instead)
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      return [];
+    }
+
     const apiUrl = process.env.API_REWRITE_URL || 'http://localhost:8080/api/:path*';
     return [
       {
