@@ -11,8 +11,8 @@ RUN npm install -g pnpm
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies (ignore prepare script as it requires git)
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Development stage
 FROM node:20-alpine AS development
