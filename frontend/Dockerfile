@@ -51,6 +51,10 @@ COPY package.json pnpm-lock.yaml ./
 # Copy source code
 COPY . .
 
+# Accept build arguments for environment variables
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Build application
 RUN pnpm build
 
@@ -68,7 +72,6 @@ RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 COPY --from=build --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=build --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --from=build --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 

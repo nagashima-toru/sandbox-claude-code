@@ -10,10 +10,11 @@ const nextConfig = {
 
   // API proxy for development
   async rewrites() {
+    const apiUrl = process.env.API_REWRITE_URL || 'http://localhost:8080/api/:path*';
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
+        destination: apiUrl,
       },
     ];
   },

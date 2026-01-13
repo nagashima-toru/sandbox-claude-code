@@ -46,9 +46,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: production
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8081/api  # Point to E2E backend port
     container_name: sandbox-frontend-e2e
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8081/api  # Point to E2E backend port
+      API_REWRITE_URL: http://backend:8080/api/:path*  # Use Docker service name for internal communication
     ports:
       - "3001:3000"  # Use different port to avoid conflict with dev environment
     depends_on:
