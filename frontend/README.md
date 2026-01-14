@@ -131,6 +131,57 @@ For detailed documentation, see [CLAUDE.md](./CLAUDE.md).
 - Form validation with real-time feedback
 - Error handling
 
+## Code Quality
+
+### Linting and Formatting
+
+```bash
+# Run ESLint
+pnpm lint
+
+# Run TypeScript type checking
+pnpm type-check
+
+# Format code with Prettier
+pnpm prettier --write "src/**/*.{ts,tsx}"
+```
+
+### Testing
+
+```bash
+# Run unit and component tests
+pnpm test
+
+# Run E2E tests
+pnpm test:e2e
+
+# Generate coverage report
+pnpm test:coverage
+```
+
+**Coverage Thresholds:**
+
+- Statements: ≥ 80%
+- Branches: ≥ 70%
+- Functions: ≥ 80%
+- Lines: ≥ 80%
+
+### Performance
+
+- **Optimized Re-renders**: Uses `useMemo` and `useCallback` to prevent unnecessary re-renders
+- **Debounced Search**: 300ms delay to reduce API calls during search
+- **Code Splitting**: Automatic code splitting via Next.js
+- **Bundle Size**: ~182 kB First Load JS (optimized)
+
+### Browser Compatibility
+
+Tested and compatible with:
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
 ## License
 
 MIT

@@ -30,6 +30,13 @@ type SortDirection = 'asc' | 'desc';
 const DEFAULT_PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 300;
 
+/**
+ * MessageTable component displays a list of messages with search, sort, and pagination features.
+ * Includes responsive design with table view for desktop and card view for mobile.
+ *
+ * @param onEdit - Callback function triggered when edit button is clicked
+ * @param onDelete - Callback function triggered when delete button is clicked
+ */
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   const { data: messages, isLoading, error } = useGetAllMessages();
   const [searchQuery, setSearchQuery] = useState('');

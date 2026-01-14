@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
@@ -16,6 +16,11 @@ import {
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 
+/**
+ * Home page component for message management.
+ * Provides CRUD operations (Create, Read, Update, Delete) for messages.
+ * Manages modal states for creating, editing, and deleting messages.
+ */
 export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -79,33 +84,45 @@ export default function Home() {
     },
   });
 
-  const handleCreateMessage = (data: MessageFormData) => {
-    createMutation.mutate({ data });
-  };
+  const handleCreateMessage = useCallback(
+    (data: MessageFormData) => {
+      createMutation.mutate({ data });
+    },
+    [createMutation]
+  );
 
-  const handleEditMessage = (data: MessageFormData) => {
-    if (selectedMessage?.id) {
-      updateMutation.mutate({ id: selectedMessage.id, data });
-    }
-  };
+  const handleEditMessage = useCallback(
+    (data: MessageFormData) => {
+      if (selectedMessage?.id) {
+        updateMutation.mutate({ id: selectedMessage.id, data });
+      }
+    },
+    [selectedMessage?.id, updateMutation]
+  );
 
-  const handleEditClick = (message: MessageResponse) => {
-    updateMutation.reset(); // Clear previous errors
-    setSelectedMessage(message);
-    setIsEditModalOpen(true);
-  };
+  const handleEditClick = useCallback(
+    (message: MessageResponse) => {
+      updateMutation.reset(); // Clear previous errors
+      setSelectedMessage(message);
+      setIsEditModalOpen(true);
+    },
+    [updateMutation]
+  );
 
-  const handleDeleteClick = (message: MessageResponse) => {
-    deleteMutation.reset(); // Clear previous errors
-    setSelectedMessage(message);
-    setIsDeleteDialogOpen(true);
-  };
+  const handleDeleteClick = useCallback(
+    (message: MessageResponse) => {
+      deleteMutation.reset(); // Clear previous errors
+      setSelectedMessage(message);
+      setIsDeleteDialogOpen(true);
+    },
+    [deleteMutation]
+  );
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (selectedMessage?.id) {
       deleteMutation.mutate({ id: selectedMessage.id });
     }
-  };
+  }, [selectedMessage?.id, deleteMutation]);
 
   return (
     <main className="min-h-screen p-8">
