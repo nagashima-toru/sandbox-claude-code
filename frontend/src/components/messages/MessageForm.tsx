@@ -24,6 +24,16 @@ interface MessageFormProps {
   error?: unknown;
 }
 
+/**
+ * MessageForm component handles creating and editing messages.
+ * Uses React Hook Form with Zod validation for form management.
+ *
+ * @param onSubmit - Callback function called when form is successfully validated and submitted
+ * @param initialData - Initial data for editing mode. If provided, form fields will be pre-populated
+ * @param isSubmitting - Loading state during form submission
+ * @param onCancel - Callback function called when cancel button is clicked
+ * @param error - API error object to display error messages from server
+ */
 export default function MessageForm({
   onSubmit,
   initialData,
