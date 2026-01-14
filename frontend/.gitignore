@@ -62,3 +62,4 @@ storybook-static
 
 # Vitest
 .vitest/
+*storybook.log
