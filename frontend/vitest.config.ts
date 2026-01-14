@@ -67,7 +67,7 @@ export default defineConfig({
       },
     },
     // Storybook Vitest integration - temporarily disabled
-    // TODO: Re-enable after fixing playwright provider configuration
+    // TODO: Re-enable after fixing playwright provider configuration (Issue #62)
     // projects: [
     //   {
     //     extends: true,
