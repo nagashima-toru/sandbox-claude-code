@@ -16,7 +16,9 @@
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "prepare": "cd .. && git config core.hooksPath .husky"
+    "prepare": "cd .. && git config core.hooksPath .husky",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -36,10 +38,17 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^5.0.0",
     "@eslint/eslintrc": "^3.3.3",
     "@faker-js/faker": "^10.2.0",
     "@next/bundle-analyzer": "^16.1.1",
     "@playwright/test": "^1.49.1",
+    "@storybook/addon-a11y": "^10.1.11",
+    "@storybook/addon-docs": "^10.1.11",
+    "@storybook/addon-onboarding": "^10.1.11",
+    "@storybook/addon-themes": "^10.1.11",
+    "@storybook/addon-vitest": "^10.1.11",
+    "@storybook/nextjs-vite": "^10.1.11",
     "@tanstack/react-query-devtools": "^5.91.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
@@ -48,20 +57,28 @@
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/browser": "^4.0.17",
+    "@vitest/browser-playwright": "^4.0.17",
+    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/ui": "^4.0.17",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.0",
+    "eslint-plugin-storybook": "^10.1.11",
     "husky": "^9.1.7",
     "jsdom": "^25.0.1",
     "lint-staged": "^16.2.7",
-    "msw": "^2.7.0",
+    "msw": "^2.12.7",
+    "msw-storybook-addon": "^2.0.6",
     "orval": "^7.3.0",
+    "playwright": "^1.57.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
+    "storybook": "^10.1.11",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.17"
   }
 }

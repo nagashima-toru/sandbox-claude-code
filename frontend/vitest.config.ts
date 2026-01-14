@@ -1,7 +1,14 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+// @ts-expect-error - vitest browser playwright is dynamically imported
+import { playwright } from '@vitest/browser/providers/playwright';
+const dirname =
+  typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
   test: {
@@ -24,20 +31,29 @@ export default defineConfig({
         'node_modules/',
         'tests/',
         '**/*.config.*',
-        '**/generated/**', // Orval auto-generated API client
+        '**/generated/**',
+        // Orval auto-generated API client
         '**/*.d.ts',
-        '.next/**', // Next.js build output
-        'playwright/**', // E2E test setup files
-        '.lintstagedrc.js', // Lint-staged configuration
+        '.next/**',
+        // Next.js build output
+        'playwright/**',
+        // E2E test setup files
+        '.lintstagedrc.js',
+        // Lint-staged configuration
 
         // Next.js entry points (covered by E2E tests)
-        'src/app/layout.tsx', // Root layout - framework setup
-        'src/app/page.tsx', // Main page - integration tested in E2E
-        'src/app/providers.tsx', // React Query provider wrapper
+        'src/app/layout.tsx',
+        // Root layout - framework setup
+        'src/app/page.tsx',
+        // Main page - integration tested in E2E
+        'src/app/providers.tsx',
+        // React Query provider wrapper
 
         // Infrastructure configuration (environment-dependent, minimal logic)
-        'src/lib/api/client.ts', // Axios instance configuration
-        'src/lib/query-client.ts', // React Query client setup
+        'src/lib/api/client.ts',
+        // Axios instance configuration
+        'src/lib/query-client.ts',
+        // React Query client setup
 
         // Unused UI components (not currently utilized in the application)
         'src/components/ui/badge.tsx',
@@ -51,6 +67,32 @@ export default defineConfig({
         statements: 80,
       },
     },
+    projects: [
+      {
+        extends: true,
+        plugins: [
+          // The plugin will run tests for the stories defined in your Storybook config
+          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+          storybookTest({
+            configDir: path.join(dirname, '.storybook'),
+          }),
+        ],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [
+              {
+                browser: 'chromium',
+              },
+            ],
+          },
+          setupFiles: ['.storybook/vitest.setup.ts'],
+        },
+      },
+    ],
   },
   resolve: {
     alias: {
