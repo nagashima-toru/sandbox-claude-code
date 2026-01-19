@@ -89,6 +89,30 @@ docker-compose build frontend
 docker-compose down
 ```
 
+### Development Workflow
+
+#### Managing npm Dependencies
+
+In development mode, `package.json` and `pnpm-lock.yaml` are mounted as volumes, allowing you to add or update dependencies without rebuilding the container:
+
+```bash
+# 1. Edit package.json locally (add/update dependencies)
+vim frontend/package.json
+
+# 2. Install dependencies inside the running container
+docker exec sandbox-frontend pnpm install
+
+# 3. Changes are automatically picked up (no rebuild needed)
+```
+
+**Note**: The container must be running for `docker exec` to work. If you need to rebuild anyway, you can also add dependencies and rebuild:
+
+```bash
+# Alternative: Add dependency and rebuild
+cd frontend && pnpm add <package-name>
+docker-compose build frontend
+```
+
 ## Repository
 
 - **Remote**: https://github.com/nagashima-toru/sandbox-claude-code.git
