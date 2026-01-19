@@ -1,0 +1,117 @@
+name: Dependabot PR Documentation Reminder
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  check-docs-update:
+    # Only run for Dependabot PRs
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Check if documentation update is needed
+        id: check
+        run: |
+          # Get PR title
+          title="${{ github.event.pull_request.title }}"
+
+          needs_update=false
+
+          # Check for major dependencies that require documentation updates
+          # Backend dependencies
+          if echo "$title" | grep -iE "spring-boot|spring boot|java-|eclipse-temurin|postgres"; then
+            needs_update=true
+          fi
+
+          # Frontend dependencies
+          if echo "$title" | grep -iE "next|react|node|typescript"; then
+            needs_update=true
+          fi
+
+          # Other important dependencies
+          if echo "$title" | grep -iE "maven|pnpm"; then
+            needs_update=true
+          fi
+
+          echo "needs_update=$needs_update" >> $GITHUB_OUTPUT
+          echo "PR title: $title"
+          echo "Needs documentation update: $needs_update"
+
+      - name: Post reminder comment
+        if: steps.check.outputs.needs_update == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const prNumber = context.issue.number;
+
+            // Determine which dependencies were updated
+            let dependencyType = "依存関係";
+            if (/spring-boot|spring boot/i.test(prTitle)) {
+              dependencyType = "Spring Boot";
+            } else if (/java-|eclipse-temurin/i.test(prTitle)) {
+              dependencyType = "Java";
+            } else if (/postgres/i.test(prTitle)) {
+              dependencyType = "PostgreSQL";
+            } else if (/next/i.test(prTitle)) {
+              dependencyType = "Next.js";
+            } else if (/react/i.test(prTitle)) {
+              dependencyType = "React";
+            } else if (/node/i.test(prTitle)) {
+              dependencyType = "Node.js";
+            } else if (/typescript/i.test(prTitle)) {
+              dependencyType = "TypeScript";
+            }
+
+            const comment = `## 📝 ドキュメント更新のリマインダー
+
+この依存関係の更新（**${dependencyType}**）は、ドキュメントへの影響がある可能性があります。
+
+### 確認が必要なドキュメント
+
+- \`CLAUDE.md\`
+- \`README.md\`
+- \`backend/README.md\`
+- \`backend/CLAUDE.md\`
+- \`frontend/CLAUDE.md\`
+- \`docs/DEPLOYMENT.md\`
+
+### @claude を使った自動更新
+
+以下のコメントを投稿すると、Claude が自動的にドキュメントを更新します：
+
+\`\`\`markdown
+@claude この PR の依存関係更新に伴い、関連するドキュメントのバージョン情報を更新してください。
+
+対象ファイル:
+- CLAUDE.md
+- README.md
+- backend/README.md
+- backend/CLAUDE.md
+- frontend/CLAUDE.md
+- docs/DEPLOYMENT.md
+
+変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。
+\`\`\`
+
+### 手動更新
+
+自分で更新する場合は、[Dependabot ドキュメント更新ガイド](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/master/docs/DEPENDABOT_DOCS_UPDATE.md) を参照してください。
+
+---
+
+💡 このリマインダーは自動的に投稿されました。ドキュメント更新が不要な場合は、このコメントを無視してください。`;
+
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+            console.log(`Posted reminder comment to PR #${prNumber}`);

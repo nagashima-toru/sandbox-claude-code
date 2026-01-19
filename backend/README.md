@@ -5,7 +5,7 @@ Spring Boot API application with PostgreSQL, MyBatis, and Flyway.
 ## Technology Stack
 
 - **Framework**: Spring Boot 3.4.1
-- **Java Version**: 23
+- **Java Version**: 21
 - **Build Tool**: Maven
 - **Database**: PostgreSQL 16
 - **ORM**: MyBatis
@@ -25,7 +25,7 @@ This project follows **Clean Architecture** principles with the following layers
 
 ## Requirements
 
-- Java 23
+- Java 21
 - Docker (or Colima on macOS)
 
 ## Docker Setup
