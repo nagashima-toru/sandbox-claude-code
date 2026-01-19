@@ -73,6 +73,10 @@ COPY --from=build --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=build --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=nextjs:nodejs /app/package.json ./package.json
 
+# Fix: Set ownership of /app directory to allow Next.js to write generated files
+# Next.js production mode writes: next-env.d.ts, tsconfig.tsbuildinfo, cache files
+RUN chown nextjs:nodejs /app
+
 USER nextjs
 
 # Expose port
