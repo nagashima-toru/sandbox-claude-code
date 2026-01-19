@@ -43,14 +43,28 @@ services:
       target: production  # Base uses production; overridden to development by docker-compose.override.yml
     container_name: sandbox-frontend
     environment:
-      # For production deployment (container-to-container communication)
-      # Development override uses http://localhost:8080 for browser access
-      NEXT_PUBLIC_API_URL: http://backend:8080
-    ports:
-      - "3000:3000"
+      # Production uses relative URL /api (accessed through nginx reverse proxy)
+      # Development override uses http://localhost:8080 for direct backend access
+      NEXT_PUBLIC_API_URL: /api
     depends_on:
       backend:
         condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    container_name: sandbox-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/api/hello"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres-data:
