@@ -43,9 +43,9 @@ services:
       target: production  # Base uses production; overridden to development by docker-compose.override.yml
     container_name: sandbox-frontend
     environment:
-      # Production uses relative URL /api (accessed through nginx reverse proxy)
+      # Production: Use empty string for relative URLs (generated code already has /api prefix)
       # Development override uses http://localhost:8080 for direct backend access
-      NEXT_PUBLIC_API_URL: /api
+      NEXT_PUBLIC_API_URL: ""
     depends_on:
       backend:
         condition: service_healthy
