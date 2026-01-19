@@ -40,10 +40,12 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: production
+      target: production  # Base uses production; overridden to development by docker-compose.override.yml
     container_name: sandbox-frontend
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8080
+      # For production deployment (container-to-container communication)
+      # Development override uses http://localhost:8080 for browser access
+      NEXT_PUBLIC_API_URL: http://backend:8080
     ports:
       - "3000:3000"
     depends_on:
