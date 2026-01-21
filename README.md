@@ -9,7 +9,7 @@ A sandbox repository for experimenting with Claude Code.
 
 ```
 sandbox-claude-code/
-├── backend/          # Spring Boot API application (Java 23, Maven)
+├── backend/          # Spring Boot API application (Java 21, Maven)
 ├── frontend/         # Next.js application (TypeScript, pnpm)
 ├── docs/             # Project documentation
 │   └── GITIGNORE_RULES.md
@@ -99,7 +99,7 @@ See [CLAUDE.md](CLAUDE.md#docker-deployment) for more details.
 
 ## Development
 
-This project is configured for IntelliJ IDEA with Java 23 and Node.js 20+.
+This project is configured for IntelliJ IDEA with Java 21 and Node.js 20+.
 
 ## Repository
 
