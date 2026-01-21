@@ -230,7 +230,7 @@ jobs:
         run: docker build -t sandbox-backend:e2e ./backend
 
       - name: Start backend services with Docker Compose
-        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml --env-file .env.e2e.example up -d
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example up -d
 
       - name: Wait for backend to be ready
         run: |
@@ -258,7 +258,7 @@ jobs:
 
       - name: Stop backend services
         if: always()
-        run: docker compose -f docker-compose.e2e.yml down -v
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example down -v
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
@@ -278,7 +278,7 @@ jobs:
 
       - name: Collect backend logs
         if: failure()
-        run: docker compose -f docker-compose.e2e.yml logs > backend-e2e-logs.txt
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example logs > backend-e2e-logs.txt
 
       - name: Upload backend logs
         uses: actions/upload-artifact@v4
