@@ -36,8 +36,8 @@ jobs:
 
       - name: Verify development images exist
         run: |
-          docker images | grep sandbox-frontend
-          docker images | grep sandbox-backend
+          docker images | grep sandbox-claude-code-frontend
+          docker images | grep sandbox-claude-code-backend
 
   production-build:
     name: Test Production Build
@@ -57,8 +57,8 @@ jobs:
 
       - name: Verify production images exist
         run: |
-          docker images | grep sandbox-frontend
-          docker images | grep sandbox-backend
+          docker images | grep sandbox-claude-code-frontend
+          docker images | grep sandbox-claude-code-backend
 
   development-startup:
     name: Test Development Startup
