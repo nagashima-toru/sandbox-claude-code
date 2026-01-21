@@ -282,14 +282,8 @@ jobs:
           echo "$http_code" | grep -E "^(200|404)$"
           echo "✅ API endpoint is responding"
 
-      - name: Test frontend can reach backend
-        run: |
-          # Frontend should be configured to call backend at http://localhost:8080
-          # This verifies the NEXT_PUBLIC_API_URL configuration
-          http_code=$(docker exec sandbox-frontend sh -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/messages')
-          echo "API Response Code from frontend: $http_code"
-          echo "$http_code" | grep -E "^(200|404)$"
-          echo "✅ Frontend container can reach backend"
+      # Frontend-backend connectivity is tested through the production integration tests
+      # where requests flow through nginx, which is the production configuration
 
       - name: Show container network information
         run: |
