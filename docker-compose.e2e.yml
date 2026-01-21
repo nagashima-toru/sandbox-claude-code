@@ -1,58 +1,42 @@
 # Docker Compose configuration for E2E testing
-# Use with: docker-compose -f docker-compose.e2e.yml up
+# This file should be used with .env.e2e for environment-specific configuration
+#
+# Recommended usage:
+#   1. Copy .env.e2e.example to .env.e2e
+#   2. Run: docker-compose -f docker-compose.yml -f docker-compose.override.yml \
+#           -f docker-compose.tmpfs.yml --env-file .env.e2e up
+#
+# Or use standard commands with .env.e2e as your active .env file:
+#   1. cp .env.e2e .env
+#   2. docker-compose up
+#
+# The .env.e2e file should contain:
+#   COMPOSE_PROJECT_NAME=sandbox-e2e
+#   PORT_OFFSET=1
+#   DB_PERSISTENCE_MODE=tmpfs
+#
+# This approach:
+# - Uses the same base configuration as development
+# - Isolates E2E environment with unique project name
+# - Uses PORT_OFFSET=1 for different ports (3001, 8081, 5433, etc.)
+# - Uses tmpfs for faster testing and automatic cleanup
+
+# No service definitions needed here - use base docker-compose.yml
+# All customization is done via .env.e2e file
+
+# Note: If you need E2E-specific overrides (beyond what .env.e2e provides),
+# add them below. For example:
 
 services:
-  postgres:
-    image: postgres:16
-    container_name: sandbox-postgres-e2e
-    environment:
-      POSTGRES_DB: sandbox_e2e
-      POSTGRES_USER: sandbox
-      POSTGRES_PASSWORD: sandbox
-    ports:
-      - "5433:5432"  # Use different port to avoid conflict with dev environment
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sandbox"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    tmpfs:
-      - /var/lib/postgresql/data  # Use tmpfs for faster tests and auto cleanup
-
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: sandbox-backend-e2e
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sandbox_e2e
-      SPRING_DATASOURCE_USERNAME: sandbox
-      SPRING_DATASOURCE_PASSWORD: sandbox
+      # E2E-specific Spring configuration
       SPRING_FLYWAY_ENABLED: "true"
-    ports:
-      - "8081:8080"  # Use different port to avoid conflict with dev environment
-    depends_on:
-      postgres:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
-      interval: 10s
-      timeout: 5s
+      # More retries for E2E stability
       retries: 10
       start_period: 30s
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: production
-      args:
-        NEXT_PUBLIC_API_URL: http://localhost:8081/api  # Point to E2E backend port
-    container_name: sandbox-frontend-e2e
-    environment:
-      API_REWRITE_URL: http://backend:8080/api/:path*  # Use Docker service name for internal communication
-    ports:
-      - "3001:3000"  # Use different port to avoid conflict with dev environment
-    depends_on:
-      backend:
-        condition: service_healthy
+      target: production  # Ensure production build for E2E tests

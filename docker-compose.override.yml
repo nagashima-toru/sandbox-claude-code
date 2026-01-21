@@ -13,8 +13,8 @@ services:
       - ./backend/src:/app/src:ro
     command: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "app.jar"]
     ports:
-      - "8080:8080"
-      - "5005:5005"  # Debug port
+      - "${BACKEND_PORT:-8080}:8080"
+      - "${DEBUG_PORT:-5005}:5005"  # Debug port
 
   frontend:
     build:
@@ -24,10 +24,11 @@ services:
       NODE_ENV: development
       # Enable hot reload
       WATCHPACK_POLLING: "true"
-      # API URL for browser (localhost) - overrides docker-compose.yml
-      NEXT_PUBLIC_API_URL: http://localhost:8080
+      # API URL for browser (localhost) - loaded from .env.local
+      # Note: NEXT_PUBLIC_API_URL should be set in frontend/.env.local, not here
+      # The setup-worktree-env.sh script automatically generates .env.local with correct port
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     volumes:
       # Mount source code for hot reload
       - ./frontend/src:/app/src:ro
@@ -38,8 +39,7 @@ services:
       - ./frontend/tailwind.config.ts:/app/tailwind.config.ts:ro
       - ./frontend/postcss.config.js:/app/postcss.config.js:ro
       - ./frontend/tsconfig.json:/app/tsconfig.json:ro
-      # Mount .env.local if exists (optional, allows customization without modifying compose files)
-      # Note: Environment variables defined above have higher precedence than .env.local
-      # Container restart required for env var changes (rebuild needed for NEXT_PUBLIC_* vars)
+      # Mount .env.local if exists (required for NEXT_PUBLIC_API_URL with correct port)
+      # The setup script creates this file automatically
       - ./frontend/.env.local:/app/.env.local:ro
     command: ["pnpm", "dev"]
