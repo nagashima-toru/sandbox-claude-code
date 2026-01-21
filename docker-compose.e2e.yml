@@ -33,6 +33,9 @@ services:
       # E2E-specific Spring configuration
       SPRING_FLYWAY_ENABLED: "true"
     healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
       # More retries for E2E stability
       retries: 10
       start_period: 30s

@@ -215,10 +215,10 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Set up JDK 23 for backend build
+      - name: Set up JDK 21 for backend build
         uses: actions/setup-java@v4
         with:
-          java-version: '23'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -230,7 +230,7 @@ jobs:
         run: docker build -t sandbox-backend:e2e ./backend
 
       - name: Start backend services with Docker Compose
-        run: docker compose -f docker-compose.e2e.yml up -d
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml --env-file .env.e2e.example up -d
 
       - name: Wait for backend to be ready
         run: |
