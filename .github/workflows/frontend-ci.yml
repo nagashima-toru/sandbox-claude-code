@@ -104,8 +104,8 @@ jobs:
       - name: Generate API client
         run: pnpm generate:api
 
-      - name: Run tests with coverage
-        run: pnpm test -- --coverage --passWithNoTests
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage --passWithNoTests
 
       - name: Generate coverage summary
         if: always()

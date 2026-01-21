@@ -1,11 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-// import { fileURLToPath } from 'node:url';
-// import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
-// import { playwright } from '@vitest/browser/providers/playwright';
-// const dirname =
-//   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
@@ -21,6 +16,7 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
       '**/tests/e2e/**',
+      '**/*.stories.{ts,tsx,js,jsx}', // Exclude Storybook stories from default test runs
     ],
     coverage: {
       provider: 'v8',
@@ -66,34 +62,6 @@ export default defineConfig({
         statements: 80,
       },
     },
-    // Storybook Vitest integration - temporarily disabled
-    // TODO: Re-enable after fixing playwright provider configuration (Issue #62)
-    // projects: [
-    //   {
-    //     extends: true,
-    //     plugins: [
-    //       // The plugin will run tests for the stories defined in your Storybook config
-    //       // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-    //       storybookTest({
-    //         configDir: path.join(dirname, '.storybook'),
-    //       }),
-    //     ],
-    //     test: {
-    //       name: 'storybook',
-    //       browser: {
-    //         enabled: true,
-    //         headless: true,
-    //         provider: playwright({}),
-    //         instances: [
-    //           {
-    //             browser: 'chromium',
-    //           },
-    //         ],
-    //       },
-    //       setupFiles: ['.storybook/vitest.setup.ts'],
-    //     },
-    //   },
-    // ],
   },
   resolve: {
     alias: {
