@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import MessageTable from './MessageTable';
 import { MessageResponse } from '@/lib/api/generated/models';
-import {
-  getGetAllMessagesMockHandler,
-  getGetAllMessagesResponseMock,
-} from '@/lib/api/generated/message/message.msw';
+import { getGetAllMessagesMockHandler } from '@/lib/api/generated/message/message.msw';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse, delay } from 'msw';
 
