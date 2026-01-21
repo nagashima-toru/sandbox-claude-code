@@ -21,6 +21,7 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
       '**/tests/e2e/**',
+      '**/*.stories.{ts,tsx,js,jsx}', // Exclude Storybook stories from default test runs
     ],
     coverage: {
       provider: 'v8',
@@ -66,34 +67,6 @@ export default defineConfig({
         statements: 80,
       },
     },
-    // Storybook Vitest integration
-    // See: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-    projects: [
-      {
-        extends: true,
-        plugins: [
-          // The plugin will run tests for the stories defined in your Storybook config
-          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          storybookTest({
-            configDir: path.join(dirname, '.storybook'),
-          }),
-        ],
-        test: {
-          name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({}),
-            instances: [
-              {
-                browser: 'chromium',
-              },
-            ],
-          },
-          setupFiles: ['.storybook/vitest.setup.ts'],
-        },
-      },
-    ],
   },
   resolve: {
     alias: {

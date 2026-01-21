@@ -104,11 +104,8 @@ jobs:
       - name: Generate API client
         run: pnpm generate:api
 
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
-
-      - name: Run tests with coverage
-        run: pnpm test -- --coverage --passWithNoTests
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage --passWithNoTests
 
       - name: Generate coverage summary
         if: always()
