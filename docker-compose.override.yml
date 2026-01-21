@@ -36,4 +36,8 @@ services:
       - ./frontend/tailwind.config.ts:/app/tailwind.config.ts:ro
       - ./frontend/postcss.config.js:/app/postcss.config.js:ro
       - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+      # Mount .env.local if exists (optional, allows customization without modifying compose files)
+      # Note: Environment variables defined above have higher precedence than .env.local
+      # Container restart required for env var changes (rebuild needed for NEXT_PUBLIC_* vars)
+      - ./frontend/.env.local:/app/.env.local:ro
     command: ["pnpm", "dev"]
