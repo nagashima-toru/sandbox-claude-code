@@ -8,18 +8,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Use case for retrieving all messages. */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class GetAllMessagesUseCase {
 
-    private final MessageRepository messageRepository;
+  private final MessageRepository messageRepository;
 
-    @Transactional(readOnly = true)
-    public List<Message> execute() {
-        log.debug("Fetching all messages");
-        List<Message> messages = messageRepository.findAll();
-        log.debug("Found {} messages", messages.size());
-        return messages;
-    }
+  /**
+   * Retrieves all messages from the repository.
+   *
+   * @return a list of all messages
+   */
+  @Transactional(readOnly = true)
+  public List<Message> execute() {
+    log.debug("Fetching all messages");
+    List<Message> messages = messageRepository.findAll();
+    log.debug("Found {} messages", messages.size());
+    return messages;
+  }
 }

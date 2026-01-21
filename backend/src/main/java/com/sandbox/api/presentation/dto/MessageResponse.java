@@ -5,20 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/** Response DTO representing a message. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponse {
 
-    private Long id;
-    private String code;
-    private String content;
+  private Long id;
+  private String code;
+  private String content;
 
-    public static MessageResponse from(Message message) {
-        return new MessageResponse(
-                message.getId(),
-                message.getCode(),
-                message.getContent()
-        );
-    }
+  public static MessageResponse from(Message message) {
+    return new MessageResponse(message.getId(), message.getCode(), message.getContent());
+  }
 }

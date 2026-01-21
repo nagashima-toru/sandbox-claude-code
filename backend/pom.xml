@@ -182,6 +182,35 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.dkanejs.maven.plugins</groupId>
+                <artifactId>docker-compose-maven-plugin</artifactId>
+                <version>4.0.0</version>
+                <configuration>
+                    <composeFile>${project.basedir}/../docker-compose.yml</composeFile>
+                    <services>
+                        <service>postgres</service>
+                    </services>
+                    <detachedMode>true</detachedMode>
+                    <removeVolumes>false</removeVolumes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>docker-compose-up</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>up</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>docker-compose-down</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>down</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
@@ -194,6 +223,9 @@
                         <configuration>
                             <skip>false</skip>
                             <jmxPort>9999</jmxPort>
+                            <arguments>
+                                <argument>--server.port=8081</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -220,7 +252,7 @@
                         </goals>
                         <phase>integration-test</phase>
                         <configuration>
-                            <apiDocsUrl>http://localhost:8080/api-docs.yaml</apiDocsUrl>
+                            <apiDocsUrl>http://localhost:8081/api-docs.yaml</apiDocsUrl>
                             <outputFileName>openapi.yaml</outputFileName>
                             <outputDir>${project.basedir}/src/main/resources/api</outputDir>
                         </configuration>
@@ -280,8 +312,6 @@
                     <suppressionFiles>
                         <suppressionFile>dependency-check-suppressions.xml</suppressionFile>
                     </suppressionFiles>
-                    <!-- Disable NVD API due to CVSSv4 parsing issues -->
-                    <nvdApiServicesEnabled>false</nvdApiServicesEnabled>
                     <!-- Skip the analyzer entirely to avoid NVD data fetch issues -->
                     <skipSystemScope>true</skipSystemScope>
                     <skipTestScope>true</skipTestScope>
