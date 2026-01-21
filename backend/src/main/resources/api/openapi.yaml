@@ -27,13 +27,13 @@ paths:
         "404":
           description: メッセージが見つかりません
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
         "200":
           description: 成功
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
     put:
@@ -59,25 +59,25 @@ paths:
         "404":
           description: メッセージが見つかりません
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
         "409":
           description: コードが既に存在します
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
         "400":
           description: バリデーションエラー
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
         "200":
           description: 更新成功
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
     delete:
@@ -109,7 +109,7 @@ paths:
         "200":
           description: 成功
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -130,19 +130,19 @@ paths:
         "201":
           description: 作成成功
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
         "409":
           description: コードが既に存在します
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
         "400":
           description: バリデーションエラー
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
   /api/message:
@@ -156,7 +156,7 @@ paths:
         "200":
           description: メッセージ取得成功
           content:
-            '*/*':
+            application/json:
               schema:
                 type: string
 components:
