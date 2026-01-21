@@ -86,7 +86,11 @@ com.sandbox.api
 
 ## API Endpoints
 
-- `GET /api/message` - Returns message from database
+- `GET /api/messages` - Get all messages
+- `GET /api/messages/{id}` - Get message by ID
+- `POST /api/messages` - Create new message
+- `PUT /api/messages/{id}` - Update message
+- `DELETE /api/messages/{id}` - Delete message
 
 ## Testing
 
