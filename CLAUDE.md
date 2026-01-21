@@ -243,6 +243,54 @@ docker-compose -f docker-compose.yml up --build
 docker-compose down
 ```
 
+#### Customizing Environment Variables
+
+**Using .env.local (Recommended)**:
+
+Development mode automatically mounts `frontend/.env.local` if it exists, allowing you to customize environment variables without modifying docker-compose files.
+
+```bash
+# 1. Copy example file
+cp frontend/.env.local.example frontend/.env.local
+
+# 2. Edit with your custom values
+vim frontend/.env.local
+
+# 3. Restart container (for runtime variables)
+docker-compose restart frontend
+
+# 4. For NEXT_PUBLIC_* variables (build-time), rebuild:
+docker-compose build frontend && docker-compose up
+```
+
+**Environment Variable Precedence** (highest to lowest):
+
+1. docker-compose.override.yml (highest)
+2. .env.local (medium)
+3. docker-compose.yml (lowest)
+
+**Important Notes**:
+
+- Variables in docker-compose.override.yml override .env.local
+- To use .env.local for a variable, remove it from docker-compose.override.yml
+- `NEXT_PUBLIC_*` variables are bundled at build time (require rebuild)
+- Other variables take effect on container restart
+- .env.local is gitignored (safe for secrets in local development)
+
+**Example**:
+
+If you want to test a different API URL:
+
+```bash
+# Option 1: Remove NEXT_PUBLIC_API_URL from docker-compose.override.yml
+# Then set it in .env.local
+echo "NEXT_PUBLIC_API_URL=http://different-api:8080" >> frontend/.env.local
+docker-compose build frontend && docker-compose up
+
+# Option 2: Keep it in docker-compose.override.yml for team-wide default
+# Individual developers can override by editing docker-compose.override.yml locally (not recommended)
+```
+
 ### Troubleshooting
 
 #### Hot Reload Not Working
