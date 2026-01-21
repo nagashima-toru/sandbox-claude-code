@@ -44,7 +44,7 @@ describe('MessageTable', () => {
 
   describe('データ表示', () => {
     it('メッセージ一覧が正しく表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -64,7 +64,7 @@ describe('MessageTable', () => {
     });
 
     it('IDが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -81,7 +81,7 @@ describe('MessageTable', () => {
     });
 
     it('編集ボタンと削除ボタンが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -92,8 +92,8 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const editButtons = screen.getAllByTitle(/edit message/i);
-      const deleteButtons = screen.getAllByTitle(/delete message/i);
+      const editButtons = screen.getAllByLabelText(/edit message/i);
+      const deleteButtons = screen.getAllByLabelText(/delete message/i);
 
       // Both desktop and mobile views are rendered, so expect 2x the number of messages
       expect(editButtons).toHaveLength(mockMessages.length * 2);
@@ -101,7 +101,7 @@ describe('MessageTable', () => {
     });
 
     it('検索バーが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -116,7 +116,7 @@ describe('MessageTable', () => {
     });
 
     it('ページネーションが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -211,7 +211,7 @@ describe('MessageTable', () => {
   describe('検索機能', () => {
     it('検索クエリでフィルタリングできる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -234,7 +234,7 @@ describe('MessageTable', () => {
 
     it('検索結果が0件の場合、メッセージを表示する', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -255,7 +255,7 @@ describe('MessageTable', () => {
 
     it('contentで検索できる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -280,7 +280,7 @@ describe('MessageTable', () => {
   describe('ソート機能', () => {
     it('IDでソートできる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -330,7 +330,7 @@ describe('MessageTable', () => {
   describe('ボタンアクション', () => {
     it('編集ボタンをクリックするとonEditが呼ばれる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -341,7 +341,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const editButtons = screen.getAllByTitle(/edit message/i);
+      const editButtons = screen.getAllByLabelText(/edit message/i);
       await user.click(editButtons[0]);
 
       expect(mockOnEdit).toHaveBeenCalledWith(mockMessages[0]);
@@ -349,7 +349,7 @@ describe('MessageTable', () => {
 
     it('削除ボタンをクリックするとonDeleteが呼ばれる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -360,7 +360,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const deleteButtons = screen.getAllByTitle(/delete message/i);
+      const deleteButtons = screen.getAllByLabelText(/delete message/i);
       await user.click(deleteButtons[0]);
 
       expect(mockOnDelete).toHaveBeenCalledWith(mockMessages[0]);

@@ -12,4 +12,5 @@ public interface MessageRepository {
     Message save(Message message);
     void deleteById(Long id);
     boolean existsByCode(String code);
+    boolean existsById(Long id);
 }

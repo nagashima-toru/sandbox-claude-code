@@ -15,4 +15,5 @@ public interface MessageMapper {
     void update(Message message);
     void deleteById(@Param("id") Long id);
     boolean existsByCode(@Param("code") String code);
+    boolean existsById(@Param("id") Long id);
 }

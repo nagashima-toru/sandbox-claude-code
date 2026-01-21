@@ -50,4 +50,9 @@ public class MessageRepositoryImpl implements MessageRepository {
     public boolean existsByCode(String code) {
         return messageMapper.existsByCode(code);
     }
+
+    @Override
+    public boolean existsById(Long id) {
+        return messageMapper.existsById(id);
+    }
 }
