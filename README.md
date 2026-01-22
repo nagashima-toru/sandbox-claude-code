@@ -51,7 +51,7 @@ See [frontend/README.md](frontend/README.md) for setup instructions.
 
 ```bash
 # Start all services (frontend, backend, postgres, nginx)
-docker-compose up
+docker compose up
 
 # Access the application
 # - Application: http://localhost:3000
@@ -65,7 +65,7 @@ Frontend connects directly to backend at `http://localhost:8080` for development
 
 ```bash
 # Start production services with nginx reverse proxy
-docker-compose -f docker-compose.yml up
+docker compose -f docker-compose.yml up
 
 # Access the application
 # - Application: http://localhost (port 80)

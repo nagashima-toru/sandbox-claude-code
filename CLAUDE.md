@@ -55,12 +55,12 @@ This project uses a two-tier Docker Compose configuration:
 
 Docker Compose automatically merges these files when you run `docker-compose up`, giving you a development environment with hot reload. To test the production setup, explicitly specify only the base file.
 
-### Development Mode (Default) - `docker-compose up`
+### Development Mode (Default) - `docker compose up`
 
 **When to use**: Daily development work
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 **What it does**:
@@ -91,12 +91,12 @@ docker-compose up
 - Larger image size
 - Development dependencies included
 
-### Production-like Testing - `docker-compose -f docker-compose.yml up`
+### Production-like Testing - `docker compose -f docker-compose.yml up`
 
 **When to use**: Testing production Docker build locally before deployment
 
 ```bash
-docker-compose -f docker-compose.yml up
+docker compose -f docker-compose.yml up
 ```
 
 **What it does**:
@@ -147,32 +147,32 @@ docker-compose -f docker-compose.yml up
 
 ```bash
 # Development mode (with hot reload)
-docker-compose up
+docker compose up
 
 # Development mode in background
-docker-compose up -d
+docker compose up -d
 
 # Production-like mode (optimized build)
-docker-compose -f docker-compose.yml up
+docker compose -f docker-compose.yml up
 
 # Rebuild specific service (development mode)
-docker-compose build backend
-docker-compose build frontend
+docker compose build backend
+docker compose build frontend
 
 # Rebuild specific service (production mode)
-docker-compose -f docker-compose.yml build backend
-docker-compose -f docker-compose.yml build frontend
+docker compose -f docker-compose.yml build backend
+docker compose -f docker-compose.yml build frontend
 
 # View logs
-docker-compose logs -f
-docker-compose logs -f frontend
-docker-compose logs -f backend
+docker compose logs -f
+docker compose logs -f frontend
+docker compose logs -f backend
 
 # Stop and remove containers
-docker-compose down
+docker compose down
 
 # Stop and remove containers with volumes
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Common Workflows

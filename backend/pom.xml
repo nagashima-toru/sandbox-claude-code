@@ -186,6 +186,8 @@
                 <artifactId>docker-compose-maven-plugin</artifactId>
                 <version>4.0.0</version>
                 <configuration>
+                    <!-- Skip in CI environment (set -DskipDockerCompose=true in CI) -->
+                    <skip>${skipDockerCompose}</skip>
                     <composeFile>${project.basedir}/../docker-compose.yml</composeFile>
                     <services>
                         <service>postgres</service>

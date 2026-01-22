@@ -53,7 +53,7 @@ jobs:
 
       - name: Build and test
         working-directory: ./backend
-        run: ./mvnw clean verify
+        run: ./mvnw clean verify -DskipDockerCompose=true
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
           SPRING_DATASOURCE_USERNAME: testuser

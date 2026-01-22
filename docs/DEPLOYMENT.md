@@ -151,7 +151,7 @@ docker pull ghcr.io/[org]/[repo]/backend:latest
 docker pull ghcr.io/[org]/[repo]/frontend:latest
 
 # Run with docker-compose (update docker-compose.yml to use GHCR images)
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Option 2: Cloud Platform Deployment
@@ -304,7 +304,7 @@ If deployment fails:
 2. **Redeploy**: Use specific image tag
    ```bash
    docker pull ghcr.io/[org]/[repo]/backend:v1.2.2
-   docker-compose up -d
+   docker compose up -d
    ```
 3. **Verify**: Health checks and functionality
 4. **Fix**: Address issues in code, then redeploy

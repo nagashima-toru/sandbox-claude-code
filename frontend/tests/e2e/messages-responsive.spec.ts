@@ -67,8 +67,8 @@ test.describe('Messages Responsive Behavior', () => {
       // Verify edit and delete buttons are visible in mobile view
       // Mobile view is in .md:hidden div
       const mobileView = page.locator('.md\\:hidden');
-      const editButton = mobileView.getByTitle(/edit message/i).first();
-      const deleteButton = mobileView.getByTitle(/delete message/i).first();
+      const editButton = mobileView.getByRole('button', { name: /edit message/i }).first();
+      const deleteButton = mobileView.getByRole('button', { name: /delete message/i }).first();
 
       await expect(editButton).toBeVisible();
       await expect(deleteButton).toBeVisible();
@@ -152,9 +152,10 @@ test.describe('Messages Responsive Behavior', () => {
       // Open create modal
       await openCreateModal(page);
 
-      // Form fields should be visible and usable
-      const codeInput = page.getByLabel(/code/i);
-      const contentInput = page.getByLabel(/content/i);
+      // Form fields should be visible and usable (scope to modal to avoid conflicts)
+      const modal = page.locator('[role="dialog"]');
+      const codeInput = modal.getByLabel(/code/i);
+      const contentInput = modal.getByLabel(/content/i);
 
       await expect(codeInput).toBeVisible();
       await expect(contentInput).toBeVisible();
