@@ -5,23 +5,13 @@ export function getApiErrorMessage(error: unknown): string | null {
   if (!error) return null;
 
   // Type guard for axios-like error structure
-  const hasResponse =
-    typeof error === 'object' &&
-    error !== null &&
-    !(error instanceof Date) &&
-    !(error instanceof RegExp) &&
-    'response' in error;
+  const hasResponse = typeof error === 'object' && error !== null && 'response' in error;
   const response = hasResponse
     ? (error as { response?: { status?: number; data?: { message?: string } } }).response
     : undefined;
   const status = response?.status;
 
-  const hasMessage =
-    typeof error === 'object' &&
-    error !== null &&
-    !(error instanceof Date) &&
-    !(error instanceof RegExp) &&
-    'message' in error;
+  const hasMessage = typeof error === 'object' && error !== null && 'message' in error;
   const errorMessage = hasMessage ? (error as { message?: string }).message : undefined;
   const message = response?.data?.message || errorMessage;
 
@@ -37,12 +27,7 @@ export function getApiErrorMessage(error: unknown): string | null {
   if (status === 500) {
     return 'Server error. Please try again later.';
   }
-  const hasCode =
-    typeof error === 'object' &&
-    error !== null &&
-    !(error instanceof Date) &&
-    !(error instanceof RegExp) &&
-    'code' in error;
+  const hasCode = typeof error === 'object' && error !== null && 'code' in error;
   const code = hasCode ? (error as { code?: string }).code : undefined;
   if (code === 'ECONNABORTED' || code === 'ERR_NETWORK') {
     return 'Network error. Please check your connection and try again.';
