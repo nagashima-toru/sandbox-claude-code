@@ -27,7 +27,7 @@ export function getApiErrorMessage(error: unknown): string | null {
 
   if (status === 409) {
     return 'A message with this code already exists. Please use a different code.';
-  }
+  const hasCode = typeof error === 'object' && 'code' in (error as object);
   if (status === 404) {
     return 'Message not found. It may have been deleted.';
   }
