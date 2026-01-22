@@ -319,7 +319,7 @@
                     <skipTestScope>true</skipTestScope>
                     <!-- Use local database only -->
                     <autoUpdate>false</autoUpdate>
-                    <!-- Set failOnError to false to allow build to continue even if dependency check fails -->
+                    <!-- Set failOnError to false allow build to continue even if dependency check fails -->
                     <failOnError>false</failOnError>
                 </configuration>
                 <executions>
