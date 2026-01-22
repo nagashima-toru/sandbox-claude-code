@@ -35,6 +35,17 @@ public class ValidationErrorResponse extends ErrorResponse {
     this.errors = errors;
   }
 
+  /**
+   * Can-equal method required by Lombok's @EqualsAndHashCode(callSuper = true).
+   *
+   * @param other the object to check
+   * @return true if the other object can be equal to this object
+   */
+  @Override
+  protected boolean canEqual(Object other) {
+    return other instanceof ValidationErrorResponse;
+  }
+
   /** Field-specific validation error details. */
   public static class FieldError {
     private String field;

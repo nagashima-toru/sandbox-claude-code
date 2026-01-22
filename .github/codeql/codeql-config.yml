@@ -2,13 +2,12 @@ name: "CodeQL Config"
 
 # Paths to exclude from analysis
 paths-ignore:
-  - '**/node_modules/**'
-  - '**/dist/**'
-  - '**/build/**'
-  - '**/.next/**'
-  - '**/coverage/**'
-  - '**/mockServiceWorker.js'  # MSW auto-generated file
-  - '**/public/mockServiceWorker.js'  # MSW auto-generated file
+  - '**/node_modules'
+  - '**/dist'
+  - '**/build'
+  - '**/.next'
+  - '**/coverage'
+  - 'frontend/public/mockServiceWorker.js'  # MSW auto-generated file
 
 # Query filters
 queries:

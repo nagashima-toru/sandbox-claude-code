@@ -3,6 +3,7 @@ package com.sandbox.api.application.usecase;
 import com.sandbox.api.domain.exception.DuplicateMessageCodeException;
 import com.sandbox.api.domain.model.Message;
 import com.sandbox.api.domain.repository.MessageRepository;
+import com.sandbox.api.infrastructure.logging.LogSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,19 @@ public class CreateMessageUseCase {
    */
   @Transactional
   public Message execute(String code, String content) {
-    log.debug("Creating message with code: {}", code);
+    log.debug("Creating message with code: {}", LogSanitizer.sanitize(code));
 
     if (messageRepository.existsByCode(code)) {
-      log.warn("Duplicate message code: {}", code);
+      log.warn("Duplicate message code: {}", LogSanitizer.sanitize(code));
       throw new DuplicateMessageCodeException(code);
     }
 
     Message message = Message.createNew(code, content);
     Message saved = messageRepository.save(message);
-    log.info("Created message with id: {} and code: {}", saved.getId(), saved.getCode());
+    log.info(
+        "Created message with id: {} and code: {}",
+        saved.getId(),
+        LogSanitizer.sanitize(saved.getCode()));
     return saved;
   }
 }
