@@ -71,6 +71,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
+          config-file: ./.github/codeql/codeql-config.yml
 
       # Java のビルド
       - name: Cache Maven packages

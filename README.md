@@ -9,7 +9,7 @@ A sandbox repository for experimenting with Claude Code.
 
 ```
 sandbox-claude-code/
-├── backend/          # Spring Boot API application (Java 23, Maven)
+├── backend/          # Spring Boot API application (Java 21, Maven)
 ├── frontend/         # Next.js application (TypeScript, pnpm)
 ├── docs/             # Project documentation
 │   └── GITIGNORE_RULES.md
@@ -51,7 +51,7 @@ See [frontend/README.md](frontend/README.md) for setup instructions.
 
 ```bash
 # Start all services (frontend, backend, postgres, nginx)
-docker-compose up
+docker compose up
 
 # Access the application
 # - Application: http://localhost:3000
@@ -65,7 +65,7 @@ Frontend connects directly to backend at `http://localhost:8080` for development
 
 ```bash
 # Start production services with nginx reverse proxy
-docker-compose -f docker-compose.yml up
+docker compose -f docker-compose.yml up
 
 # Access the application
 # - Application: http://localhost (port 80)
@@ -99,7 +99,7 @@ See [CLAUDE.md](CLAUDE.md#docker-deployment) for more details.
 
 ## Development
 
-This project is configured for IntelliJ IDEA with Java 23 and Node.js 20+.
+This project is configured for IntelliJ IDEA with Java 21 and Node.js 20+.
 
 ## Repository
 
