@@ -259,7 +259,7 @@ check_coverage() {
   local threshold=$3
 
   local status
-  if (( $(echo "$actual >= $threshold" | awk '{print ($1 >= $2)}') )); then
+  if (( $(echo "$actual >= $threshold" | awk '{print ($1 >= $3)}') )); then
     status="${GREEN}✅${NC}"
   else
     status="${RED}❌${NC}"
