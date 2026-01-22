@@ -18,7 +18,10 @@
 #   ./scripts/ci-check-local.sh
 ################################################################################
 
-. "$(dirname "$0")/_/husky.sh"
+# Source husky.sh if it exists (optional for backward compatibility)
+if [ -f "$(dirname "$0")/_/husky.sh" ]; then
+  . "$(dirname "$0")/_/husky.sh"
+fi
 
 # Color codes
 RED='\033[0;31m'
