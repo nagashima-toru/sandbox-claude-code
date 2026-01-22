@@ -277,12 +277,12 @@ echo ""
 # Check thresholds
 COVERAGE_FAILED=false
 
-if (( $(echo "$LINE_COVERAGE < 80" | awk '{print ($1 < $2)}') )); then
+if (( $(echo "$LINE_COVERAGE < 80" | awk '{print ($1 < $3)}') )); then
   print_error "Line coverage ($LINE_COVERAGE%) is below threshold (80%)"
   COVERAGE_FAILED=true
 fi
 
-if (( $(echo "$BRANCH_COVERAGE < 75" | awk '{print ($1 < $2)}') )); then
+if (( $(echo "$BRANCH_COVERAGE < 75" | awk '{print ($1 < $3)}') )); then
   print_error "Branch coverage ($BRANCH_COVERAGE%) is below threshold (75%)"
   COVERAGE_FAILED=true
 fi
