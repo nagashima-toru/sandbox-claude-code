@@ -4,7 +4,7 @@ import com.sandbox.api.domain.exception.DuplicateMessageCodeException;
 import com.sandbox.api.domain.exception.MessageNotFoundException;
 import com.sandbox.api.domain.model.Message;
 import com.sandbox.api.domain.repository.MessageRepository;
-import com.sandbox.api.infrastructure.logging.LogSanitizer;
+import com.sandbox.api.domain.util.LogSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

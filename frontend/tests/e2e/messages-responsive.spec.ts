@@ -67,8 +67,8 @@ test.describe('Messages Responsive Behavior', () => {
       // Verify edit and delete buttons are visible in mobile view
       // Mobile view is in .md:hidden div
       const mobileView = page.locator('.md\\:hidden');
-      const editButton = mobileView.getByRole('button', { name: /edit message/i }).first();
-      const deleteButton = mobileView.getByRole('button', { name: /delete message/i }).first();
+      const editButton = mobileView.getByRole('button', { name: /^edit message/i }).first();
+      const deleteButton = mobileView.getByRole('button', { name: /^delete message/i }).first();
 
       await expect(editButton).toBeVisible();
       await expect(deleteButton).toBeVisible();

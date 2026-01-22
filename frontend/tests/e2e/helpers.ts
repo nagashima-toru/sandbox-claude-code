@@ -157,7 +157,7 @@ export async function editMessage(
     await page.waitForTimeout(600); // Wait for debounce
   }
 
-  await row.getByRole('button', { name: /edit/i }).click();
+  await row.getByRole('button', { name: /^edit message/i }).click();
 
   await waitForModal(page);
   await fillFormField(page, 'content', newContent);
@@ -185,7 +185,7 @@ export async function deleteMessage(page: Page, code: string): Promise<void> {
     await page.waitForTimeout(600); // Wait for debounce
   }
 
-  await row.getByRole('button', { name: /delete/i }).click();
+  await row.getByRole('button', { name: /^delete message/i }).click();
 
   // Wait for confirmation dialog
   const confirmDialog = page.locator('[role="alertdialog"]').or(page.locator('[role="dialog"]'));
