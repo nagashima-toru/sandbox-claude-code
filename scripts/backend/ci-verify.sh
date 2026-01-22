@@ -112,10 +112,16 @@ fi
 
 # Check PostgreSQL availability
 print_info "Checking PostgreSQL availability..."
+
+# Environment variables for PostgreSQL connection (matching CI)
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/sandbox"
+export SPRING_DATASOURCE_USERNAME="sandbox"
+export SPRING_DATASOURCE_PASSWORD="sandbox"
+
 if command -v psql &> /dev/null; then
-  # Try to connect to PostgreSQL
-  if PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "SELECT 1" &> /dev/null; then
-    print_success "PostgreSQL is running (testdb/testuser/testpass)"
+  # Try to connect to PostgreSQL with sandbox credentials (development default)
+  if PGPASSWORD=sandbox psql -h localhost -U sandbox -d sandbox -c "SELECT 1" &> /dev/null; then
+    print_success "PostgreSQL is running (sandbox/sandbox/sandbox)"
   else
     print_warning "PostgreSQL not accessible. Attempting to start via docker-compose..."
 
@@ -129,22 +135,14 @@ if command -v psql &> /dev/null; then
       print_info "Waiting for PostgreSQL to be ready..."
       for i in {1..30}; do
         if PGPASSWORD=sandbox psql -h localhost -U sandbox -d sandbox -c "SELECT 1" &> /dev/null; then
-          print_success "PostgreSQL is now running"
-
-          # Create test database and user if needed
-          print_info "Setting up test database..."
-          PGPASSWORD=sandbox psql -h localhost -U sandbox -d postgres <<EOF
-CREATE DATABASE testdb;
-CREATE USER testuser WITH PASSWORD 'testpass';
-GRANT ALL PRIVILEGES ON DATABASE testdb TO testuser;
-EOF
+          print_success "PostgreSQL is now running (sandbox/sandbox/sandbox)"
           break
         fi
         sleep 1
       done
 
       # Final check
-      if ! PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "SELECT 1" &> /dev/null; then
+      if ! PGPASSWORD=sandbox psql -h localhost -U sandbox -d sandbox -c "SELECT 1" &> /dev/null; then
         print_error "Failed to start PostgreSQL. Please start it manually:"
         print_info "  docker-compose up -d postgres"
         exit 99
@@ -168,13 +166,9 @@ print_header "2. Maven Build and Verify"
 
 print_info "Running: ./mvnw clean verify -DskipDockerCompose=true"
 print_info "This will compile, test, and run quality checks..."
+print_info "Using database: $SPRING_DATASOURCE_URL"
 
-# Set PostgreSQL environment variables (matching CI)
-export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/testdb"
-export SPRING_DATASOURCE_USERNAME="testuser"
-export SPRING_DATASOURCE_PASSWORD="testpass"
-
-# Run Maven verify
+# Run Maven verify (environment variables already set in validation step)
 if [ "$VERBOSE" = true ]; then
   ./mvnw clean verify -DskipDockerCompose=true
   MVN_EXIT_CODE=$?
@@ -259,7 +253,7 @@ check_coverage() {
   local threshold=$3
 
   local status
-  if (( $(echo "$actual >= $threshold" | awk '{print ($1 >= $2)}') )); then
+  if (( $(echo "$actual >= $threshold" | awk '{print ($1 >= $3)}') )); then
     status="${GREEN}✅${NC}"
   else
     status="${RED}❌${NC}"
@@ -277,12 +271,12 @@ echo ""
 # Check thresholds
 COVERAGE_FAILED=false
 
-if (( $(echo "$LINE_COVERAGE < 80" | awk '{print ($1 < $2)}') )); then
+if (( $(echo "$LINE_COVERAGE < 80" | awk '{print ($1 < $3)}') )); then
   print_error "Line coverage ($LINE_COVERAGE%) is below threshold (80%)"
   COVERAGE_FAILED=true
 fi
 
-if (( $(echo "$BRANCH_COVERAGE < 75" | awk '{print ($1 < $2)}') )); then
+if (( $(echo "$BRANCH_COVERAGE < 75" | awk '{print ($1 < $3)}') )); then
   print_error "Branch coverage ($BRANCH_COVERAGE%) is below threshold (75%)"
   COVERAGE_FAILED=true
 fi
@@ -309,9 +303,9 @@ else
   print_info "Parsing SpotBugs report..."
 
   # Count bugs by priority (1=High, 2=Medium, 3=Low)
-  HIGH_BUGS=$(grep -c 'priority="1"' "$SPOTBUGS_XML" || echo "0")
-  MEDIUM_BUGS=$(grep -c 'priority="2"' "$SPOTBUGS_XML" || echo "0")
-  LOW_BUGS=$(grep -c 'priority="3"' "$SPOTBUGS_XML" || echo "0")
+  HIGH_BUGS=$(grep 'priority="1"' "$SPOTBUGS_XML" 2>/dev/null | wc -l | tr -d ' ')
+  MEDIUM_BUGS=$(grep 'priority="2"' "$SPOTBUGS_XML" 2>/dev/null | wc -l | tr -d ' ')
+  LOW_BUGS=$(grep 'priority="3"' "$SPOTBUGS_XML" 2>/dev/null | wc -l | tr -d ' ')
   TOTAL_BUGS=$((HIGH_BUGS + MEDIUM_BUGS + LOW_BUGS))
 
   echo ""
@@ -354,9 +348,9 @@ else
   print_info "Parsing Checkstyle report..."
 
   # Count violations by severity
-  ERROR_COUNT=$(grep -c 'severity="error"' "$CHECKSTYLE_XML" || echo "0")
-  WARNING_COUNT=$(grep -c 'severity="warning"' "$CHECKSTYLE_XML" || echo "0")
-  INFO_COUNT=$(grep -c 'severity="info"' "$CHECKSTYLE_XML" || echo "0")
+  ERROR_COUNT=$(grep 'severity="error"' "$CHECKSTYLE_XML" 2>/dev/null | wc -l | tr -d ' ')
+  WARNING_COUNT=$(grep 'severity="warning"' "$CHECKSTYLE_XML" 2>/dev/null | wc -l | tr -d ' ')
+  INFO_COUNT=$(grep 'severity="info"' "$CHECKSTYLE_XML" 2>/dev/null | wc -l | tr -d ' ')
   TOTAL_VIOLATIONS=$((ERROR_COUNT + WARNING_COUNT + INFO_COUNT))
 
   echo ""

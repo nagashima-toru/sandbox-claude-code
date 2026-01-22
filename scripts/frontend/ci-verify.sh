@@ -340,7 +340,7 @@ if [ -f "$COVERAGE_JSON" ]; then
     local threshold=$3
 
     local status
-    if (( $(echo "$actual >= $threshold" | awk '{print ($1 >= $2)}') )); then
+    if (( $(echo "$actual >= $threshold" | awk '{print ($1 >= $3)}') )); then
       status="${GREEN}✅${NC}"
     else
       status="${RED}❌${NC}"
@@ -359,22 +359,22 @@ if [ -f "$COVERAGE_JSON" ]; then
   # Check thresholds
   COVERAGE_FAILED=false
 
-  if (( $(echo "$STATEMENTS < 80" | awk '{print ($1 < $2)}') )); then
+  if (( $(echo "$STATEMENTS < 80" | awk '{print ($1 < $3)}') )); then
     print_error "Statements coverage ($STATEMENTS%) is below threshold (80%)"
     COVERAGE_FAILED=true
   fi
 
-  if (( $(echo "$BRANCHES < 70" | awk '{print ($1 < $2)}') )); then
+  if (( $(echo "$BRANCHES < 70" | awk '{print ($1 < $3)}') )); then
     print_error "Branches coverage ($BRANCHES%) is below threshold (70%)"
     COVERAGE_FAILED=true
   fi
 
-  if (( $(echo "$FUNCTIONS < 80" | awk '{print ($1 < $2)}') )); then
+  if (( $(echo "$FUNCTIONS < 80" | awk '{print ($1 < $3)}') )); then
     print_error "Functions coverage ($FUNCTIONS%) is below threshold (80%)"
     COVERAGE_FAILED=true
   fi
 
-  if (( $(echo "$LINES < 80" | awk '{print ($1 < $2)}') )); then
+  if (( $(echo "$LINES < 80" | awk '{print ($1 < $3)}') )); then
     print_error "Lines coverage ($LINES%) is below threshold (80%)"
     COVERAGE_FAILED=true
   fi

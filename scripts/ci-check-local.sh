@@ -18,6 +18,7 @@
 #   --dependency-check   Include OWASP dependency-check (slow)
 #   --parallel           Run frontend lint and type-check in parallel
 #   --verbose            Show detailed output
+#   --yes, -y            Skip confirmation prompt (for automation)
 #   --help               Show this help message
 #
 # Examples:
@@ -58,6 +59,7 @@ RUN_E2E=false
 RUN_DEPENDENCY_CHECK=false
 RUN_PARALLEL=false
 VERBOSE=false
+SKIP_CONFIRM=false
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -86,6 +88,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --verbose)
       VERBOSE=true
+      shift
+      ;;
+    --yes|-y)
+      SKIP_CONFIRM=true
       shift
       ;;
     --help)
@@ -215,9 +221,11 @@ if [ "$RUN_BACKEND" = true ] && [ "$RUN_FRONTEND" = true ]; then
   fi
 fi
 
-echo ""
-read -p "Press Enter to continue or Ctrl+C to cancel..."
-echo ""
+if [ "$SKIP_CONFIRM" = false ]; then
+  echo ""
+  read -p "Press Enter to continue or Ctrl+C to cancel..."
+  echo ""
+fi
 
 ################################################################################
 # Run Checks
