@@ -45,6 +45,84 @@ cd backend && ./mvnw test
 - **IDE**: IntelliJ IDEA
 - **Java**: JDK 21
 
+## Local CI Verification
+
+To ensure your changes pass GitHub CI before pushing, use the local verification scripts.
+
+### Quick Start
+
+```bash
+# Quick check (2-3 minutes, recommended before PR)
+./scripts/ci-check-local.sh
+
+# Full check with E2E tests (8-10 minutes)
+./scripts/ci-check-local.sh --e2e
+
+# Backend or frontend only (1-2 minutes)
+./scripts/ci-check-local.sh --backend-only
+./scripts/ci-check-local.sh --frontend-only
+```
+
+### What Gets Checked
+
+#### Backend
+- ✅ Build and tests (Maven verify)
+- ✅ Code coverage (≥80% lines, ≥75% branches)
+- ✅ SpotBugs static analysis
+- ✅ Checkstyle validation
+
+#### Frontend
+- ✅ ESLint and Prettier
+- ✅ TypeScript type checking
+- ✅ Vitest tests with coverage (≥80% statements/functions/lines, ≥70% branches)
+- ✅ Production build
+
+### Three-Tier Verification System
+
+1. **Pre-commit hook** (~10s) - Automatic on commit
+   - Prettier, ESLint, TypeScript on staged files
+
+2. **Pre-push hook** (~30s) - Automatic on push
+   - Backend: `./mvnw compile test`
+   - Frontend: `pnpm lint && pnpm type-check`
+
+3. **Full CI verification** (2-15min) - Manual before PR
+   - Complete simulation of GitHub Actions CI
+   - Run: `./scripts/ci-check-local.sh`
+
+### Common Commands
+
+```bash
+# Standard check (recommended before creating PR)
+./scripts/ci-check-local.sh
+
+# Backend changes only
+./scripts/ci-check-local.sh --backend-only
+
+# Frontend changes only
+./scripts/ci-check-local.sh --frontend-only
+
+# Fast parallel execution
+./scripts/ci-check-local.sh --parallel
+
+# Full verification with everything
+./scripts/ci-check-local.sh --e2e --dependency-check
+```
+
+### Skip Hooks (Emergency Only)
+
+```bash
+# Skip pre-commit hook
+git commit --no-verify
+
+# Skip pre-push hook
+git push --no-verify
+```
+
+**Golden Rule:** If `./scripts/ci-check-local.sh` passes locally, CI should pass.
+
+See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for detailed documentation, troubleshooting, and best practices.
+
 ## Docker Deployment
 
 ### Overview
