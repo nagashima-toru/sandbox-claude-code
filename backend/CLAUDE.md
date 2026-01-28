@@ -92,6 +92,15 @@ com.sandbox.api
 - `PUT /api/messages/{id}` - Update message
 - `DELETE /api/messages/{id}` - Delete message
 
+## バックエンドの開発プロセス（実装〜単体テスト）
+
+1. ユースケース設計
+2. OpenAPI仕様作成
+3. DB 設計
+4. クラス設計
+5. 実装 & 単体テスト
+6. review
+
 ## Testing
 
 **IMPORTANT**: When writing tests, follow the comprehensive test strategy documented in `docs/TEST_STRATEGY.md`.
