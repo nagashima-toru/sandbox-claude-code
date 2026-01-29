@@ -28,6 +28,17 @@ const createWrapper = () => {
   return Wrapper;
 };
 
+// Helper to wrap messages in MessagePage format
+const createMessagePage = (messages: MessageResponse[]) => ({
+  content: messages,
+  page: {
+    size: 20,
+    number: 0,
+    totalElements: messages.length,
+    totalPages: Math.ceil(messages.length / 20),
+  },
+});
+
 describe('MessageTable', () => {
   const mockMessages: MessageResponse[] = [
     {
@@ -63,7 +74,7 @@ describe('MessageTable', () => {
   describe('データ表示', () => {
     it('メッセージ一覧が正しく表示される', () => {
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -82,7 +93,7 @@ describe('MessageTable', () => {
 
     it('IDが表示される', () => {
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -98,7 +109,7 @@ describe('MessageTable', () => {
 
     it('編集ボタンと削除ボタンが表示される', () => {
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -117,7 +128,7 @@ describe('MessageTable', () => {
 
     it('検索バーが表示される', () => {
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -131,7 +142,7 @@ describe('MessageTable', () => {
 
     it('ページネーションが表示される', () => {
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -207,7 +218,7 @@ describe('MessageTable', () => {
   describe('空の状態', () => {
     it('メッセージが0件の場合、空のメッセージを表示する', () => {
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: [],
+        data: createMessagePage([]),
         isLoading: false,
         error: null,
       } as any);
@@ -226,7 +237,7 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -249,7 +260,7 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -270,7 +281,7 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -295,7 +306,7 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -316,7 +327,7 @@ describe('MessageTable', () => {
     it('Codeでソートできる', async () => {
       const user = userEvent.setup();
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: [
+        data: createMessagePage([
           {
             id: 1,
             code: 'CCC',
@@ -338,7 +349,7 @@ describe('MessageTable', () => {
             createdAt: '2026-01-29T00:00:00Z',
             updatedAt: '2026-01-29T00:00:00Z',
           },
-        ],
+        ]),
         isLoading: false,
         error: null,
       } as any);
@@ -363,7 +374,7 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -382,7 +393,7 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: mockMessages,
+        data: createMessagePage(mockMessages),
         isLoading: false,
         error: null,
       } as any);
@@ -410,7 +421,7 @@ describe('MessageTable', () => {
       }));
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
-        data: manyMessages,
+        data: createMessagePage(manyMessages),
         isLoading: false,
         error: null,
       } as any);
