@@ -19,6 +19,9 @@
 
     <properties>
         <java.version>25</java.version>
+        <!-- Java 25 compatibility -->
+        <mockito.version>5.21.0</mockito.version>
+        <byte-buddy.version>1.17.5</byte-buddy.version>
     </properties>
 
     <dependencies>
