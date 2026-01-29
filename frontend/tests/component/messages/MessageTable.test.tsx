@@ -30,9 +30,27 @@ const createWrapper = () => {
 
 describe('MessageTable', () => {
   const mockMessages: MessageResponse[] = [
-    { id: 1, code: 'MSG001', content: 'First message' },
-    { id: 2, code: 'MSG002', content: 'Second message' },
-    { id: 3, code: 'MSG003', content: 'Third message' },
+    {
+      id: 1,
+      code: 'MSG001',
+      content: 'First message',
+      createdAt: '2026-01-29T00:00:00Z',
+      updatedAt: '2026-01-29T00:00:00Z',
+    },
+    {
+      id: 2,
+      code: 'MSG002',
+      content: 'Second message',
+      createdAt: '2026-01-29T00:00:00Z',
+      updatedAt: '2026-01-29T00:00:00Z',
+    },
+    {
+      id: 3,
+      code: 'MSG003',
+      content: 'Third message',
+      createdAt: '2026-01-29T00:00:00Z',
+      updatedAt: '2026-01-29T00:00:00Z',
+    },
   ];
 
   const mockOnEdit = vi.fn();
@@ -299,9 +317,27 @@ describe('MessageTable', () => {
       const user = userEvent.setup();
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: [
-          { id: 1, code: 'CCC', content: 'Content C' },
-          { id: 2, code: 'AAA', content: 'Content A' },
-          { id: 3, code: 'BBB', content: 'Content B' },
+          {
+            id: 1,
+            code: 'CCC',
+            content: 'Content C',
+            createdAt: '2026-01-29T00:00:00Z',
+            updatedAt: '2026-01-29T00:00:00Z',
+          },
+          {
+            id: 2,
+            code: 'AAA',
+            content: 'Content A',
+            createdAt: '2026-01-29T00:00:00Z',
+            updatedAt: '2026-01-29T00:00:00Z',
+          },
+          {
+            id: 3,
+            code: 'BBB',
+            content: 'Content B',
+            createdAt: '2026-01-29T00:00:00Z',
+            updatedAt: '2026-01-29T00:00:00Z',
+          },
         ],
         isLoading: false,
         error: null,
@@ -369,6 +405,8 @@ describe('MessageTable', () => {
         id: i + 1,
         code: `MSG${String(i + 1).padStart(3, '0')}`,
         content: `Message ${i + 1}`,
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
       }));
 
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({

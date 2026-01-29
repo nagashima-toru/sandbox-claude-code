@@ -9,6 +9,8 @@ describe('DeleteConfirmDialog', () => {
     id: 1,
     code: 'TEST001',
     content: 'This is a test message',
+    createdAt: '2026-01-29T00:00:00Z',
+    updatedAt: '2026-01-29T00:00:00Z',
   };
 
   const mockOnOpenChange = vi.fn();
@@ -179,6 +181,8 @@ describe('DeleteConfirmDialog', () => {
         id: 1,
         code: 'A'.repeat(50),
         content: 'Test content',
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
       };
 
       render(<DeleteConfirmDialog {...defaultProps} message={longCodeMessage} />);
@@ -191,6 +195,8 @@ describe('DeleteConfirmDialog', () => {
         id: 1,
         code: 'TEST001',
         content: 'B'.repeat(500),
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
       };
 
       render(<DeleteConfirmDialog {...defaultProps} message={longContentMessage} />);

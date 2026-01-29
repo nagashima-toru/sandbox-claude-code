@@ -19,6 +19,8 @@ const mockMessage: MessageResponse = {
   id: 1,
   code: 'TEST001',
   content: 'This is a test message for editing.',
+  createdAt: '2026-01-29T00:00:00Z',
+  updatedAt: '2026-01-29T00:00:00Z',
 };
 
 export const CreateMode: Story = {

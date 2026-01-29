@@ -18,6 +18,8 @@ const mockInitialData: MessageResponse = {
   id: 1,
   code: 'TEST001',
   content: 'This is a test message',
+  createdAt: '2026-01-29T00:00:00Z',
+  updatedAt: '2026-01-29T00:00:00Z',
 };
 
 export const Create: Story = {

@@ -38,26 +38,36 @@ const mockMessages: MessageResponse[] = [
     id: 1,
     code: 'WELCOME',
     content: 'Welcome to our application!',
+    createdAt: '2026-01-29T00:00:00Z',
+    updatedAt: '2026-01-29T00:00:00Z',
   },
   {
     id: 2,
     code: 'ERROR_001',
     content: 'An error occurred while processing your request.',
+    createdAt: '2026-01-29T00:00:00Z',
+    updatedAt: '2026-01-29T00:00:00Z',
   },
   {
     id: 3,
     code: 'SUCCESS',
     content: 'Operation completed successfully.',
+    createdAt: '2026-01-29T00:00:00Z',
+    updatedAt: '2026-01-29T00:00:00Z',
   },
   {
     id: 4,
     code: 'WARNING',
     content: 'Please review your input before continuing.',
+    createdAt: '2026-01-29T00:00:00Z',
+    updatedAt: '2026-01-29T00:00:00Z',
   },
   {
     id: 5,
     code: 'INFO',
     content: 'This is an informational message.',
+    createdAt: '2026-01-29T00:00:00Z',
+    updatedAt: '2026-01-29T00:00:00Z',
   },
 ];
 
@@ -65,6 +75,8 @@ const manyMessages: MessageResponse[] = Array.from({ length: 50 }, (_, i) => ({
   id: i + 1,
   code: `MSG_${String(i + 1).padStart(3, '0')}`,
   content: `This is message number ${i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+  createdAt: '2026-01-29T00:00:00Z',
+  updatedAt: '2026-01-29T00:00:00Z',
 }));
 
 export const Default: Story = {
@@ -74,7 +86,17 @@ export const Default: Story = {
   },
   parameters: {
     msw: {
-      handlers: [getGetAllMessagesMockHandler(() => mockMessages)],
+      handlers: [
+        getGetAllMessagesMockHandler(() => ({
+          content: mockMessages,
+          page: {
+            size: 20,
+            number: 0,
+            totalElements: mockMessages.length,
+            totalPages: 1,
+          },
+        })),
+      ],
     },
   },
 };
@@ -89,7 +111,15 @@ export const Loading: Story = {
       handlers: [
         http.get('*/api/messages', async () => {
           await delay(10000);
-          return HttpResponse.json(mockMessages);
+          return HttpResponse.json({
+            content: mockMessages,
+            page: {
+              size: 20,
+              number: 0,
+              totalElements: mockMessages.length,
+              totalPages: 1,
+            },
+          });
         }),
       ],
     },
@@ -103,7 +133,17 @@ export const Empty: Story = {
   },
   parameters: {
     msw: {
-      handlers: [getGetAllMessagesMockHandler(() => [])],
+      handlers: [
+        getGetAllMessagesMockHandler(() => ({
+          content: [],
+          page: {
+            size: 20,
+            number: 0,
+            totalElements: 0,
+            totalPages: 0,
+          },
+        })),
+      ],
     },
   },
 };
@@ -132,7 +172,17 @@ export const ManyMessages: Story = {
   },
   parameters: {
     msw: {
-      handlers: [getGetAllMessagesMockHandler(() => manyMessages)],
+      handlers: [
+        getGetAllMessagesMockHandler(() => ({
+          content: manyMessages,
+          page: {
+            size: 20,
+            number: 0,
+            totalElements: manyMessages.length,
+            totalPages: Math.ceil(manyMessages.length / 20),
+          },
+        })),
+      ],
     },
   },
 };
@@ -147,7 +197,17 @@ export const Mobile: Story = {
       defaultViewport: 'mobile1',
     },
     msw: {
-      handlers: [getGetAllMessagesMockHandler(() => mockMessages)],
+      handlers: [
+        getGetAllMessagesMockHandler(() => ({
+          content: mockMessages,
+          page: {
+            size: 20,
+            number: 0,
+            totalElements: mockMessages.length,
+            totalPages: 1,
+          },
+        })),
+      ],
     },
   },
 };
