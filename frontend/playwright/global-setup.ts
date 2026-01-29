@@ -22,7 +22,7 @@ async function globalSetup(config: FullConfig) {
 
     while (retries < maxRetries) {
       try {
-        const response = await page.goto('http://localhost:8080/actuator/health', {
+        const response = await page.goto('http://localhost:8081/actuator/health', {
           timeout: 5000,
         });
 

@@ -1,39 +1,45 @@
-services:
-  postgres:
-    image: postgres:16
-    container_name: sandbox-postgres-e2e
-    environment:
-      POSTGRES_DB: sandbox_e2e
-      POSTGRES_USER: sandbox
-      POSTGRES_PASSWORD: sandbox
-    ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sandbox"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    tmpfs:
-      - /var/lib/postgresql/data
+# Docker Compose configuration for E2E testing
+# This file should be used with .env.e2e for environment-specific configuration
+#
+# Recommended usage:
+#   1. Copy .env.e2e.example to .env.e2e
+#   2. Run: docker compose -f docker-compose.yml -f docker-compose.override.yml \
+#           -f docker-compose.tmpfs.yml --env-file .env.e2e up
+#
+# Or use standard commands with .env.e2e as your active .env file:
+#   1. cp .env.e2e .env
+#   2. docker compose up
+#
+# The .env.e2e file should contain:
+#   COMPOSE_PROJECT_NAME=sandbox-e2e
+#   PORT_OFFSET=1
+#   DB_PERSISTENCE_MODE=tmpfs
+#
+# This approach:
+# - Uses the same base configuration as development
+# - Isolates E2E environment with unique project name
+# - Uses PORT_OFFSET=1 for different ports (3001, 8081, 5433, etc.)
+# - Uses tmpfs for faster testing and automatic cleanup
 
+# No service definitions needed here - use base docker-compose.yml
+# All customization is done via .env.e2e file
+
+# Note: If you need E2E-specific overrides (beyond what .env.e2e provides),
+# add them below. For example:
+
+services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: sandbox-backend-e2e
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sandbox_e2e
-      SPRING_DATASOURCE_USERNAME: sandbox
-      SPRING_DATASOURCE_PASSWORD: sandbox
+      # E2E-specific Spring configuration
       SPRING_FLYWAY_ENABLED: "true"
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 5s
+      # More retries for E2E stability
       retries: 10
       start_period: 30s
+
+  frontend:
+    build:
+      target: production  # Ensure production build for E2E tests

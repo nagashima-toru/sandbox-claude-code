@@ -1,15 +1,70 @@
 services:
   postgres:
-    image: postgres:16
-    container_name: sandbox-postgres
+    image: postgres:16.4-alpine
+    # container_name removed - automatically generated from COMPOSE_PROJECT_NAME
     environment:
-      POSTGRES_DB: sandbox
-      POSTGRES_USER: sandbox
-      POSTGRES_PASSWORD: sandbox
+      POSTGRES_DB: ${POSTGRES_DB:-sandbox}
+      POSTGRES_USER: ${POSTGRES_USER:-sandbox}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sandbox}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sandbox}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # container_name removed - automatically generated from COMPOSE_PROJECT_NAME
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-sandbox}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-sandbox}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-sandbox}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production  # Base uses production; overridden to development by docker-compose.override.yml
+    # container_name removed - automatically generated from COMPOSE_PROJECT_NAME
+    environment:
+      # Production: Use empty string for relative URLs (generated code already has /api prefix)
+      # Development override uses http://localhost:8080 for direct backend access
+      NEXT_PUBLIC_API_URL: ""
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    # container_name removed - automatically generated from COMPOSE_PROJECT_NAME
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  postgres_data:
+  postgres-data:

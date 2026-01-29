@@ -52,8 +52,9 @@ pnpm-debug.log*
 next-env.d.ts
 
 # Orval generated files
-# DO NOT manually edit files in this directory
-src/lib/api/generated/
+# Note: Generated files are now committed to ensure Docker builds work in CI
+# Regenerate with: pnpm generate:api when backend OpenAPI spec changes
+# DO NOT manually edit files in src/lib/api/generated/
 
 # Storybook
 storybook-static
@@ -61,3 +62,4 @@ storybook-static
 
 # Vitest
 .vitest/
+*storybook.log

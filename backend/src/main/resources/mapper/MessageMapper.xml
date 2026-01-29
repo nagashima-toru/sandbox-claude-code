@@ -41,4 +41,10 @@
         FROM messages
         WHERE code = #{code}
     </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM messages
+        WHERE id = #{id}
+    </select>
 </mapper>
