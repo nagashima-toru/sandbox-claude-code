@@ -153,8 +153,8 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6(msw@2.12.7(@types/node@22.19.3)(typescript@5.9.3))
       orval:
-        specifier: ^8.0.2
-        version: 8.0.2(typescript@5.9.3)
+        specifier: ^8.1.0
+        version: 8.1.0(typescript@5.9.3)
       playwright:
         specifier: ^1.57.0
         version: 1.57.0
@@ -1534,70 +1534,70 @@ packages:
         integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==,
       }
 
-  '@orval/angular@8.0.2':
+  '@orval/angular@8.1.0':
     resolution:
       {
-        integrity: sha512-4RWMlGOFvsBrIPVZOo6fIRN46aMatgLpX69Zu9JeW/+9uQJ5CyNOtDg4RPYWVYdTFGjhEhf6OkeR0aKoxStAfA==,
+        integrity: sha512-C0YZbCE5E99qgRTiFPlr8irCvXjRJzKlw4pKKW7lyeP3P1nchsPx/L6Wm0iJ6nTv97WbxeNzMzNqaT2hEMH7vQ==,
       }
 
-  '@orval/axios@8.0.2':
+  '@orval/axios@8.1.0':
     resolution:
       {
-        integrity: sha512-C9Jt0+fc6EmhIhCXosUXffo55QG9FflGEAFw7J7G0w7gGxUHbUkPCSR6tXuH/Y72CRXiBdxlIpBs8UgzgyRf6Q==,
+        integrity: sha512-sWmaNzHFhf5JBfL7gRIqx6fzRQkSx2Qf2hrf6OWHzK3TnBpJzflLHEBgrXzIYzqOn5yVazeH2IbsF0CSU94mdQ==,
       }
 
-  '@orval/core@8.0.2':
+  '@orval/core@8.1.0':
     resolution:
       {
-        integrity: sha512-XBKaEE2g378Y2Hs6LY/QZ5uVpffzsmHQR5Uvzr9K13Wb4LDbN3MR5VNWyISnLVAwdLDYyvqtGEcGpJJgsUH4EQ==,
+        integrity: sha512-dQoNy77ckcfpKT8pWJrRzrMK8OapuJtUscqZ4iDMk2XGBh0EEAVNmobEXAj7dzTPaDFuB5LJpQ9LiU+/NDdlfg==,
       }
 
-  '@orval/fetch@8.0.2':
+  '@orval/fetch@8.1.0':
     resolution:
       {
-        integrity: sha512-rJdsYMxP3Q7XFzZ7stPkj31oPxWnXSFUONYxnDnDe8u95lQhtr0ThAKCuJg18Tc3ZlNpkvnufXqMkAKH8cOm1Q==,
+        integrity: sha512-ppVvUVq4v+z9Julknysk4VCIPpkoYEqlHt2JgmlMKX2fcwFBjpzStkrf5xBHTQr8NyvIy5M+O5j8gDnEsi4OpQ==,
       }
 
-  '@orval/hono@8.0.2':
+  '@orval/hono@8.1.0':
     resolution:
       {
-        integrity: sha512-P2dxi5MbTNyqQQSxteqa+K0hGTpW4rbxb8GuMaf+ConSucWhknJyhfVe3Q5cvRXodnpRrw801P5HDpwqXsVjAg==,
+        integrity: sha512-GUOgC1w4yXMz57ZgYgAwxHnNslGYJeZFvqVflfL48epaccjrs6tfuLynTvyjsehr2dtaIcdlw+txvpsL2wRI3A==,
       }
 
-  '@orval/mcp@8.0.2':
+  '@orval/mcp@8.1.0':
     resolution:
       {
-        integrity: sha512-0asnmvWGbnIiP9mFB0QJ+gFAQfDup+/vjzybPJyTHAOuSfJUKLZIpj7JZpUPbgiSikzAXPLz0Jwna+T4q8ytpg==,
+        integrity: sha512-EDmjY+lU0w2PHMu1UN1nVS2v7j6eRbKxeggBsWNBKyEiGIDqxp8ALYO/u6TRSCeVjs3PGeX/2wFbUiIaB0tgnA==,
       }
 
-  '@orval/mock@8.0.2':
+  '@orval/mock@8.1.0':
     resolution:
       {
-        integrity: sha512-eDo91SxlKgoStBcXRS/2kb0aO95xopq8/SAncHz7eKGI3TBHbE51D+FR04uBlbq5DuW31KEzb237uaZje5eVPg==,
+        integrity: sha512-+80bTjDr+/X+8MwVw+LVqc2Mqr4ByWc+9pOc4QYkeKHm5NnKaBKHlrIAv/WDJs7exmeb7RQjfKJSwDCZoI/qDw==,
       }
 
-  '@orval/query@8.0.2':
+  '@orval/query@8.1.0':
     resolution:
       {
-        integrity: sha512-rO+1eKwaWcp0hOA/aez+e2X3f/bVGB1LRakfNaCsqRhhWfi0xeM1QsnIP1BazmZKjGJmsXZDrzHAnkWbIt5aUQ==,
+        integrity: sha512-Kq/dn5AbE4u8NbJXdfwNg7L8YC69R4+D2SUgvKxUV//tMgD7RjmJbO3CsfPxlcFkY9eUeaCmb1weDxK1Afkd5w==,
       }
 
-  '@orval/solid-start@8.0.2':
+  '@orval/solid-start@8.1.0':
     resolution:
       {
-        integrity: sha512-Ihho1Haqb/z0blAk/IF87iDvi2BFntbGO+MNOeXXR9YUipYtIQtpfKogBVuSYCErmYQ7r6UUcKtc4s5tdHEfOA==,
+        integrity: sha512-AYob5tdeznkC9HbxJidgDdktTalFE4fJA7WSgQYjJt16dC6ZysIURQl4xhPGlzVlFWSx5k1kukXceMKdP6vs2A==,
       }
 
-  '@orval/swr@8.0.2':
+  '@orval/swr@8.1.0':
     resolution:
       {
-        integrity: sha512-H43aOnede3ePPa5YNSLvdmfzHW1HX9LJ0vSMlGj4SQ4QrxRvTfyA03Mk8YQgq5IK/UofubXYEcYrXxQhK5t8Lg==,
+        integrity: sha512-rUIS80rzMaT1co55GpqXvCTxIHJ01Lr4oiBmXTSpWBDc4oxFRZb650RPjILm3JOLK+wjw4BASaafitFnh202+A==,
       }
 
-  '@orval/zod@8.0.2':
+  '@orval/zod@8.1.0':
     resolution:
       {
-        integrity: sha512-RP+GhsEtXXgteldZAkNt8DhSS37/6IPFr30Hg67YEnxMGgVOWIOjS8R2vHkw7uZEY7E7ZJlieiJh9Tav7Qii6g==,
+        integrity: sha512-ARAT4kygdT/5M5WbJ7RMcxFujji4bua7TF23VEawu8U7E61o41OdPdXTYGAnNkocnHDf0xKXRip2X4dOaIpnuw==,
       }
 
   '@playwright/test@1.57.0':
@@ -5662,10 +5662,10 @@ packages:
       }
     engines: { node: '>= 0.8.0' }
 
-  orval@8.0.2:
+  orval@8.1.0:
     resolution:
       {
-        integrity: sha512-0MPpNARaTNvE+hXkQC1YT3Os8pkId8B3i07cqn6OksNYfH8f9FYOHHbUSQUyEiOzovfSYIsmcum2pWbA9d4I0A==,
+        integrity: sha512-qjjw85hA4ds5vTFZ4gKrnfHYoo3tw36m0Cs+4AdIfXPgZUjeNMeFMXHljPedoEARCt6xwOQqWWeK97qv2VKm4Q==,
       }
     engines: { node: '>=22.18.0' }
     hasBin: true
@@ -7291,10 +7291,10 @@ packages:
         integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==,
       }
 
-  zod@4.3.5:
+  zod@4.3.6:
     resolution:
       {
-        integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==,
+        integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==,
       }
 
 snapshots:
@@ -7968,21 +7968,21 @@ snapshots:
 
   '@open-draft/until@2.1.0': {}
 
-  '@orval/angular@8.0.2(typescript@5.9.3)':
+  '@orval/angular@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/axios@8.0.2(typescript@5.9.3)':
+  '@orval/axios@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/core@8.0.2(typescript@5.9.3)':
+  '@orval/core@8.1.0(typescript@5.9.3)':
     dependencies:
       '@scalar/openapi-types': 0.5.3
       acorn: 8.15.0
@@ -7999,68 +7999,68 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/fetch@8.0.2(typescript@5.9.3)':
+  '@orval/fetch@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
       '@scalar/openapi-types': 0.5.3
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/hono@8.0.2(typescript@5.9.3)':
+  '@orval/hono@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
-      '@orval/zod': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
+      '@orval/zod': 8.1.0(typescript@5.9.3)
       fs-extra: 11.3.3
       remeda: 2.33.4
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/mcp@8.0.2(typescript@5.9.3)':
+  '@orval/mcp@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
-      '@orval/fetch': 8.0.2(typescript@5.9.3)
-      '@orval/zod': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
+      '@orval/fetch': 8.1.0(typescript@5.9.3)
+      '@orval/zod': 8.1.0(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/mock@8.0.2(typescript@5.9.3)':
+  '@orval/mock@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/query@8.0.2(typescript@5.9.3)':
+  '@orval/query@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
-      '@orval/fetch': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
+      '@orval/fetch': 8.1.0(typescript@5.9.3)
       chalk: 5.6.2
       remeda: 2.33.4
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/solid-start@8.0.2(typescript@5.9.3)':
+  '@orval/solid-start@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/swr@8.0.2(typescript@5.9.3)':
+  '@orval/swr@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
-      '@orval/fetch': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
+      '@orval/fetch': 8.1.0(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/zod@8.0.2(typescript@5.9.3)':
+  '@orval/zod@8.1.0(typescript@5.9.3)':
     dependencies:
-      '@orval/core': 8.0.2(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
       remeda: 2.33.4
     transitivePeerDependencies:
       - supports-color
@@ -8357,7 +8357,7 @@ snapshots:
 
   '@scalar/openapi-types@0.5.3':
     dependencies:
-      zod: 4.3.5
+      zod: 4.3.6
 
   '@scalar/openapi-upgrader@0.1.7':
     dependencies:
@@ -10688,20 +10688,20 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  orval@8.0.2(typescript@5.9.3):
+  orval@8.1.0(typescript@5.9.3):
     dependencies:
       '@commander-js/extra-typings': 14.0.0(commander@14.0.2)
-      '@orval/angular': 8.0.2(typescript@5.9.3)
-      '@orval/axios': 8.0.2(typescript@5.9.3)
-      '@orval/core': 8.0.2(typescript@5.9.3)
-      '@orval/fetch': 8.0.2(typescript@5.9.3)
-      '@orval/hono': 8.0.2(typescript@5.9.3)
-      '@orval/mcp': 8.0.2(typescript@5.9.3)
-      '@orval/mock': 8.0.2(typescript@5.9.3)
-      '@orval/query': 8.0.2(typescript@5.9.3)
-      '@orval/solid-start': 8.0.2(typescript@5.9.3)
-      '@orval/swr': 8.0.2(typescript@5.9.3)
-      '@orval/zod': 8.0.2(typescript@5.9.3)
+      '@orval/angular': 8.1.0(typescript@5.9.3)
+      '@orval/axios': 8.1.0(typescript@5.9.3)
+      '@orval/core': 8.1.0(typescript@5.9.3)
+      '@orval/fetch': 8.1.0(typescript@5.9.3)
+      '@orval/hono': 8.1.0(typescript@5.9.3)
+      '@orval/mcp': 8.1.0(typescript@5.9.3)
+      '@orval/mock': 8.1.0(typescript@5.9.3)
+      '@orval/query': 8.1.0(typescript@5.9.3)
+      '@orval/solid-start': 8.1.0(typescript@5.9.3)
+      '@orval/swr': 8.1.0(typescript@5.9.3)
+      '@orval/zod': 8.1.0(typescript@5.9.3)
       '@scalar/json-magic': 0.8.10
       '@scalar/openapi-parser': 0.23.13
       '@scalar/openapi-types': 0.5.3
@@ -11769,4 +11769,4 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zod@4.3.5: {}
+  zod@4.3.6: {}
