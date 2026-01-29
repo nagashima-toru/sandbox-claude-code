@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { FullConfig } from '@playwright/test';
 
-async function globalTeardown(config: FullConfig) {
+async function globalTeardown(_config: FullConfig) {
   console.log('🛑 Global teardown: Stopping backend services...');
 
   try {
