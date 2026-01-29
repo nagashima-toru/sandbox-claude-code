@@ -35,7 +35,7 @@ See [backend/README.md](backend/README.md) for setup instructions.
 
 Next.js-based message management application with full CRUD functionality.
 
-- **Tech Stack**: Next.js 15+, TypeScript, shadcn/ui, TanStack Query, Orval
+- **Tech Stack**: Next.js 16+, TypeScript, shadcn/ui, TanStack Query, Orval
 - **API Client**: Auto-generated from OpenAPI spec
 - **Docs**: [frontend/CLAUDE.md](frontend/CLAUDE.md)
 

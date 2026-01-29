@@ -8,7 +8,7 @@ Next.js-based message management application with full CRUD functionality.
 
 ## Tech Stack
 
-- **Framework**: Next.js 15+ (App Router)
+- **Framework**: Next.js 16+ (App Router)
 - **Language**: TypeScript
 - **UI Library**: shadcn/ui
 - **Styling**: Tailwind CSS v4

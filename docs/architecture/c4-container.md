@@ -33,7 +33,7 @@
     │   • State Management (TanStack Query) │
     │                                       │
     │   Technology:                         │
-    │   - Next.js 15                        │
+    │   - Next.js 16                        │
     │   - TypeScript 5                      │
     │   - Tailwind CSS                      │
     │   - shadcn/ui                         │
@@ -136,7 +136,7 @@
 
 **技術スタック**:
 - **Runtime**: Node.js 20+
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 3
 - **UI Components**: shadcn/ui
