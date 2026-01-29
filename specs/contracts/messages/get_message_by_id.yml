@@ -1,0 +1,37 @@
+description: メッセージID取得のコントラクト
+name: get_message_by_id_contract
+priority: 1
+
+request:
+  method: GET
+  url: /api/messages/1
+  urlPath: /api/messages/1
+  matchers:
+    url:
+      regex: /api/messages/[0-9]+
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    id: 1
+    code: "MSG_001"
+    content: "Message 1"
+    createdAt: "2024-01-01T00:00:00Z"
+    updatedAt: "2024-01-01T00:00:00Z"
+  matchers:
+    body:
+      - path: $.id
+        type: by_type
+      - path: $.code
+        type: by_regex
+        value: "^[a-zA-Z0-9_-]+$"
+      - path: $.content
+        type: by_type
+      - path: $.createdAt
+        type: by_regex
+        value: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*$"
+      - path: $.updatedAt
+        type: by_regex
+        value: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*$"
