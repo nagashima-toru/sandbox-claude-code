@@ -246,6 +246,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                Disabled: OpenAPI specification is now manually managed in specs/openapi/
+                Keeping springdoc for Swagger UI only
+            -->
+            <!--
             <plugin>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-maven-plugin</artifactId>
@@ -261,6 +266,40 @@
                             <apiDocsUrl>http://localhost:8081/api-docs.yaml</apiDocsUrl>
                             <outputFileName>openapi.yaml</outputFileName>
                             <outputDir>${project.basedir}/src/main/resources/api</outputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.10.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <inputSpec>${project.basedir}/../specs/openapi/openapi.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>com.sandbox.api.presentation.generated.api</apiPackage>
+                            <modelPackage>com.sandbox.api.presentation.generated.model</modelPackage>
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useTags>true</useTags>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <delegatePattern>false</delegatePattern>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useOptional>false</useOptional>
+                                <openApiNullable>false</openApiNullable>
+                                <performBeanValidation>true</performBeanValidation>
+                                <useBeanValidation>true</useBeanValidation>
+                            </configOptions>
                         </configuration>
                     </execution>
                 </executions>
