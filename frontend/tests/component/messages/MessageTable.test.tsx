@@ -89,8 +89,8 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const editButtons = screen.getAllByTitle(/edit message/i);
-      const deleteButtons = screen.getAllByTitle(/delete message/i);
+      const editButtons = screen.getAllByLabelText(/edit message/i);
+      const deleteButtons = screen.getAllByLabelText(/delete message/i);
 
       // Both desktop and mobile views are rendered, so expect 2x the number of messages
       expect(editButtons).toHaveLength(mockMessages.length * 2);
@@ -336,7 +336,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const editButtons = screen.getAllByTitle(/edit message/i);
+      const editButtons = screen.getAllByLabelText(/edit message/i);
       await user.click(editButtons[0]);
 
       expect(mockOnEdit).toHaveBeenCalledWith(mockMessages[0]);
@@ -355,7 +355,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const deleteButtons = screen.getAllByTitle(/delete message/i);
+      const deleteButtons = screen.getAllByLabelText(/delete message/i);
       await user.click(deleteButtons[0]);
 
       expect(mockOnDelete).toHaveBeenCalledWith(mockMessages[0]);

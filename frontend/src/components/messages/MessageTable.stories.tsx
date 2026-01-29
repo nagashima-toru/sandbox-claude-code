@@ -74,7 +74,7 @@ export const Default: Story = {
   },
   parameters: {
     msw: {
-      handlers: [getGetAllMessagesMockHandler(mockMessages)],
+      handlers: [getGetAllMessagesMockHandler(() => mockMessages)],
     },
   },
 };
@@ -103,7 +103,7 @@ export const Empty: Story = {
   },
   parameters: {
     msw: {
-      handlers: [getGetAllMessagesMockHandler([])],
+      handlers: [getGetAllMessagesMockHandler(() => [])],
     },
   },
 };
@@ -132,7 +132,7 @@ export const ManyMessages: Story = {
   },
   parameters: {
     msw: {
-      handlers: [getGetAllMessagesMockHandler(manyMessages)],
+      handlers: [getGetAllMessagesMockHandler(() => manyMessages)],
     },
   },
 };
@@ -147,7 +147,7 @@ export const Mobile: Story = {
       defaultViewport: 'mobile1',
     },
     msw: {
-      handlers: [getGetAllMessagesMockHandler(mockMessages)],
+      handlers: [getGetAllMessagesMockHandler(() => mockMessages)],
     },
   },
 };

@@ -13,7 +13,7 @@ Spring Boot REST API application with PostgreSQL, MyBatis, and Flyway.
 ## Tech Stack
 
 - **Framework**: Spring Boot 3.4.1
-- **Java Version**: 21
+- **Java Version**: 25
 - **Database**: PostgreSQL 16
 - **ORM**: MyBatis
 - **Migration**: Flyway
@@ -86,7 +86,20 @@ com.sandbox.api
 
 ## API Endpoints
 
-- `GET /api/message` - Returns message from database
+- `GET /api/messages` - Get all messages
+- `GET /api/messages/{id}` - Get message by ID
+- `POST /api/messages` - Create new message
+- `PUT /api/messages/{id}` - Update message
+- `DELETE /api/messages/{id}` - Delete message
+
+## バックエンドの開発プロセス（実装〜単体テスト）
+
+1. ユースケース設計
+2. OpenAPI仕様作成
+3. DB 設計
+4. クラス設計
+5. 実装 & 単体テスト
+6. review
 
 ## Testing
 

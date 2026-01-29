@@ -145,7 +145,9 @@ export async function editMessage(
   originalCode: string,
   newContent: string
 ): Promise<void> {
-  const row = page.locator(`tr:has-text("${originalCode}")`);
+  // Target desktop table view only (md:block is visible on md+ breakpoints)
+  const table = page.locator('.md\\:block table');
+  const row = table.locator(`tr:has-text("${originalCode}")`);
 
   // Try to find the row; if not visible, search for it
   const isVisible = await row.isVisible().catch(() => false);
@@ -155,7 +157,7 @@ export async function editMessage(
     await page.waitForTimeout(600); // Wait for debounce
   }
 
-  await row.getByRole('button', { name: /edit/i }).click();
+  await row.getByRole('button', { name: /^edit message/i }).click();
 
   await waitForModal(page);
   await fillFormField(page, 'content', newContent);
@@ -171,7 +173,9 @@ export async function editMessage(
  * Delete a message by finding its row
  */
 export async function deleteMessage(page: Page, code: string): Promise<void> {
-  const row = page.locator(`tr:has-text("${code}")`);
+  // Target desktop table view only (md:block is visible on md+ breakpoints)
+  const table = page.locator('.md\\:block table');
+  const row = table.locator(`tr:has-text("${code}")`);
 
   // Try to find the row; if not visible, search for it
   const isVisible = await row.isVisible().catch(() => false);
@@ -181,7 +185,7 @@ export async function deleteMessage(page: Page, code: string): Promise<void> {
     await page.waitForTimeout(600); // Wait for debounce
   }
 
-  await row.getByRole('button', { name: /delete/i }).click();
+  await row.getByRole('button', { name: /^delete message/i }).click();
 
   // Wait for confirmation dialog
   const confirmDialog = page.locator('[role="alertdialog"]').or(page.locator('[role="dialog"]'));

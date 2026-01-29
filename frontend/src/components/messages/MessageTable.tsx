@@ -1,31 +1,21 @@
 'use client';
 
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useGetAllMessages } from '@/lib/api/generated/message/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { Loading } from '@/components/common/Loading';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Table, TableBody } from '@/components/ui/table';
 import { SearchBar } from './SearchBar';
 import { Pagination } from './Pagination';
+import { MessageTableHeader, SortField, SortDirection } from './MessageTableHeader';
+import { MessageTableRow, MessageCard } from './MessageTableRow';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface MessageTableProps {
   onEdit?: (message: MessageResponse) => void;
   onDelete?: (message: MessageResponse) => void;
 }
-
-type SortField = 'id' | 'code' | 'content';
-type SortDirection = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -59,20 +49,6 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       setSortDirection('asc');
     }
   };
-
-  const getSortIcon = useCallback(
-    (field: SortField) => {
-      if (sortField !== field) {
-        return <ArrowUpDown className="h-4 w-4 ml-1 inline" />;
-      }
-      return sortDirection === 'asc' ? (
-        <ArrowUp className="h-4 w-4 ml-1 inline" />
-      ) : (
-        <ArrowDown className="h-4 w-4 ml-1 inline" />
-      );
-    },
-    [sortField, sortDirection]
-  );
 
   const filteredAndSortedMessages = useMemo(() => {
     if (!messages) return [];
@@ -123,7 +99,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-12">
+      <div className="flex justify-center items-center py-12" role="status" aria-live="polite">
         <Loading size="lg" text="Loading messages..." />
       </div>
     );
@@ -131,13 +107,15 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
 
   if (error) {
     return (
-      <ErrorMessage message="Failed to load messages. Please try again later." variant="card" />
+      <div role="alert">
+        <ErrorMessage message="Failed to load messages. Please try again later." variant="card" />
+      </div>
     );
   }
 
   if (!messages || messages.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" role="status">
         <p className="text-muted-foreground text-lg">No messages found.</p>
         <p className="text-muted-foreground text-sm mt-2">
           Create your first message to get started.
@@ -152,122 +130,47 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
         value={searchQuery}
         onChange={setSearchQuery}
         placeholder="Search by code or content..."
+        aria-label="Search messages"
       />
 
       {filteredAndSortedMessages.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg">
+        <div className="text-center py-12 border rounded-lg" role="status" aria-live="polite">
           <p className="text-muted-foreground text-lg">No messages match your search.</p>
           <p className="text-muted-foreground text-sm mt-2">Try a different search term.</p>
         </div>
       ) : (
         <>
           <div className="border rounded-lg overflow-hidden">
+            {/* Desktop Table View */}
             <div className="hidden md:block">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">
-                      <button
-                        onClick={() => handleSort('id')}
-                        className="flex items-center hover:text-foreground"
-                      >
-                        ID
-                        {getSortIcon('id')}
-                      </button>
-                    </TableHead>
-                    <TableHead className="w-[200px]">
-                      <button
-                        onClick={() => handleSort('code')}
-                        className="flex items-center hover:text-foreground"
-                      >
-                        Code
-                        {getSortIcon('code')}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        onClick={() => handleSort('content')}
-                        className="flex items-center hover:text-foreground"
-                      >
-                        Content
-                        {getSortIcon('content')}
-                      </button>
-                    </TableHead>
-                    <TableHead className="w-[150px] text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+              <Table aria-label="Messages table">
+                <MessageTableHeader
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <TableBody>
                   {paginatedMessages.map((message: MessageResponse) => (
-                    <TableRow key={message.id}>
-                      <TableCell className="font-medium">{message.id}</TableCell>
-                      <TableCell>
-                        <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
-                      </TableCell>
-                      <TableCell className="max-w-md truncate">{message.content}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onEdit?.(message)}
-                            title="Edit message"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onDelete?.(message)}
-                            title="Delete message"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                    <MessageTableRow
+                      key={message.id}
+                      message={message}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                    />
                   ))}
                 </TableBody>
               </Table>
             </div>
 
-            <div className="md:hidden divide-y">
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y" role="list" aria-label="Messages list">
               {paginatedMessages.map((message: MessageResponse) => (
-                <div key={message.id} className="p-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">ID:</span>
-                        <span className="font-medium">{message.id}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">Code:</span>
-                        <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit?.(message)}
-                        title="Edit message"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onDelete?.(message)}
-                        title="Delete message"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground">Content:</span>
-                    <p className="mt-1 text-sm">{message.content}</p>
-                  </div>
-                </div>
+                <MessageCard
+                  key={message.id}
+                  message={message}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
               ))}
             </div>
           </div>

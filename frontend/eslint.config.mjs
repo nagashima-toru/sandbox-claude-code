@@ -30,10 +30,9 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   ...storybook.configs['flat/recommended'],
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'tests/**', 'playwright/**'],
+    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/tests/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
 ];

@@ -43,11 +43,11 @@ jobs:
         uses: actions/checkout@v4
 
       # Java のビルド設定
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         if: matrix.language == 'java'
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -71,6 +71,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
+          config-file: ./.github/codeql/codeql-config.yml
 
       # Java のビルド
       - name: Cache Maven packages

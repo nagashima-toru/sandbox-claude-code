@@ -3,7 +3,7 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- url: http://localhost:8080
+- url: http://localhost:8081
   description: Generated server url
 tags:
 - name: Message
@@ -145,20 +145,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-  /api/message:
-    get:
-      tags:
-      - Message
-      summary: メッセージ取得
-      description: データベースからメッセージを取得します
-      operationId: getMessage
-      responses:
-        "200":
-          description: メッセージ取得成功
-          content:
-            application/json:
-              schema:
-                type: string
 components:
   schemas:
     MessageRequest:

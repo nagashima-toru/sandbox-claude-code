@@ -1,5 +1,5 @@
-# Dependencies stage
-FROM node:20-alpine AS deps
+# Base stage with pnpm
+FROM node:20.18-alpine AS base
 WORKDIR /app
 
 # Install git (required for prepare script in package.json)
@@ -8,6 +8,9 @@ RUN apk add --no-cache git
 # Install pnpm
 RUN npm install -g pnpm
 
+# Dependencies stage
+FROM base AS deps
+
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
@@ -15,11 +18,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Development stage
-FROM node:20-alpine AS development
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
+FROM base AS development
 
 # Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
@@ -38,11 +37,7 @@ ENV HOSTNAME="0.0.0.0"
 CMD ["pnpm", "dev"]
 
 # Build stage
-FROM node:20-alpine AS build
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
+FROM base AS build
 
 # Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
@@ -59,11 +54,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN pnpm build
 
 # Runtime stage
-FROM node:20-alpine AS production
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
+FROM base AS production
 
 # Create non-root user
 RUN addgroup -S nodejs && adduser -S nextjs -G nodejs

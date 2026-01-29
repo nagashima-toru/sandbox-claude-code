@@ -29,8 +29,6 @@ export const getGetAllMessagesResponseMock = (): MessageResponse[] => (Array.fro
 
 export const getCreateMessageResponseMock = (overrideResponse: Partial< MessageResponse > = {}): MessageResponse => ({id: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), code: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), content: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), ...overrideResponse})
 
-export const getGetMessageResponseMock = (): string => (faker.word.sample())
-
 
 export const getGetMessageByIdMockHandler = (overrideResponse?: MessageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MessageResponse> | MessageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/messages/:id', async (info) => {
@@ -89,23 +87,10 @@ export const getCreateMessageMockHandler = (overrideResponse?: MessageResponse |
       })
   }, options)
 }
-
-export const getGetMessageMockHandler = (overrideResponse?: string | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string> | string), options?: RequestHandlerOptions) => {
-  return http.get('*/api/message', async (info) => {
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetMessageResponseMock()),
-      { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  }, options)
-}
 export const getMessageMock = () => [
   getGetMessageByIdMockHandler(),
   getUpdateMessageMockHandler(),
   getDeleteMessageMockHandler(),
   getGetAllMessagesMockHandler(),
-  getCreateMessageMockHandler(),
-  getGetMessageMockHandler()
+  getCreateMessageMockHandler()
 ]

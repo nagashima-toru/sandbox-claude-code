@@ -221,7 +221,8 @@ jobs:
 
       - name: Verify frontend runs as non-root user
         run: |
-          user=$(docker exec sandbox-frontend whoami)
+          FRONTEND_CONTAINER=$(docker compose -f docker-compose.yml ps -q frontend)
+          user=$(docker exec $FRONTEND_CONTAINER whoami)
           echo "Frontend running as user: $user"
           if [ "$user" = "nextjs" ]; then
             echo "✅ Frontend is running as non-root user 'nextjs'"
@@ -232,13 +233,15 @@ jobs:
 
       - name: Verify frontend has write permissions in /app
         run: |
-          docker exec sandbox-frontend touch /app/.next/test-write.txt
-          docker exec sandbox-frontend rm /app/.next/test-write.txt
+          FRONTEND_CONTAINER=$(docker compose -f docker-compose.yml ps -q frontend)
+          docker exec $FRONTEND_CONTAINER touch /app/.next/test-write.txt
+          docker exec $FRONTEND_CONTAINER rm /app/.next/test-write.txt
           echo "✅ Frontend has correct write permissions"
 
       - name: Verify frontend directory ownership
         run: |
-          owner=$(docker exec sandbox-frontend stat -c '%U' /app)
+          FRONTEND_CONTAINER=$(docker compose -f docker-compose.yml ps -q frontend)
+          owner=$(docker exec $FRONTEND_CONTAINER stat -c '%U' /app)
           echo "Directory /app owned by: $owner"
           if [ "$owner" = "nextjs" ]; then
             echo "✅ Directory ownership is correct"

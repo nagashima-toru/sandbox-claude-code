@@ -5,9 +5,9 @@ spring:
   application:
     name: sandbox-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/sandbox
-    username: sandbox
-    password: sandbox
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/sandbox}
+    username: ${DATABASE_USERNAME:sandbox}
+    password: ${DATABASE_PASSWORD:sandbox}
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
@@ -36,3 +36,8 @@ springdoc:
     title: Sandbox API
     description: Spring Boot REST API with Clean Architecture
     version: 1.0.0
+
+logging:
+  level:
+    root: INFO
+    com.sandbox.api: DEBUG
