@@ -1,0 +1,213 @@
+messages:
+  get:
+    tags:
+      - Message
+    summary: メッセージ一覧取得
+    description: |
+      すべてのメッセージを取得します。ページネーションに対応しています。
+
+      **受け入れ条件:** specs/acceptance/messages/get-messages.feature
+    operationId: getAllMessages
+    parameters:
+      - name: page
+        in: query
+        description: ページ番号（0から始まる）
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: 1ページあたりの件数
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
+    responses:
+      '200':
+        description: 成功
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/MessagePage'
+            examples:
+              success:
+                summary: メッセージが存在する場合
+                value:
+                  content:
+                    - id: 1
+                      code: 'MSG_001'
+                      content: 'Hello, World!'
+                      createdAt: '2024-01-01T00:00:00Z'
+                      updatedAt: '2024-01-01T00:00:00Z'
+                  page:
+                    size: 20
+                    number: 0
+                    totalElements: 1
+                    totalPages: 1
+              empty:
+                summary: メッセージが存在しない場合
+                value:
+                  content: []
+                  page:
+                    size: 20
+                    number: 0
+                    totalElements: 0
+                    totalPages: 0
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/Unauthorized'
+
+  post:
+    tags:
+      - Message
+    summary: メッセージ作成
+    description: |
+      新しいメッセージを作成します。
+
+      **受け入れ条件:** specs/acceptance/messages/create-message.feature
+    operationId: createMessage
+    requestBody:
+      description: 作成するメッセージの情報
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/MessageRequest'
+          examples:
+            valid:
+              summary: 有効なリクエスト
+              value:
+                code: 'MSG_001'
+                content: 'Hello, World!'
+    responses:
+      '201':
+        description: 作成成功
+        headers:
+          Location:
+            description: 作成されたメッセージのURI
+            schema:
+              type: string
+              format: uri
+              example: '/api/messages/1'
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/MessageResponse'
+            examples:
+              created:
+                value:
+                  id: 1
+                  code: 'MSG_001'
+                  content: 'Hello, World!'
+                  createdAt: '2024-01-01T00:00:00Z'
+                  updatedAt: '2024-01-01T00:00:00Z'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/Unauthorized'
+      '409':
+        $ref: '../openapi.yaml#/components/responses/Conflict'
+
+messagesById:
+  get:
+    tags:
+      - Message
+    summary: メッセージ取得
+    description: IDでメッセージを取得します
+    operationId: getMessageById
+    parameters:
+      - name: id
+        in: path
+        description: メッセージID
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+    responses:
+      '200':
+        description: 成功
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/MessageResponse'
+            examples:
+              success:
+                value:
+                  id: 1
+                  code: 'MSG_001'
+                  content: 'Hello, World!'
+                  createdAt: '2024-01-01T00:00:00Z'
+                  updatedAt: '2024-01-01T00:00:00Z'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/Unauthorized'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/NotFound'
+
+  put:
+    tags:
+      - Message
+    summary: メッセージ更新
+    description: 既存のメッセージを更新します
+    operationId: updateMessage
+    parameters:
+      - name: id
+        in: path
+        description: メッセージID
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+    requestBody:
+      description: 更新するメッセージの情報
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/MessageRequest'
+    responses:
+      '200':
+        description: 更新成功
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/MessageResponse'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '401':
+        $ref: '../openapi.yaml#/components/responses/Unauthorized'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/NotFound'
+      '409':
+        $ref: '../openapi.yaml#/components/responses/Conflict'
+
+  delete:
+    tags:
+      - Message
+    summary: メッセージ削除
+    description: メッセージを削除します
+    operationId: deleteMessage
+    parameters:
+      - name: id
+        in: path
+        description: メッセージID
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+    responses:
+      '204':
+        description: 削除成功
+      '401':
+        $ref: '../openapi.yaml#/components/responses/Unauthorized'
+      '404':
+        $ref: '../openapi.yaml#/components/responses/NotFound'

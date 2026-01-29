@@ -1,0 +1,85 @@
+name: Epic（大機能）
+description: 複数のStoryを含む大きな機能単位の定義
+title: "[EPIC] "
+labels: ["epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Epic について
+
+        Epicは大機能のスコープを定義します。複数のStoryに分割され、それぞれに具体的な仕様と受け入れ条件が定義されます。
+
+  - type: input
+    id: title
+    attributes:
+      label: Epic タイトル
+      description: この機能の簡潔な名称（例：メッセージ管理機能）
+      placeholder: "例：メッセージ管理機能"
+    validations:
+      required: true
+
+  - type: textarea
+    id: overview
+    attributes:
+      label: 概要
+      description: この機能の目的とスコープを説明してください
+      placeholder: |
+        この機能で何を実現したいのか、なぜ必要なのかを記述してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: business_value
+    attributes:
+      label: ビジネス価値
+      description: この機能がもたらす価値や効果
+      placeholder: |
+        - ユーザーにとっての価値
+        - ビジネスへのインパクト
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: スコープ
+      description: 含まれる機能と含まれない機能を明確にしてください
+      placeholder: |
+        **含まれる機能：**
+        - 機能A
+        - 機能B
+
+        **含まれない機能：**
+        - 機能X（理由）
+    validations:
+      required: true
+
+  - type: textarea
+    id: stories
+    attributes:
+      label: 含まれるStory一覧
+      description: このEpicに含まれるStoryのリスト（後から更新可能）
+      placeholder: |
+        - [ ] Story: メッセージを作成する (#000)
+        - [ ] Story: メッセージを一覧表示する (#000)
+        - [ ] Story: メッセージを削除する (#000)
+    validations:
+      required: false
+
+  - type: input
+    id: milestone
+    attributes:
+      label: マイルストーン
+      description: 関連するマイルストーン名
+      placeholder: "例：v1.0.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 補足事項
+      description: その他の重要な情報や制約事項
+    validations:
+      required: false
