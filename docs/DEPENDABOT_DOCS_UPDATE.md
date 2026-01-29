@@ -163,16 +163,16 @@ grep -r "Next.js.*15" frontend/
 
 | ファイル | 記載されているバージョン |
 |---------|----------------------|
-| `CLAUDE.md` | Spring Boot 3.4.1, Java 21 |
+| `CLAUDE.md` | Spring Boot 3.5.10, Java 25 |
 | `README.md` | (プロジェクト概要のみ、詳細なバージョンは各サブディレクトリ) |
 
 ### Backend
 
 | ファイル | 記載されているバージョン |
 |---------|----------------------|
-| `backend/README.md` | Spring Boot 3.4.1, Java 21, PostgreSQL 16 |
-| `backend/CLAUDE.md` | Spring Boot 3.4.1, Java 21, PostgreSQL 16 |
-| `backend/pom.xml` | Spring Boot 3.4.1 (parent), Java 21 (properties) |
+| `backend/README.md` | Spring Boot 3.5.10, Java 25, PostgreSQL 16 |
+| `backend/CLAUDE.md` | Spring Boot 3.5.10, Java 25, PostgreSQL 16 |
+| `backend/pom.xml` | Spring Boot 3.5.10 (parent), Java 25 (properties) |
 | `backend/Dockerfile` | eclipse-temurin ベースイメージバージョン |
 
 ### Frontend
