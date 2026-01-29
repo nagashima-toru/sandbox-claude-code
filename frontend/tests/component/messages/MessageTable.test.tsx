@@ -44,7 +44,6 @@ describe('MessageTable', () => {
 
   describe('データ表示', () => {
     it('メッセージ一覧が正しく表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -64,7 +63,6 @@ describe('MessageTable', () => {
     });
 
     it('IDが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -81,7 +79,6 @@ describe('MessageTable', () => {
     });
 
     it('編集ボタンと削除ボタンが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -101,7 +98,6 @@ describe('MessageTable', () => {
     });
 
     it('検索バーが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -116,7 +112,6 @@ describe('MessageTable', () => {
     });
 
     it('ページネーションが表示される', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -211,7 +206,7 @@ describe('MessageTable', () => {
   describe('検索機能', () => {
     it('検索クエリでフィルタリングできる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -234,7 +229,7 @@ describe('MessageTable', () => {
 
     it('検索結果が0件の場合、メッセージを表示する', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -255,7 +250,7 @@ describe('MessageTable', () => {
 
     it('contentで検索できる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -280,7 +275,7 @@ describe('MessageTable', () => {
   describe('ソート機能', () => {
     it('IDでソートできる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -330,7 +325,7 @@ describe('MessageTable', () => {
   describe('ボタンアクション', () => {
     it('編集ボタンをクリックするとonEditが呼ばれる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,
@@ -349,7 +344,7 @@ describe('MessageTable', () => {
 
     it('削除ボタンをクリックするとonDeleteが呼ばれる', async () => {
       const user = userEvent.setup();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
         data: mockMessages,
         isLoading: false,

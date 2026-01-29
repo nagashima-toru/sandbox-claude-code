@@ -5,11 +5,9 @@ import { cleanup } from '@testing-library/react';
 // Setup global timer methods for fake timers
 beforeEach(() => {
   if (!globalThis.setTimeout) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     globalThis.setTimeout = vi.fn() as any;
   }
   if (!globalThis.clearTimeout) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     globalThis.clearTimeout = vi.fn() as any;
   }
 });
