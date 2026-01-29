@@ -11,7 +11,7 @@ Next.js-based message management application with full CRUD functionality.
 - **Framework**: Next.js 15+ (App Router)
 - **Language**: TypeScript
 - **UI Library**: shadcn/ui
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS v4
 - **Package Manager**: pnpm
 - **API Code Generation**: Orval (OpenAPI → TypeScript + React Query hooks)
 - **HTTP Client**: axios
@@ -54,6 +54,80 @@ pnpm type-check
 pnpm storybook           # port 6006
 pnpm build-storybook
 ```
+
+## Tailwind CSS v4 Migration
+
+This project uses **Tailwind CSS v4**, which introduced significant changes from v3:
+
+### Key Changes
+
+1. **PostCSS Plugin Separation**
+   - The PostCSS plugin is now in a separate package: `@tailwindcss/postcss`
+   - Updated `postcss.config.js` to use `@tailwindcss/postcss` instead of `tailwindcss`
+
+2. **New CSS Import Syntax**
+   - Changed from `@tailwind` directives to `@import "tailwindcss"`
+   - `src/app/globals.css` now uses the new v4 syntax
+
+3. **Dark Mode Configuration**
+   - `darkMode` in `tailwind.config.ts` changed from array `['class']` to string `'class'`
+
+4. **Removed @apply Usage**
+   - Replaced `@apply` directives with direct CSS properties
+   - Example: `@apply border-border` → `border-color: hsl(var(--border))`
+
+### Configuration Files
+
+**postcss.config.js**:
+
+```javascript
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+};
+```
+
+**tailwind.config.ts**:
+
+```typescript
+const config: Config = {
+  darkMode: 'class', // Changed from ['class']
+  // ... rest of config
+};
+```
+
+**src/app/globals.css**:
+
+```css
+@import 'tailwindcss';
+
+:root {
+  /* CSS variables */
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+```
+
+### Migration Notes
+
+- The `tailwind.config.ts` file is still supported and used for theme customization
+- CSS variables (e.g., `--background`, `--foreground`) continue to work as before
+- shadcn/ui components are fully compatible with v4
+- No changes required in component files
+
+### Resources
+
+- [Tailwind CSS v4 Documentation](https://tailwindcss.com/docs)
+- [v4 Migration Guide](https://tailwindcss.com/docs/upgrade-guide)
 
 ## Project Structure
 

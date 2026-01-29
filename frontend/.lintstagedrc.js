@@ -4,7 +4,7 @@ module.exports = {
     const escapedFilenames = filenames.map((filename) => `"${filename}"`).join(' ');
     return [
       `prettier --write ${escapedFilenames}`,
-      `next lint --fix --file ${filenames.map((f) => f.replace(/^.*\/frontend\//, '')).join(' --file ')}`,
+      `eslint --fix ${escapedFilenames}`,
       'tsc --noEmit',
     ];
   },
