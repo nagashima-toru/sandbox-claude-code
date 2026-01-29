@@ -10,7 +10,7 @@ This is a sandbox repository for experimenting with Claude Code.
 
 ```
 sandbox-claude-code/
-├── backend/     # Spring Boot API (Java 21, Maven)
+├── backend/     # Spring Boot API (Java 25, Maven)
 ├── frontend/    # Next.js App (TypeScript, pnpm)
 ├── docs/        # Documentation
 ├── scripts/     # Utility scripts
@@ -42,7 +42,7 @@ docker compose -f docker-compose.yml up
 ## Development Environment
 
 - **IDE**: IntelliJ IDEA
-- **Java**: JDK 21
+- **Java**: JDK 25
 - **Node.js**: See frontend/.nvmrc
 - **Package Manager**: pnpm (frontend), Maven (backend)
 

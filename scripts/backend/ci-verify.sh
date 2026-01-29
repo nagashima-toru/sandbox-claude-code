@@ -99,14 +99,14 @@ print_header "1. Environment Validation"
 print_info "Checking Java version..."
 if command -v java &> /dev/null; then
   JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | cut -d. -f1)
-  if [ "$JAVA_VERSION" = "21" ]; then
-    print_success "Java 21 detected"
+  if [ "$JAVA_VERSION" = "25" ]; then
+    print_success "Java 25 detected"
   else
-    print_error "Java 21 required, but Java $JAVA_VERSION detected"
+    print_error "Java 25 required, but Java $JAVA_VERSION detected"
     exit 99
   fi
 else
-  print_error "Java not found. Please install Java 21"
+  print_error "Java not found. Please install Java 25"
   exit 99
 fi
 

@@ -9,7 +9,7 @@ A sandbox repository for experimenting with Claude Code.
 
 ```
 sandbox-claude-code/
-├── backend/          # Spring Boot API application (Java 21, Maven)
+├── backend/          # Spring Boot API application (Java 25, Maven)
 ├── frontend/         # Next.js application (TypeScript, pnpm)
 ├── docs/             # Project documentation
 │   └── GITIGNORE_RULES.md
@@ -25,7 +25,7 @@ sandbox-claude-code/
 
 Spring Boot API application with PostgreSQL, MyBatis, and Flyway.
 
-- **Tech Stack**: Java 21, Spring Boot 3.4.1, PostgreSQL, MyBatis, Flyway
+- **Tech Stack**: Java 25, Spring Boot 3.4.1, PostgreSQL, MyBatis, Flyway
 - **API**: RESTful CRUD for Message management
 - **Docs**: [backend/CLAUDE.md](backend/CLAUDE.md)
 
@@ -99,7 +99,7 @@ See [CLAUDE.md](CLAUDE.md#docker-deployment) for more details.
 
 ## Development
 
-This project is configured for IntelliJ IDEA with Java 21 and Node.js 20+.
+This project is configured for IntelliJ IDEA with Java 25 and Node.js 20+.
 
 ## Repository
 
