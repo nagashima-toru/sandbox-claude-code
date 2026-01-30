@@ -22,6 +22,14 @@ public class GlobalExceptionHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+  private static String sanitizeForLog(String value) {
+    if (value == null) {
+      return null;
+    }
+    // Remove characters that could break log lines or enable log forging
+    return value.replace('\n', ' ').replace('\r', ' ');
+  }
+
   private static final String ERROR_TYPE_BASE_URI = "https://api.example.com/errors";
   private static final MediaType PROBLEM_JSON = MediaType.parseMediaType("application/problem+json");
 
@@ -121,7 +129,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGeneralException(
       Exception ex, HttpServletRequest request) {
-    LOGGER.error("Unhandled exception occurred during request processing for URI: {}", request.getRequestURI(), ex);
+    LOGGER.error(
+        "Unhandled exception occurred during request processing for URI: {}",
+        sanitizeForLog(request.getRequestURI()),
+        ex);
     ErrorResponse error =
         ErrorResponse.builder()
             .type(ERROR_TYPE_BASE_URI + "/internal-error")
