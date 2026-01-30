@@ -16,10 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class UpdateMessageUseCaseTest {
   @Mock private MessageRepository messageRepository;
   @InjectMocks private UpdateMessageUseCase useCase;
+
   @Test
   void execute_withValidData_updatesMessage() {
     // Arrange
@@ -41,13 +43,21 @@ class UpdateMessageUseCaseTest {
     verify(messageRepository).existsByCode(code);
     verify(messageRepository).save(any(Message.class));
   }
+
+  @Test
   void execute_withSameCode_updatesSuccessfully() {
+    Long id = 1L;
     String code = "same-code";
     String newContent = "Updated Content";
-    Message existingMessage = new Message(id, code, "Old Content");
+    Message existingMessage = new Message(id, code, "Old Content", LocalDateTime.now(), LocalDateTime.now());
     Message updatedMessage = new Message(id, code, newContent, LocalDateTime.now(), LocalDateTime.now());
+    when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
+    when(messageRepository.save(any(Message.class))).thenReturn(updatedMessage);
     Message result = useCase.execute(id, code, newContent);
     assertThat(result.getContent()).isEqualTo(newContent);
+  }
+
+  @Test
   void execute_withNonexistentId_throwsMessageNotFoundException() {
     Long id = 99L;
     when(messageRepository.findById(id)).thenReturn(Optional.empty());
@@ -55,11 +65,18 @@ class UpdateMessageUseCaseTest {
     assertThatThrownBy(() -> useCase.execute(id, "code", "content"))
         .isInstanceOf(MessageNotFoundException.class)
         .hasMessage("Message with id 99 not found");
+  }
+
+  @Test
   void execute_withDuplicateCode_throwsDuplicateMessageCodeException() {
+    Long id = 1L;
     String newCode = "duplicate-code";
+    Message existingMessage = new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
+    when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.existsByCode(newCode)).thenReturn(true);
     assertThatThrownBy(() -> useCase.execute(id, newCode, "content"))
         .isInstanceOf(DuplicateMessageCodeException.class)
         .hasMessage("Message with code 'duplicate-code' already exists");
     verify(messageRepository).existsByCode(newCode);
+  }
 }

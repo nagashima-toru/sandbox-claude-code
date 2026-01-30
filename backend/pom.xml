@@ -203,6 +203,7 @@
                         <configuration>
                             <excludes>
                                 <exclude>com/sandbox/api/ApiApplication.class</exclude>
+                                <exclude>com/sandbox/api/presentation/generated/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -215,6 +216,7 @@
                         <configuration>
                             <excludes>
                                 <exclude>com/sandbox/api/ApiApplication.class</exclude>
+                                <exclude>com/sandbox/api/presentation/generated/**</exclude>
                             </excludes>
                             <rules>
                                 <rule>
@@ -385,6 +387,9 @@
                     <consoleOutput>true</consoleOutput>
                     <failOnViolation>true</failOnViolation>
                     <violationSeverity>warning</violationSeverity>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
                 </configuration>
                 <executions>
                     <execution>

@@ -14,10 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class CreateMessageUseCaseTest {
   @Mock private MessageRepository messageRepository;
   @InjectMocks private CreateMessageUseCase useCase;
+
   @Test
   void execute_withValidData_createsMessage() {
     // Arrange
@@ -36,6 +38,8 @@ class CreateMessageUseCaseTest {
     verify(messageRepository).existsByCode(code);
     verify(messageRepository).save(any(Message.class));
   }
+
+  @Test
   void execute_withDuplicateCode_throwsDuplicateMessageCodeException() {
     String code = "existing-code";
     String content = "Some Content";
@@ -44,4 +48,5 @@ class CreateMessageUseCaseTest {
     assertThatThrownBy(() -> useCase.execute(code, content))
         .isInstanceOf(DuplicateMessageCodeException.class)
         .hasMessage("Message with code 'existing-code' already exists");
+  }
 }

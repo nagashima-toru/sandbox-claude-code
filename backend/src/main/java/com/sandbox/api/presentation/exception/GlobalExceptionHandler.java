@@ -31,7 +31,8 @@ public class GlobalExceptionHandler {
   }
 
   private static final String ERROR_TYPE_BASE_URI = "https://api.example.com/errors";
-  private static final MediaType PROBLEM_JSON = MediaType.parseMediaType("application/problem+json");
+  private static final MediaType PROBLEM_JSON =
+      MediaType.parseMediaType("application/problem+json");
 
   /**
    * Handles MessageNotFoundException and returns a 404 response in RFC 7807 format.
@@ -84,7 +85,8 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles validation errors and returns a 400 response in RFC 7807 format with field-specific error details.
+   * Handles validation errors and returns a 400 response in RFC 7807 format with field-specific
+   * error details.
    *
    * @param ex the exception
    * @param request the HTTP request

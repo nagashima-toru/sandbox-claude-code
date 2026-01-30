@@ -14,10 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class GetAllMessagesUseCaseTest {
   @Mock private MessageRepository messageRepository;
   @InjectMocks private GetAllMessagesUseCase useCase;
+
   @Test
   void execute_whenMessagesExist_returnsAllMessages() {
     // Arrange
@@ -31,7 +33,11 @@ class GetAllMessagesUseCaseTest {
     assertThat(result).isEqualTo(expected);
     verify(messageRepository).findAll();
   }
+
+  @Test
   void execute_whenNoMessages_returnsEmptyList() {
     when(messageRepository.findAll()).thenReturn(Collections.emptyList());
+    List<Message> result = useCase.execute();
     assertThat(result).isEmpty();
+  }
 }

@@ -40,6 +40,12 @@ public class Message {
     return Message.builder().code(code).content(content).build();
   }
 
+  /**
+   * Creates a new Message instance with the specified ID.
+   *
+   * @param newId the new ID
+   * @return a new Message with the specified ID
+   */
   public Message withId(Long newId) {
     return Message.builder()
         .id(newId)

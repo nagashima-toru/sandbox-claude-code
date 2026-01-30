@@ -14,10 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class GetMessageByIdUseCaseTest {
   @Mock private MessageRepository messageRepository;
   @InjectMocks private GetMessageByIdUseCase useCase;
+
   @Test
   void execute_whenMessageExists_returnsMessage() {
     // Arrange
@@ -29,6 +31,8 @@ class GetMessageByIdUseCaseTest {
     assertThat(result).isEqualTo(expected);
     verify(messageRepository).findById(1L);
   }
+
+  @Test
   void execute_whenMessageNotFound_throwsMessageNotFoundException() {
     when(messageRepository.findById(99L)).thenReturn(Optional.empty());
     // Act & Assert
@@ -36,4 +40,5 @@ class GetMessageByIdUseCaseTest {
         .isInstanceOf(MessageNotFoundException.class)
         .hasMessage("Message with id 99 not found");
     verify(messageRepository).findById(99L);
+  }
 }

@@ -18,6 +18,12 @@ public class MessageResponse {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
+  /**
+   * Creates a MessageResponse from a Message domain model.
+   *
+   * @param message the domain model
+   * @return the response DTO
+   */
   public static MessageResponse from(Message message) {
     return new MessageResponse(
         message.getId(),

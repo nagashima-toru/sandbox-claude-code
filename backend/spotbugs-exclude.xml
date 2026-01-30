@@ -11,4 +11,9 @@
     <Match>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
+
+    <!-- Exclude OpenAPI generated code -->
+    <Match>
+        <Class name="~com\.sandbox\.api\.presentation\.generated\..*"/>
+    </Match>
 </FindBugsFilter>

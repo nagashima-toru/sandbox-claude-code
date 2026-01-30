@@ -13,10 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class MessageRepositoryImplTest {
   @Mock private MessageMapper messageMapper;
   @InjectMocks private MessageRepositoryImpl repository;
+
   @Test
   void findByCode_whenMapperReturnsMessage_returnsOptionalWithMessage() {
     // Arrange
@@ -29,21 +31,32 @@ class MessageRepositoryImplTest {
     assertThat(result.get()).isEqualTo(expected);
     verify(messageMapper).findByCode("test-code");
   }
+
+  @Test
   void findByCode_whenMapperReturnsNull_returnsEmptyOptional() {
     when(messageMapper.findByCode("nonexistent")).thenReturn(null);
     Optional<Message> result = repository.findByCode("nonexistent");
     assertThat(result).isEmpty();
     verify(messageMapper).findByCode("nonexistent");
+  }
+
+  @Test
   void findByCode_withNullCode_returnsEmptyOptionalWhenMapperReturnsNull() {
     when(messageMapper.findByCode(null)).thenReturn(null);
     Optional<Message> result = repository.findByCode(null);
     verify(messageMapper).findByCode(null);
+  }
+
+  @Test
   void findByCode_callsMapperExactlyOnce() {
     String code = "hello";
-    Message message = new Message(1L, code, "Hello, World!");
+    Message message = new Message(1L, code, "Hello, World!", LocalDateTime.now(), LocalDateTime.now());
     when(messageMapper.findByCode(code)).thenReturn(message);
     repository.findByCode(code);
     verify(messageMapper).findByCode(code);
+  }
+
+  @Test
   void findAll_whenMapperReturnsMessages_returnsListOfMessages() {
     List<Message> expected =
         Arrays.asList(new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()), new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
@@ -52,35 +65,59 @@ class MessageRepositoryImplTest {
     assertThat(result).hasSize(2);
     assertThat(result).isEqualTo(expected);
     verify(messageMapper).findAll();
+  }
+
+  @Test
   void findById_whenMapperReturnsMessage_returnsOptionalWithMessage() {
     Message expected = new Message(1L, "code", "Content", LocalDateTime.now(), LocalDateTime.now());
     when(messageMapper.findById(1L)).thenReturn(expected);
     Optional<Message> result = repository.findById(1L);
     verify(messageMapper).findById(1L);
+  }
+
+  @Test
   void findById_whenMapperReturnsNull_returnsEmptyOptional() {
     when(messageMapper.findById(99L)).thenReturn(null);
     Optional<Message> result = repository.findById(99L);
     verify(messageMapper).findById(99L);
+  }
+
+  @Test
   void save_whenMessageHasNoId_callsInsert() {
     Message message = new Message(null, "new-code", "New Content", LocalDateTime.now(), LocalDateTime.now());
     Message result = repository.save(message);
     assertThat(result).isEqualTo(message);
     verify(messageMapper).insert(message);
+  }
+
+  @Test
   void save_whenMessageHasId_callsUpdate() {
     Message message = new Message(1L, "code", "Updated Content", LocalDateTime.now(), LocalDateTime.now());
+    Message result = repository.save(message);
+    assertThat(result).isEqualTo(message);
     verify(messageMapper).update(message);
+  }
+
+  @Test
   void deleteById_callsMapperDeleteById() {
     // Arrange & Act
     repository.deleteById(1L);
     verify(messageMapper).deleteById(1L);
+  }
+
+  @Test
   void existsByCode_whenMapperReturnsTrue_returnsTrue() {
     when(messageMapper.existsByCode("existing")).thenReturn(true);
     boolean result = repository.existsByCode("existing");
     assertThat(result).isTrue();
     verify(messageMapper).existsByCode("existing");
+  }
+
+  @Test
   void existsByCode_whenMapperReturnsFalse_returnsFalse() {
     when(messageMapper.existsByCode("nonexistent")).thenReturn(false);
     boolean result = repository.existsByCode("nonexistent");
     assertThat(result).isFalse();
     verify(messageMapper).existsByCode("nonexistent");
+  }
 }

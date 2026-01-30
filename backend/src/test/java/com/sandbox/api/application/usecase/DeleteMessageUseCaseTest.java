@@ -11,10 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class DeleteMessageUseCaseTest {
   @Mock private MessageRepository messageRepository;
   @InjectMocks private DeleteMessageUseCase useCase;
+
   @Test
   void execute_withExistingId_deletesMessage() {
     // Arrange
@@ -26,6 +28,8 @@ class DeleteMessageUseCaseTest {
     verify(messageRepository).existsById(id);
     verify(messageRepository).deleteById(id);
   }
+
+  @Test
   void execute_withNonexistentId_throwsMessageNotFoundException() {
     Long id = 99L;
     when(messageRepository.existsById(id)).thenReturn(false);
@@ -33,4 +37,5 @@ class DeleteMessageUseCaseTest {
     assertThatThrownBy(() -> useCase.execute(id))
         .isInstanceOf(MessageNotFoundException.class)
         .hasMessage("Message with id 99 not found");
+  }
 }
