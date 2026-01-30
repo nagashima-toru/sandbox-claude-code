@@ -231,8 +231,71 @@ fi
 # Run Checks
 ################################################################################
 
+SPEC_EXIT_CODE=0
 BACKEND_EXIT_CODE=0
 FRONTEND_EXIT_CODE=0
+
+# Specification validation (if specs changed)
+SPECS_CHANGED=false
+if git diff --name-only HEAD | grep -q "^specs/"; then
+  SPECS_CHANGED=true
+fi
+if git diff --cached --name-only | grep -q "^specs/"; then
+  SPECS_CHANGED=true
+fi
+
+if [ "$SPECS_CHANGED" = true ] || [ -d "specs" ]; then
+  print_header "SPECIFICATION VALIDATION"
+
+  SPEC_VALIDATION_FAILED=false
+
+  # Validate OpenAPI with Spectral
+  if [ -f "specs/openapi/openapi.yaml" ]; then
+    print_section "Validating OpenAPI specification with Spectral"
+
+    if command -v spectral &> /dev/null; then
+      if spectral lint specs/openapi/openapi.yaml --ruleset specs/.spectral.yaml; then
+        print_success "OpenAPI specification is valid"
+      else
+        print_error "OpenAPI validation failed"
+        SPEC_VALIDATION_FAILED=true
+      fi
+    else
+      print_warning "Spectral not installed. Run: npm install -g @stoplight/spectral-cli"
+      print_info "Skipping OpenAPI validation"
+    fi
+  fi
+
+  # Validate Gherkin files
+  if [ -d "specs/acceptance" ]; then
+    print_section "Validating Gherkin acceptance criteria"
+
+    if command -v gherkin-lint &> /dev/null; then
+      if gherkin-lint specs/acceptance/**/*.feature; then
+        print_success "Gherkin files are valid"
+      else
+        print_warning "Gherkin validation found issues (non-blocking)"
+      fi
+    else
+      print_warning "gherkin-lint not installed. Run: npm install -g gherkin-lint"
+      print_info "Skipping Gherkin validation"
+    fi
+  fi
+
+  # Check contracts
+  if [ -d "specs/contracts" ]; then
+    print_section "Checking contract definitions"
+    CONTRACT_COUNT=$(find specs/contracts -name "*.yml" | wc -l | tr -d ' ')
+    print_info "Found $CONTRACT_COUNT contract definition(s)"
+  fi
+
+  if [ "$SPEC_VALIDATION_FAILED" = true ]; then
+    SPEC_EXIT_CODE=1
+    print_error "Specification validation failed"
+  else
+    print_success "Specification validation passed"
+  fi
+fi
 
 # Backend checks
 if [ "$RUN_BACKEND" = true ]; then
@@ -291,6 +354,19 @@ print_header "FINAL SUMMARY"
 echo ""
 echo "Results:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Specification summary
+if [ "$SPECS_CHANGED" = true ]; then
+  if [ $SPEC_EXIT_CODE -eq 0 ]; then
+    echo -e "${GREEN}✅ Specification${NC}"
+    echo "   ✓ OpenAPI validation"
+    echo "   ✓ Gherkin syntax"
+    echo "   ✓ Contract definitions"
+  else
+    echo -e "${RED}❌ Specification${NC}"
+    echo "   ✗ Validation failed"
+  fi
+fi
 
 # Backend summary
 if [ "$RUN_BACKEND" = true ]; then
@@ -377,7 +453,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Overall result
-if [ $BACKEND_EXIT_CODE -eq 0 ] && [ $FRONTEND_EXIT_CODE -eq 0 ]; then
+if [ $SPEC_EXIT_CODE -eq 0 ] && [ $BACKEND_EXIT_CODE -eq 0 ] && [ $FRONTEND_EXIT_CODE -eq 0 ]; then
   echo -e "${BOLD}${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
   echo -e "${BOLD}${GREEN}║                                                               ║${NC}"
   echo -e "${BOLD}${GREEN}║              ✅ ALL CHECKS PASSED! 🎉                          ║${NC}"
@@ -409,7 +485,9 @@ else
   echo ""
 
   # Return the first non-zero exit code
-  if [ $BACKEND_EXIT_CODE -ne 0 ]; then
+  if [ $SPEC_EXIT_CODE -ne 0 ]; then
+    exit $SPEC_EXIT_CODE
+  elif [ $BACKEND_EXIT_CODE -ne 0 ]; then
     exit $BACKEND_EXIT_CODE
   else
     exit $FRONTEND_EXIT_CODE

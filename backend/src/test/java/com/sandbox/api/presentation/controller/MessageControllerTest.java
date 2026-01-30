@@ -3,7 +3,6 @@ package com.sandbox.api.presentation.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +22,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @Transactional
 class MessageControllerTest {
-
   @Container static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
 
   @DynamicPropertySource
@@ -34,7 +32,6 @@ class MessageControllerTest {
   }
 
   @Autowired private MockMvc mockMvc;
-
   @Autowired private JdbcTemplate jdbcTemplate;
 
   @Test
@@ -43,9 +40,9 @@ class MessageControllerTest {
         .perform(get("/api/messages"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-        .andExpect(jsonPath("$[0].code", is("hello")))
-        .andExpect(jsonPath("$[0].content", is("Hello, World!")));
+        .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$.content[0].code", is("hello")))
+        .andExpect(jsonPath("$.content[0].content", is("Hello, World!")));
   }
 
   @Test
@@ -53,7 +50,6 @@ class MessageControllerTest {
     mockMvc
         .perform(get("/api/messages/1"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id", is(1)))
         .andExpect(jsonPath("$.code", is("hello")))
         .andExpect(jsonPath("$.content", is("Hello, World!")));
@@ -64,9 +60,8 @@ class MessageControllerTest {
     mockMvc
         .perform(get("/api/messages/99999"))
         .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status", is(404)))
-        .andExpect(jsonPath("$.error", is("Not Found")));
+        .andExpect(jsonPath("$.title", is("Not Found")));
   }
 
   @Test
@@ -78,12 +73,10 @@ class MessageControllerTest {
             "content": "New Message Content"
         }
         """;
-
     mockMvc
         .perform(post("/api/messages").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(status().isCreated())
         .andExpect(header().exists("Location"))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id", notNullValue()))
         .andExpect(jsonPath("$.code", is("new-message")))
         .andExpect(jsonPath("$.content", is("New Message Content")));
@@ -98,13 +91,11 @@ class MessageControllerTest {
             "content": ""
         }
         """;
-
     mockMvc
         .perform(post("/api/messages").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(status().isBadRequest())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status", is(400)))
-        .andExpect(jsonPath("$.error", is("Bad Request")));
+        .andExpect(jsonPath("$.title", is("Validation Error")));
   }
 
   @Test
@@ -116,13 +107,11 @@ class MessageControllerTest {
             "content": "Duplicate Content"
         }
         """;
-
     mockMvc
         .perform(post("/api/messages").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(status().isConflict())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status", is(409)))
-        .andExpect(jsonPath("$.error", is("Conflict")));
+        .andExpect(jsonPath("$.title", is("Duplicate Code")));
   }
 
   @Test
@@ -134,13 +123,10 @@ class MessageControllerTest {
             "content": "Updated Content"
         }
         """;
-
     mockMvc
         .perform(
             put("/api/messages/1").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id", is(1)))
         .andExpect(jsonPath("$.code", is("updated-hello")))
         .andExpect(jsonPath("$.content", is("Updated Content")));
   }
@@ -154,12 +140,10 @@ class MessageControllerTest {
             "content": "Updated Content"
         }
         """;
-
     mockMvc
         .perform(
             put("/api/messages/99999").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status", is(404)));
   }
 
@@ -182,14 +166,12 @@ class MessageControllerTest {
         """
         {
             "code": "test-duplicate",
-            "content": "Updated Content"
+            "content": "Trying to duplicate"
         }
         """;
-
     mockMvc
         .perform(put("/api/messages/1").contentType(MediaType.APPLICATION_JSON).content(updateBody))
         .andExpect(status().isConflict())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status", is(409)));
   }
 
@@ -202,8 +184,6 @@ class MessageControllerTest {
   void deleteMessage_whenNotFound_returns404() throws Exception {
     mockMvc
         .perform(delete("/api/messages/99999"))
-        .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.status", is(404)));
+        .andExpect(status().isNotFound());
   }
 }

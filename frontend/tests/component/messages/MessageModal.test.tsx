@@ -58,6 +58,8 @@ describe('MessageModal', () => {
       id: 1,
       code: 'TEST',
       content: 'Test content',
+      createdAt: '2026-01-29T00:00:00Z',
+      updatedAt: '2026-01-29T00:00:00Z',
     };
 
     render(<MessageModal {...defaultProps} initialData={initialData} />);

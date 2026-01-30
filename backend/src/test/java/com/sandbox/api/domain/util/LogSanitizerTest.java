@@ -1,11 +1,9 @@
 package com.sandbox.api.domain.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 
 class LogSanitizerTest {
-
   @Test
   void testSanitizeWithNull() {
     String result = LogSanitizer.sanitize(null);

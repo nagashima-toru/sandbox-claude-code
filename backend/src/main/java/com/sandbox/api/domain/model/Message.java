@@ -1,5 +1,6 @@
 package com.sandbox.api.domain.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,6 +19,8 @@ public class Message {
   private Long id;
   private String code;
   private String content;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
   /**
    * Creates a new message with the given code and content.
@@ -37,7 +40,19 @@ public class Message {
     return Message.builder().code(code).content(content).build();
   }
 
+  /**
+   * Creates a new Message instance with the specified ID.
+   *
+   * @param newId the new ID
+   * @return a new Message with the specified ID
+   */
   public Message withId(Long newId) {
-    return Message.builder().id(newId).code(this.code).content(this.content).build();
+    return Message.builder()
+        .id(newId)
+        .code(this.code)
+        .content(this.content)
+        .createdAt(this.createdAt)
+        .updatedAt(this.updatedAt)
+        .build();
   }
 }

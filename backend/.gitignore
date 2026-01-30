@@ -72,3 +72,7 @@ hs_err_pid*
 *.db
 *.sqlite
 *.sqlite3
+
+# OpenAPI Generated Code
+src/main/java/com/sandbox/api/presentation/generated/
+target/generated-sources/openapi/

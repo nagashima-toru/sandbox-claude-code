@@ -19,6 +19,8 @@ const mockMessage: MessageResponse = {
   id: 1,
   code: 'TEST001',
   content: 'This is a test message that will be deleted.',
+  createdAt: '2026-01-29T00:00:00Z',
+  updatedAt: '2026-01-29T00:00:00Z',
 };
 
 const longContentMessage: MessageResponse = {
@@ -26,6 +28,8 @@ const longContentMessage: MessageResponse = {
   code: 'LONG_MESSAGE',
   content:
     'This is a very long message content that demonstrates how the dialog handles lengthy text. It should wrap properly and display in a readable format within the dialog. This helps us verify that the UI remains usable even with substantial content.',
+  createdAt: '2026-01-29T00:00:00Z',
+  updatedAt: '2026-01-29T00:00:00Z',
 };
 
 export const Default: Story = {

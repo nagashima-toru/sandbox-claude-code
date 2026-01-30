@@ -3,12 +3,15 @@ FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
-COPY src ./src
+COPY backend/.mvn/ .mvn/
+COPY backend/mvnw backend/pom.xml ./
+COPY backend/src ./src
+
+# Copy OpenAPI specs (required for code generation)
+COPY specs ../specs
 
 # Build application (dependencies will be downloaded as needed)
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 # Runtime stage
 FROM eclipse-temurin:25-jre-alpine
