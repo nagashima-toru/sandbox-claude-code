@@ -227,7 +227,7 @@ jobs:
         run: ./mvnw clean package -DskipTests
 
       - name: Build backend Docker image
-        run: docker build -t sandbox-backend:e2e ./backend
+        run: docker build -f backend/Dockerfile -t sandbox-backend:e2e .
 
       - name: Start backend services with Docker Compose
         run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example up -d
