@@ -68,24 +68,25 @@ jobs:
               dependencyType = "TypeScript";
             }
 
+            const backtick = String.fromCharCode(96);
             const comment = `## 📝 ドキュメント更新のリマインダー
 
 この依存関係の更新（**${dependencyType}**）は、ドキュメントへの影響がある可能性があります。
 
 ### 確認が必要なドキュメント
 
-- ` + '`CLAUDE.md`' + `
-- ` + '`README.md`' + `
-- ` + '`backend/README.md`' + `
-- ` + '`backend/CLAUDE.md`' + `
-- ` + '`frontend/CLAUDE.md`' + `
-- ` + '`docs/DEPLOYMENT.md`' + `
+- ${backtick}CLAUDE.md${backtick}
+- ${backtick}README.md${backtick}
+- ${backtick}backend/README.md${backtick}
+- ${backtick}backend/CLAUDE.md${backtick}
+- ${backtick}frontend/CLAUDE.md${backtick}
+- ${backtick}docs/DEPLOYMENT.md${backtick}
 
 ### @claude を使った自動更新
 
 以下のコメントを投稿すると、Claude が自動的にドキュメントを更新します：
 
-` + '```markdown' + `
+${backtick}${backtick}${backtick}markdown
 @claude この PR の依存関係更新に伴い、関連するドキュメントのバージョン情報を更新してください。
 
 対象ファイル:
@@ -97,7 +98,7 @@ jobs:
 - docs/DEPLOYMENT.md
 
 変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。
-` + '```' + `
+${backtick}${backtick}${backtick}
 
 ### 手動更新
 
