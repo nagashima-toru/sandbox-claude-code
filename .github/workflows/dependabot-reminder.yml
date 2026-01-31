@@ -74,18 +74,18 @@ jobs:
 
 ### 確認が必要なドキュメント
 
-- ` + '`CLAUDE.md`' + `
-- ` + '`README.md`' + `
-- ` + '`backend/README.md`' + `
-- ` + '`backend/CLAUDE.md`' + `
-- ` + '`frontend/CLAUDE.md`' + `
-- ` + '`docs/DEPLOYMENT.md`' + `
+- \`CLAUDE.md\`
+- \`README.md\`
+- \`backend/README.md\`
+- \`backend/CLAUDE.md\`
+- \`frontend/CLAUDE.md\`
+- \`docs/DEPLOYMENT.md\`
 
 ### @claude を使った自動更新
 
 以下のコメントを投稿すると、Claude が自動的にドキュメントを更新します：
 
-` + '```' + `markdown
+\`\`\`markdown
 @claude この PR の依存関係更新に伴い、関連するドキュメントのバージョン情報を更新してください。
 
 対象ファイル:
@@ -97,7 +97,7 @@ jobs:
 - docs/DEPLOYMENT.md
 
 変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。
-` + '```' + `
+\`\`\`
 
 ### 手動更新
 
