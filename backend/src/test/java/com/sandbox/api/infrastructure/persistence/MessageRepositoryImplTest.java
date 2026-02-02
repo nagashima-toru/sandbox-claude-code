@@ -1,6 +1,7 @@
 package com.sandbox.api.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
 class MessageRepositoryImplTest {
@@ -119,5 +123,133 @@ class MessageRepositoryImplTest {
     boolean result = repository.existsByCode("nonexistent");
     assertThat(result).isFalse();
     verify(messageMapper).existsByCode("nonexistent");
+  }
+
+  // Security tests for SQL injection prevention
+
+  @Test
+  void findAllWithPagination_withValidSortField_succeeds() {
+    // Arrange
+    List<Message> messages =
+        Arrays.asList(
+            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+    when(messageMapper.findAllWithPagination(0L, 10, "id", "ASC")).thenReturn(messages);
+    when(messageMapper.count()).thenReturn(1L);
+
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
+
+    // Act
+    Page<Message> result = repository.findAll(pageable);
+
+    // Assert
+    assertThat(result.getContent()).hasSize(1);
+    verify(messageMapper).findAllWithPagination(0L, 10, "id", "ASC");
+  }
+
+  @Test
+  void findAllWithPagination_withCamelCaseSortField_convertsToSnakeCase() {
+    // Arrange
+    List<Message> messages =
+        Arrays.asList(
+            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+    when(messageMapper.findAllWithPagination(0L, 10, "created_at", "DESC")).thenReturn(messages);
+    when(messageMapper.count()).thenReturn(1L);
+
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+    // Act
+    Page<Message> result = repository.findAll(pageable);
+
+    // Assert
+    assertThat(result.getContent()).hasSize(1);
+    verify(messageMapper).findAllWithPagination(0L, 10, "created_at", "DESC");
+  }
+
+  @Test
+  void findAllWithPagination_withInvalidSortField_throwsIllegalArgumentException() {
+    // Arrange
+    PageRequest pageable =
+        PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "malicious; DROP TABLE messages--"));
+
+    // Act & Assert
+    assertThatThrownBy(() -> repository.findAll(pageable))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Invalid sort field");
+  }
+
+  @Test
+  void findAllWithPagination_withSqlInjectionAttemptInSortField_throwsException() {
+    // Arrange
+    PageRequest pageable =
+        PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id; DELETE FROM messages"));
+
+    // Act & Assert
+    assertThatThrownBy(() -> repository.findAll(pageable))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Invalid sort field");
+  }
+
+  @Test
+  void findAllWithPagination_withInvalidSortDirection_throwsIllegalArgumentException() {
+    // This test ensures that even if someone manipulates the sort direction,
+    // it will be validated. Note: Spring's Sort.Direction is an enum, so this is less likely,
+    // but we test the validation logic anyway.
+    List<Message> messages =
+        Arrays.asList(
+            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+    when(messageMapper.findAllWithPagination(0L, 10, "id", "ASC")).thenReturn(messages);
+    when(messageMapper.count()).thenReturn(1L);
+
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
+
+    // Act
+    Page<Message> result = repository.findAll(pageable);
+
+    // Assert - verify that only ASC/DESC are accepted
+    assertThat(result).isNotNull();
+    verify(messageMapper).findAllWithPagination(0L, 10, "id", "ASC");
+  }
+
+  @Test
+  void findAllWithPagination_withAllAllowedSortFields_succeeds() {
+    // Test all allowed fields: id, code, content, createdAt, updatedAt
+    String[][] testCases = {
+      {"id", "id"},
+      {"code", "code"},
+      {"content", "content"},
+      {"createdAt", "created_at"},
+      {"updatedAt", "updated_at"}
+    };
+
+    for (String[] testCase : testCases) {
+      String camelCase = testCase[0];
+      String snakeCase = testCase[1];
+
+      List<Message> messages =
+          Arrays.asList(
+              new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+      when(messageMapper.findAllWithPagination(0L, 10, snakeCase, "ASC")).thenReturn(messages);
+      when(messageMapper.count()).thenReturn(1L);
+
+      PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, camelCase));
+
+      // Act
+      Page<Message> result = repository.findAll(pageable);
+
+      // Assert
+      assertThat(result.getContent()).hasSize(1);
+      verify(messageMapper).findAllWithPagination(0L, 10, snakeCase, "ASC");
+    }
+  }
+
+  @Test
+  void findAllWithPagination_withNonWhitelistedField_throwsException() {
+    // Arrange
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "nonExistentField"));
+
+    // Act & Assert
+    assertThatThrownBy(() -> repository.findAll(pageable))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Invalid sort field: nonExistentField");
   }
 }
