@@ -19,6 +19,10 @@
 
     <properties>
         <java.version>23</java.version>
+        <!-- Security vulnerability fixes -->
+        <tomcat.version>10.1.52</tomcat.version>
+        <postgresql.version>42.7.7</postgresql.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
     </properties>
 
     <dependencies>
@@ -46,6 +50,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -62,7 +67,13 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.7.0</version>
+            <version>3.0.1</version>
+        </dependency>
+
+        <!-- Security vulnerability fix for CVE-2025-48924 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <dependency>
@@ -265,8 +276,6 @@
                     <suppressionFiles>
                         <suppressionFile>dependency-check-suppressions.xml</suppressionFile>
                     </suppressionFiles>
-                    <!-- Disable NVD API due to CVSSv4 parsing issues -->
-                    <nvdApiServicesEnabled>false</nvdApiServicesEnabled>
                     <!-- Skip the analyzer entirely to avoid NVD data fetch issues -->
                     <skipSystemScope>true</skipSystemScope>
                     <skipTestScope>true</skipTestScope>
