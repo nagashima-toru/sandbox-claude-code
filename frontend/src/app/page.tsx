@@ -1,18 +1,13 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import {
-  useCreateMessage,
-  useUpdateMessage,
-  useDeleteMessage,
-} from '@/lib/api/generated/message/message';
+import { useMessageMutations } from '@/hooks/useMessageMutations';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 
@@ -26,61 +21,46 @@ export default function Home() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<MessageResponse | null>(null);
-  const queryClient = useQueryClient();
 
-  const createMutation = useCreateMessage({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
-        setIsCreateModalOpen(false);
-      },
-      onError: (error: unknown) => {
-        console.error('Failed to create message:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 409) {
-            console.error('Duplicate code error');
-          }
-        }
-      },
+  const {
+    createMessage: createMutation,
+    updateMessage: updateMutation,
+    deleteMessage: deleteMutation,
+  } = useMessageMutations({
+    onCreateSuccess: () => {
+      setIsCreateModalOpen(false);
     },
-  });
-
-  const updateMutation = useUpdateMessage({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
-        setIsEditModalOpen(false);
-        setSelectedMessage(null);
-      },
-      onError: (error: unknown) => {
-        console.error('Failed to update message:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 404) {
-            console.error('Message not found');
-          }
-        }
-      },
+    onUpdateSuccess: () => {
+      setIsEditModalOpen(false);
+      setSelectedMessage(null);
     },
-  });
-
-  const deleteMutation = useDeleteMessage({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
-        setIsDeleteDialogOpen(false);
-        setSelectedMessage(null);
-      },
-      onError: (error: unknown) => {
-        console.error('Failed to delete message:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 404) {
-            console.error('Message not found');
-          }
+    onDeleteSuccess: () => {
+      setIsDeleteDialogOpen(false);
+      setSelectedMessage(null);
+    },
+    onCreateError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 409) {
+          console.error('Duplicate code error');
         }
-      },
+      }
+    },
+    onUpdateError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 404) {
+          console.error('Message not found');
+        }
+      }
+    },
+    onDeleteError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 404) {
+          console.error('Message not found');
+        }
+      }
     },
   });
 
