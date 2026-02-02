@@ -18,9 +18,13 @@ on:
       - '.github/workflows/docker-test.yml'
 
 jobs:
-  development-build:
-    name: Test Development Build
+  build-tests:
+    name: Test ${{ matrix.mode }} Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [development, production]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -28,20 +32,50 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build frontend (development)
-        run: docker compose build frontend
+      - name: Cache Docker layers (frontend)
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache-frontend
+          key: ${{ runner.os }}-buildx-frontend-${{ matrix.mode }}-${{ hashFiles('frontend/Dockerfile', 'frontend/package.json', 'frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-frontend-${{ matrix.mode }}-
 
-      - name: Build backend (development)
-        run: docker compose build backend
+      - name: Cache Docker layers (backend)
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache-backend
+          key: ${{ runner.os }}-buildx-backend-${{ matrix.mode }}-${{ hashFiles('backend/Dockerfile', 'backend/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-backend-${{ matrix.mode }}-
 
-      - name: Verify development images exist
+      - name: Build frontend (${{ matrix.mode }})
+        run: |
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml build frontend
+          else
+            docker compose build frontend
+          fi
+
+      - name: Build backend (${{ matrix.mode }})
+        run: |
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml build backend
+          else
+            docker compose build backend
+          fi
+
+      - name: Verify images exist
         run: |
           docker images | grep sandbox-claude-code-frontend
           docker images | grep sandbox-claude-code-backend
 
-  production-build:
-    name: Test Production Build
+  startup-tests:
+    name: Test ${{ matrix.mode }} Startup
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [development, production]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -49,162 +83,134 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build frontend (production)
-        run: docker compose -f docker-compose.yml build frontend
-
-      - name: Build backend (production)
-        run: docker compose -f docker-compose.yml build backend
-
-      - name: Verify production images exist
+      - name: Start containers (${{ matrix.mode }})
         run: |
-          docker images | grep sandbox-claude-code-frontend
-          docker images | grep sandbox-claude-code-backend
-
-  development-startup:
-    name: Test Development Startup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Start containers (development)
-        run: docker compose up -d
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml up -d
+          else
+            docker compose up -d
+          fi
 
       - name: Wait for containers to start
         run: sleep 15
 
       - name: Check containers are running
         run: |
-          docker compose ps
-          docker compose ps | grep "Up" | grep frontend
-          docker compose ps | grep "Up" | grep backend
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml ps
+            docker compose -f docker-compose.yml ps | grep "Up" | grep frontend
+            docker compose -f docker-compose.yml ps | grep "Up" | grep backend
+            docker compose -f docker-compose.yml ps | grep "Up" | grep nginx
+          else
+            docker compose ps
+            docker compose ps | grep "Up" | grep frontend
+            docker compose ps | grep "Up" | grep backend
+          fi
 
       - name: Check container logs for errors
         if: always()
         run: |
           echo "=== Frontend Logs ==="
-          docker compose logs frontend | tail -n 50
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml logs frontend | tail -n 50
+          else
+            docker compose logs frontend | tail -n 50
+          fi
           echo "=== Backend Logs ==="
-          docker compose logs backend | tail -n 50
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml logs backend | tail -n 50
+          else
+            docker compose logs backend | tail -n 50
+          fi
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            echo "=== Nginx Logs ==="
+            docker compose -f docker-compose.yml logs nginx | tail -n 50
+          fi
 
       - name: Stop containers
         if: always()
-        run: docker compose down -v
+        run: |
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml down -v
+          else
+            docker compose down -v
+          fi
 
-  production-startup:
-    name: Test Production Startup
+  health-check-tests:
+    name: Test ${{ matrix.mode }} Health Checks
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [development, production]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Start containers (production)
-        run: docker compose -f docker-compose.yml up -d
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Wait for containers to start
-        run: sleep 15
-
-      - name: Check containers are running
+      - name: Start containers (${{ matrix.mode }})
         run: |
-          docker compose -f docker-compose.yml ps
-          docker compose -f docker-compose.yml ps | grep "Up" | grep frontend
-          docker compose -f docker-compose.yml ps | grep "Up" | grep backend
-          docker compose -f docker-compose.yml ps | grep "Up" | grep nginx
-
-      - name: Check container logs for errors
-        if: always()
-        run: |
-          echo "=== Frontend Logs ==="
-          docker compose -f docker-compose.yml logs frontend | tail -n 50
-          echo "=== Backend Logs ==="
-          docker compose -f docker-compose.yml logs backend | tail -n 50
-          echo "=== Nginx Logs ==="
-          docker compose -f docker-compose.yml logs nginx | tail -n 50
-
-      - name: Stop containers
-        if: always()
-        run: docker compose -f docker-compose.yml down -v
-
-  development-health-checks:
-    name: Test Development Health Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Start containers (development)
-        run: docker compose up -d
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml up -d
+          else
+            docker compose up -d
+          fi
 
       - name: Wait for services to be ready
-        run: sleep 20
-
-      - name: Test frontend is accessible
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
-          echo "✅ Frontend is accessible at http://localhost:3000"
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            sleep 30
+          else
+            sleep 20
+          fi
 
-      - name: Test backend health endpoint
+      - name: Test services accessibility
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 2; done'
-          echo "✅ Backend health check passed"
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            # Production: Test through nginx
+            timeout 60 bash -c 'until curl -f http://localhost; do sleep 2; done'
+            echo "✅ Nginx is accessible at http://localhost"
 
-      - name: Test backend API endpoint
-        run: |
-          # Test that API is responding (200 or 404 is acceptable - means backend is running)
-          curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/messages | grep -E "^(200|404)$"
-          echo "✅ Backend API is responding"
+            curl -f http://localhost
+            echo "✅ Frontend is accessible through nginx"
 
-      - name: Verify backend health response
-        run: |
-          response=$(curl -s http://localhost:8080/actuator/health)
-          echo "Health response: $response"
-          echo "$response" | grep -q '"status":"UP"'
-          echo "✅ Backend health status is UP"
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/messages)
+            echo "API Response Code: $http_code"
+            echo "$http_code" | grep -E "^(200|404)$"
+            echo "✅ Backend API accessible through nginx"
+
+            timeout 60 bash -c 'until curl -f http://localhost/actuator/health; do sleep 2; done'
+            response=$(curl -s http://localhost/actuator/health)
+            echo "Health response: $response"
+            echo "$response" | grep -q '"status":"UP"'
+            echo "✅ Backend health check through nginx passed"
+          else
+            # Development: Test direct access
+            timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+            echo "✅ Frontend is accessible at http://localhost:3000"
+
+            timeout 60 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 2; done'
+            echo "✅ Backend health check passed"
+
+            curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/messages | grep -E "^(200|404)$"
+            echo "✅ Backend API is responding"
+
+            response=$(curl -s http://localhost:8080/actuator/health)
+            echo "Health response: $response"
+            echo "$response" | grep -q '"status":"UP"'
+            echo "✅ Backend health status is UP"
+          fi
 
       - name: Stop containers
         if: always()
-        run: docker compose down -v
-
-  production-health-checks:
-    name: Test Production Health Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Start containers (production)
-        run: docker compose -f docker-compose.yml up -d
-
-      - name: Wait for services to be ready
-        run: sleep 30
-
-      - name: Test nginx is accessible
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost; do sleep 2; done'
-          echo "✅ Nginx is accessible at http://localhost"
-
-      - name: Test frontend through nginx
-        run: |
-          curl -f http://localhost
-          echo "✅ Frontend is accessible through nginx"
-
-      - name: Test backend API through nginx
-        run: |
-          # Test that API is responding through nginx (200 or 404 is acceptable)
-          curl -s -o /dev/null -w "%{http_code}" http://localhost/api/messages | grep -E "^(200|404)$"
-          echo "✅ Backend API is accessible through nginx"
-
-      - name: Test backend health through nginx
-        run: |
-          timeout 60 bash -c 'until curl -f http://localhost/actuator/health; do sleep 2; done'
-          response=$(curl -s http://localhost/actuator/health)
-          echo "Health response: $response"
-          echo "$response" | grep -q '"status":"UP"'
-          echo "✅ Backend health check through nginx passed"
-
-      - name: Stop containers
-        if: always()
-        run: docker compose -f docker-compose.yml down -v
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml down -v
+          else
+            docker compose down -v
+          fi
 
   production-permissions:
     name: Test Production Container Permissions
@@ -212,6 +218,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Start frontend (production)
         run: docker compose -f docker-compose.yml up -d frontend
@@ -254,115 +263,99 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.yml down -v
 
-  integration-test:
-    name: Test Frontend-Backend Integration
+  integration-tests:
+    name: Test ${{ matrix.mode }} Integration
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [development, production]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Start all services (development)
-        run: docker compose up -d
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start all services (${{ matrix.mode }})
+        run: |
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml up -d
+          else
+            docker compose up -d
+          fi
 
       - name: Wait for all services to be ready
-        run: sleep 20
-
-      - name: Test backend is accessible
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 2; done'
-          echo "✅ Backend is ready"
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            sleep 30
+          else
+            sleep 20
+          fi
 
-      - name: Test frontend is accessible
+      - name: Test integration
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
-          echo "✅ Frontend is ready"
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            # Production: Test all services through nginx
+            curl -f http://localhost
+            echo "✅ Frontend accessible through nginx"
 
-      - name: Test API call from host
-        run: |
-          # Test that API is responding (200 or 404 is acceptable)
-          http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/messages)
-          echo "API Response Code: $http_code"
-          echo "$http_code" | grep -E "^(200|404)$"
-          echo "✅ API endpoint is responding"
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/messages)
+            echo "API Response Code: $http_code"
+            echo "$http_code" | grep -E "^(200|404)$"
+            echo "✅ Backend API accessible through nginx"
 
-      # Frontend-backend connectivity is tested through the production integration tests
-      # where requests flow through nginx, which is the production configuration
+            curl -f http://localhost/actuator/health
+            echo "✅ Health check accessible through nginx"
 
-      - name: Show container network information
-        run: |
-          echo "=== Container Network Info ==="
-          docker network ls
-          docker network inspect sandbox-claude-code_default || true
+            # Verify nginx routing configuration
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/messages)
+            echo "API response code through nginx: $http_code"
+            echo "$http_code" | grep -E "^(200|404)$"
+
+            frontend_response=$(curl -s http://localhost)
+            echo "Frontend response length: ${#frontend_response}"
+            [ ${#frontend_response} -gt 100 ]
+            echo "✅ Nginx routing is working correctly"
+
+            curl -I http://localhost/api/messages
+            echo "✅ API headers checked through nginx"
+          else
+            # Development: Test backend and frontend
+            timeout 60 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 2; done'
+            echo "✅ Backend is ready"
+
+            timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+            echo "✅ Frontend is ready"
+
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/messages)
+            echo "API Response Code: $http_code"
+            echo "$http_code" | grep -E "^(200|404)$"
+            echo "✅ API endpoint is responding"
+
+            echo "=== Container Network Info ==="
+            docker network ls
+            docker network inspect sandbox-claude-code_default || true
+          fi
 
       - name: Stop containers
         if: always()
-        run: docker compose down -v
-
-  production-integration-test:
-    name: Test Production Integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Start all services (production)
-        run: docker compose -f docker-compose.yml up -d
-
-      - name: Wait for all services to be ready
-        run: sleep 30
-
-      - name: Test all services through nginx
         run: |
-          # Frontend
-          curl -f http://localhost
-          echo "✅ Frontend accessible through nginx"
-
-          # Backend API
-          http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/messages)
-          echo "API Response Code: $http_code"
-          echo "$http_code" | grep -E "^(200|404)$"
-          echo "✅ Backend API accessible through nginx"
-
-          # Health check
-          curl -f http://localhost/actuator/health
-          echo "✅ Health check accessible through nginx"
-
-      - name: Test nginx routing configuration
-        run: |
-          # Verify nginx routes /api to backend
-          http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/messages)
-          echo "API response code through nginx: $http_code"
-          echo "$http_code" | grep -E "^(200|404)$"
-
-          # Verify nginx routes / to frontend
-          frontend_response=$(curl -s http://localhost)
-          echo "Frontend response length: ${#frontend_response}"
-          [ ${#frontend_response} -gt 100 ] # Frontend HTML should be substantial
-          echo "✅ Nginx routing is working correctly"
-
-      - name: Verify API is accessible through nginx
-        run: |
-          # Test API headers when accessing through nginx
-          curl -I http://localhost/api/messages
-          echo "✅ API headers checked through nginx"
-
-      - name: Stop containers
-        if: always()
-        run: docker compose -f docker-compose.yml down -v
+          if [ "${{ matrix.mode }}" = "production" ]; then
+            docker compose -f docker-compose.yml down -v
+          else
+            docker compose down -v
+          fi
 
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
     needs:
-      - development-build
-      - production-build
-      - development-startup
-      - production-startup
-      - development-health-checks
-      - production-health-checks
+      - build-tests
+      - startup-tests
+      - health-check-tests
       - production-permissions
-      - integration-test
-      - production-integration-test
+      - integration-tests
     if: always()
     steps:
       - name: Generate summary
