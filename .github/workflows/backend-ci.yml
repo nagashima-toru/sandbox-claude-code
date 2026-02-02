@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4.6.0
         with:
           name: test-results
           path: |
@@ -70,21 +70,21 @@ jobs:
 
       - name: Upload JaCoCo coverage report
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4.6.0
         with:
           name: jacoco-report
           path: backend/target/site/jacoco/
 
       - name: Upload SpotBugs report
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4.6.0
         with:
           name: spotbugs-report
           path: backend/target/spotbugsXml.xml
 
       - name: Upload Checkstyle report
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4.6.0
         with:
           name: checkstyle-report
           path: backend/target/checkstyle-result.xml
@@ -145,7 +145,7 @@ jobs:
 
       - name: Upload Dependency-Check report
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4.6.0
         with:
           name: dependency-check-report
           path: |
@@ -258,7 +258,7 @@ jobs:
 
       - name: Upload OpenAPI validation results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: openapi-validation-results
           path: backend/target/surefire-reports/**/OpenApiValidationTest*.xml
