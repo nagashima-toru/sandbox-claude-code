@@ -8,13 +8,19 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - '.github/workflows/shared-setup.yml'
   pull_request:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - '.github/workflows/shared-setup.yml'
 
 jobs:
+  setup:
+    uses: ./.github/workflows/shared-setup.yml
+
   lint:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -38,8 +44,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Run ESLint
         run: pnpm lint
@@ -48,6 +57,7 @@ jobs:
         run: pnpm format:check
 
   type-check:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -71,13 +81,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Run TypeScript type check
         run: pnpm type-check
 
   test:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,8 +115,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Run unit tests with coverage
         run: pnpm test:coverage --passWithNoTests
@@ -159,6 +176,7 @@ jobs:
           retention-days: 30
 
   build:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -182,8 +200,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Build Next.js application
         run: pnpm build
@@ -198,6 +219,7 @@ jobs:
           retention-days: 7
 
   e2e:
+    needs: [setup, build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -242,9 +264,11 @@ jobs:
         working-directory: ./frontend
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        working-directory: ./frontend
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Install Playwright browsers
         working-directory: ./frontend
