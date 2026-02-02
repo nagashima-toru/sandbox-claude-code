@@ -8,6 +8,6 @@ echo "🛑 Stopping backend services for E2E tests..."
 cd "$(dirname "$0")/../.."
 
 # Stop and remove containers
-docker compose -f docker-compose.e2e.yml down -v
+docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example down -v
 
 echo "✅ Backend services stopped and cleaned up"

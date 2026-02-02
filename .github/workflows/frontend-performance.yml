@@ -1,0 +1,187 @@
+name: Frontend Performance Monitoring
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-performance.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API client
+        run: pnpm generate:api
+
+      - name: Build with bundle analyzer
+        run: pnpm build:analyze
+        env:
+          ANALYZE: true
+
+      - name: Upload bundle analysis reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: |
+            frontend/.next/analyze/*.html
+          retention-days: 30
+
+      - name: Analyze bundle size
+        id: analyze
+        run: |
+          echo "## 📦 Bundle Size Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Get build output stats
+          if [ -f .next/build-manifest.json ]; then
+            echo "### Build completed successfully" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Calculate total size of .next directory
+            TOTAL_SIZE=$(du -sh .next | cut -f1)
+            echo "**Total build size:** $TOTAL_SIZE" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # List largest files
+            echo "### Largest Files" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+            echo "| ---- | ---- |" >> $GITHUB_STEP_SUMMARY
+
+            # Find top 10 largest files
+            find .next -type f -exec du -h {} + | sort -rh | head -10 | while read size path; do
+              filename=$(basename "$path")
+              echo "| \`$filename\` | $size |" >> $GITHUB_STEP_SUMMARY
+            done
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Full bundle analysis available in artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "💡 To view interactive bundle analysis locally, run:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+            echo "cd frontend && pnpm build:analyze" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Build manifest not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR
+        uses: actions/github-script@v8
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Read the build manifest to get page sizes
+            const manifestPath = path.join(process.cwd(), 'frontend/.next/build-manifest.json');
+            let comment = '## 📦 Frontend Bundle Size Report\n\n';
+
+            if (fs.existsSync(manifestPath)) {
+              // Calculate total size
+              const { execSync } = require('child_process');
+              const totalSize = execSync('du -sh frontend/.next', { encoding: 'utf-8' }).split('\t')[0];
+
+              comment += `**Total build size:** ${totalSize}\n\n`;
+              comment += '### Bundle Analysis\n\n';
+              comment += 'Bundle analysis reports have been generated. ';
+              comment += 'Download the artifacts to view detailed HTML reports.\n\n';
+              comment += '### Largest Files\n\n';
+              comment += '| File | Size |\n';
+              comment += '| ---- | ---- |\n';
+
+              // List top 10 largest files
+              const files = execSync(
+                'find frontend/.next -type f -exec du -h {} + | sort -rh | head -10',
+                { encoding: 'utf-8' }
+              ).trim().split('\n');
+
+              files.forEach(line => {
+                const [size, filepath] = line.split(/\s+/);
+                const filename = path.basename(filepath);
+                comment += `| \`${filename}\` | ${size} |\n`;
+              });
+
+              comment += '\n### Recommendations\n\n';
+              comment += '- Review the bundle analysis artifacts for detailed breakdown\n';
+              comment += '- Consider code splitting for large pages\n';
+              comment += '- Optimize images and assets\n';
+              comment += '- Use dynamic imports for heavy components\n';
+              comment += '\n💡 To view interactive analysis locally:\n';
+              comment += '```bash\n';
+              comment += 'cd frontend && pnpm build:analyze\n';
+              comment += '```\n';
+            } else {
+              comment += '⚠️ Build manifest not found. Build may have failed.\n';
+            }
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user?.login === 'github-actions[bot]' &&
+              c.body.includes('Frontend Bundle Size Report')
+            );
+
+            // Create or update comment
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            }
+
+      - name: Check bundle size thresholds
+        run: |
+          # Calculate total size in MB
+          TOTAL_SIZE_MB=$(du -sm .next | cut -f1)
+          THRESHOLD_MB=50
+
+          echo "Total build size: ${TOTAL_SIZE_MB}MB"
+          echo "Threshold: ${THRESHOLD_MB}MB"
+
+          if [ $TOTAL_SIZE_MB -gt $THRESHOLD_MB ]; then
+            echo "⚠️ Warning: Build size exceeds threshold!"
+            echo "Current: ${TOTAL_SIZE_MB}MB, Threshold: ${THRESHOLD_MB}MB"
+            echo "::warning::Build size (${TOTAL_SIZE_MB}MB) exceeds threshold (${THRESHOLD_MB}MB)"
+          else
+            echo "✅ Build size is within acceptable limits"
+          fi

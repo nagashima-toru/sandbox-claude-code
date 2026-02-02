@@ -1,0 +1,127 @@
+name: Story（ユーザーストーリー）
+description: ユーザー価値を提供する機能単位（仕様と受け入れ条件を定義）
+title: "[STORY] "
+labels: ["story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Story について
+
+        Storyはユーザーに価値を提供する機能単位です。必ず受け入れ条件を定義し、仕様PRを先に作成してください。
+
+        **重要：** 実装PRは、このStoryに `spec-approved` ラベルが付与された後にのみマージ可能です。
+
+  - type: input
+    id: parent_epic
+    attributes:
+      label: 親Epic
+      description: このStoryが属するEpicのIssue番号
+      placeholder: "#123"
+    validations:
+      required: true
+
+  - type: textarea
+    id: user_story
+    attributes:
+      label: ユーザーストーリー
+      description: "As a... I want... So that..." の形式で記述
+      placeholder: |
+        As a ユーザー
+        I want メッセージを作成したい
+        So that 情報を記録できる
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: 受け入れ条件（Gherkin形式）
+      description: Given-When-Then形式で検証可能な条件を記述
+      placeholder: |
+        **正常系：**
+
+        Scenario: 有効なデータでメッセージを作成する
+          Given 以下のメッセージデータを準備する:
+            | code    | content       |
+            | MSG_001 | Hello, World! |
+          When 作成APIを呼び出す
+          Then ステータスコード 201 が返される
+          And メッセージが作成される
+
+        **異常系：**
+
+        Scenario: codeが空の場合バリデーションエラー
+          Given codeが空のメッセージデータを準備する
+          When 作成APIを呼び出す
+          Then ステータスコード 400 が返される
+          And エラーメッセージ "コードは必須です" が含まれる
+    validations:
+      required: true
+
+  - type: textarea
+    id: api_spec
+    attributes:
+      label: API仕様（該当する場合）
+      description: 変更・追加するAPIエンドポイントの概要
+      placeholder: |
+        **エンドポイント：** POST /api/messages
+        **リクエスト：**
+        ```json
+        {
+          "code": "MSG_001",
+          "content": "Hello, World!"
+        }
+        ```
+        **レスポンス：** 201 Created
+        ```json
+        {
+          "id": 1,
+          "code": "MSG_001",
+          "content": "Hello, World!",
+          "createdAt": "2024-01-01T00:00:00Z"
+        }
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: ui_spec
+    attributes:
+      label: UI仕様（該当する場合）
+      description: 画面の変更内容や動作
+      placeholder: |
+        - メッセージ作成フォームを追加
+        - 入力項目：コード、内容
+        - バリデーション：両方必須
+        - 作成成功時：一覧画面にリダイレクト
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: 技術的な補足
+      description: 実装時の注意事項や制約
+      placeholder: |
+        - 既存のメッセージテーブルを使用
+        - トランザクション管理が必要
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 作業チェックリスト
+      description: 完了すべき作業項目
+      options:
+        - label: 受け入れ条件を .feature ファイルとして作成
+          required: false
+        - label: OpenAPI仕様を更新（API変更の場合）
+          required: false
+        - label: 仕様PRを作成してレビュー依頼
+          required: false
+        - label: 仕様PRマージ後、`spec-approved` ラベルを確認
+          required: false
+        - label: 実装Taskを作成
+          required: false

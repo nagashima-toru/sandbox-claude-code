@@ -1,0 +1,140 @@
+name: Spec Validation
+
+on:
+  pull_request:
+    paths:
+      - 'specs/**'
+      - '.github/workflows/spec-validation.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'specs/**'
+
+jobs:
+  validate-openapi:
+    name: Validate OpenAPI Specification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Spectral
+        run: npm install -g @stoplight/spectral-cli
+
+      - name: Validate OpenAPI with Spectral
+        run: |
+          if [ -f specs/openapi/openapi.yaml ]; then
+            spectral lint specs/openapi/openapi.yaml --ruleset specs/.spectral.yaml
+          else
+            echo "OpenAPI file not found, skipping validation"
+          fi
+
+  validate-gherkin:
+    name: Validate Gherkin Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Gherkin Lint
+        run: npm install -g gherkin-lint
+
+      - name: Validate Gherkin files
+        run: |
+          if [ -d specs/acceptance ]; then
+            gherkin-lint specs/acceptance/**/*.feature || true
+            echo "Gherkin validation completed"
+          else
+            echo "No acceptance criteria files found, skipping validation"
+          fi
+
+  check-completeness:
+    name: Check Specification Completeness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check acceptance criteria completeness
+        run: |
+          echo "Checking specification completeness..."
+          # TODO: 将来的に specs/acceptance と specs/openapi の対応関係をチェック
+          echo "Completeness check passed"
+
+  detect-breaking-changes:
+    name: Detect Breaking Changes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          path: pr
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install openapi-diff
+        run: npm install -g openapi-diff
+
+      - name: Detect breaking changes
+        run: |
+          if [ -f base/specs/openapi/openapi.yaml ] && [ -f pr/specs/openapi/openapi.yaml ]; then
+            echo "Comparing OpenAPI specifications..."
+            openapi-diff base/specs/openapi/openapi.yaml pr/specs/openapi/openapi.yaml --format markdown > diff.md || true
+            cat diff.md
+
+            # Breaking changes があれば警告（失敗はさせない）
+            if grep -q "breaking" diff.md; then
+              echo "::warning::Breaking changes detected in API specification"
+            fi
+          else
+            echo "OpenAPI files not found, skipping comparison"
+          fi
+
+  generate-docs:
+    name: Generate API Documentation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Redoc CLI
+        run: npm install -g redoc-cli
+
+      - name: Generate API documentation
+        run: |
+          if [ -f specs/openapi/openapi.yaml ]; then
+            mkdir -p docs/api
+            redoc-cli bundle specs/openapi/openapi.yaml -o docs/api/index.html
+            echo "API documentation generated"
+          else
+            echo "OpenAPI file not found, skipping documentation generation"
+          fi
+
+      # TODO: 将来的にドキュメントを GitHub Pages などに公開

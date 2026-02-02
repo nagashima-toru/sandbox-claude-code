@@ -1,49 +1,10 @@
 version: 2
 updates:
-  # Frontend (npm/pnpm) の依存関係更新
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "nagashima-toru"
-    labels:
-      - "dependencies"
-      - "frontend"
-    commit-message:
-      prefix: "chore(deps):"
-      include: "scope"
-    # セマンティックバージョニングに基づく自動マージ設定
-    # patch と minor のみ自動マージ候補（CI が通る必要がある）
-    versioning-strategy: increase
-
-  # Backend (Maven) の依存関係更新
-  - package-ecosystem: "maven"
-    directory: "/backend"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "nagashima-toru"
-    labels:
-      - "dependencies"
-      - "backend"
-    commit-message:
-      prefix: "chore(deps):"
-      include: "scope"
-
   # GitHub Actions の依存関係更新
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
       day: "monday"
       time: "09:00"
       timezone: "Asia/Tokyo"
@@ -56,6 +17,53 @@ updates:
     commit-message:
       prefix: "chore(deps):"
       include: "scope"
+
+  # Backend (Maven) の依存関係更新
+  - package-ecosystem: "maven"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "nagashima-toru"
+    labels:
+      - "dependencies"
+      - "backend"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    ignore:
+      # Spring Boot は慎重にアップデート
+      - dependency-name: "org.springframework.boot:*"
+        update-types: ["version-update:semver-major"]
+
+  # Frontend (npm/pnpm) の依存関係更新
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "nagashima-toru"
+    labels:
+      - "dependencies"
+      - "frontend"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    ignore:
+      # Next.js は慎重にアップデート
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+    # セマンティックバージョニングに基づく自動マージ設定
+    # patch と minor のみ自動マージ候補（CI が通る必要がある）
+    versioning-strategy: increase
 
   # Docker の依存関係更新
   - package-ecosystem: "docker"

@@ -1,111 +1,108 @@
 'use client';
 
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import {
-  useCreateMessage,
-  useUpdateMessage,
-  useDeleteMessage,
-} from '@/lib/api/generated/message/message';
+import { useMessageMutations } from '@/hooks/useMessageMutations';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 
+/**
+ * Home page component for message management.
+ * Provides CRUD operations (Create, Read, Update, Delete) for messages.
+ * Manages modal states for creating, editing, and deleting messages.
+ */
 export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<MessageResponse | null>(null);
-  const queryClient = useQueryClient();
 
-  const createMutation = useCreateMessage({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
-        setIsCreateModalOpen(false);
-      },
-      onError: (error: unknown) => {
-        console.error('Failed to create message:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 409) {
-            console.error('Duplicate code error');
-          }
+  const {
+    createMessage: createMutation,
+    updateMessage: updateMutation,
+    deleteMessage: deleteMutation,
+  } = useMessageMutations({
+    onCreateSuccess: () => {
+      setIsCreateModalOpen(false);
+    },
+    onUpdateSuccess: () => {
+      setIsEditModalOpen(false);
+      setSelectedMessage(null);
+    },
+    onDeleteSuccess: () => {
+      setIsDeleteDialogOpen(false);
+      setSelectedMessage(null);
+    },
+    onCreateError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 409) {
+          console.error('Duplicate code error');
         }
-      },
+      }
+    },
+    onUpdateError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 404) {
+          console.error('Message not found');
+        }
+      }
+    },
+    onDeleteError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 404) {
+          console.error('Message not found');
+        }
+      }
     },
   });
 
-  const updateMutation = useUpdateMessage({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
-        setIsEditModalOpen(false);
-        setSelectedMessage(null);
-      },
-      onError: (error: unknown) => {
-        console.error('Failed to update message:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 404) {
-            console.error('Message not found');
-          }
-        }
-      },
+  const handleCreateMessage = useCallback(
+    (data: MessageFormData) => {
+      createMutation.mutate({ data });
     },
-  });
+    [createMutation]
+  );
 
-  const deleteMutation = useDeleteMessage({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
-        setIsDeleteDialogOpen(false);
-        setSelectedMessage(null);
-      },
-      onError: (error: unknown) => {
-        console.error('Failed to delete message:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 404) {
-            console.error('Message not found');
-          }
-        }
-      },
+  const handleEditMessage = useCallback(
+    (data: MessageFormData) => {
+      if (selectedMessage?.id) {
+        updateMutation.mutate({ id: selectedMessage.id, data });
+      }
     },
-  });
+    [selectedMessage?.id, updateMutation]
+  );
 
-  const handleCreateMessage = (data: MessageFormData) => {
-    createMutation.mutate({ data });
-  };
+  const handleEditClick = useCallback(
+    (message: MessageResponse) => {
+      updateMutation.reset(); // Clear previous errors
+      setSelectedMessage(message);
+      setIsEditModalOpen(true);
+    },
+    [updateMutation]
+  );
 
-  const handleEditMessage = (data: MessageFormData) => {
-    if (selectedMessage?.id) {
-      updateMutation.mutate({ id: selectedMessage.id, data });
-    }
-  };
+  const handleDeleteClick = useCallback(
+    (message: MessageResponse) => {
+      deleteMutation.reset(); // Clear previous errors
+      setSelectedMessage(message);
+      setIsDeleteDialogOpen(true);
+    },
+    [deleteMutation]
+  );
 
-  const handleEditClick = (message: MessageResponse) => {
-    updateMutation.reset(); // Clear previous errors
-    setSelectedMessage(message);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (message: MessageResponse) => {
-    deleteMutation.reset(); // Clear previous errors
-    setSelectedMessage(message);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (selectedMessage?.id) {
       deleteMutation.mutate({ id: selectedMessage.id });
     }
-  };
+  }, [selectedMessage?.id, deleteMutation]);
 
   return (
     <main className="min-h-screen p-8">

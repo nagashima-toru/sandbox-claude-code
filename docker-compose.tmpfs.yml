@@ -1,0 +1,27 @@
+# Docker Compose Override for Temporary PostgreSQL Storage
+# This file provides an option to use tmpfs (memory) instead of persistent volumes.
+# Useful for CI/CD environments or temporary testing where data persistence is not needed.
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.tmpfs.yml up
+#
+# Or set DB_PERSISTENCE_MODE=tmpfs in .env and use:
+#   docker-compose up
+#
+# Benefits:
+#   - Faster database operations (in-memory)
+#   - No disk I/O overhead
+#   - Automatic cleanup (data lost on container stop)
+#
+# Caution:
+#   - All data is lost when the container stops
+#   - Not suitable for development work that needs data persistence
+
+services:
+  postgres:
+    volumes:
+      # Remove the named volume and use tmpfs instead
+      - type: tmpfs
+        target: /var/lib/postgresql/data
+        tmpfs:
+          size: 1G  # Limit memory usage to 1GB

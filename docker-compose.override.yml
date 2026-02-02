@@ -1,0 +1,45 @@
+# Development overrides for docker-compose.yml
+# This file is automatically used when running `docker-compose up`
+# It enables hot-reload and debugging features for local development
+
+services:
+  backend:
+    environment:
+      # Spring Boot DevTools configuration
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+    volumes:
+      # Mount source code for hot reload (optional - rebuild required for code changes)
+      - ./backend/src:/app/src:ro
+    command: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "app.jar"]
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+      - "${DEBUG_PORT:-5005}:5005"  # Debug port
+
+  frontend:
+    build:
+      target: development  # Override to development for local dev with hot reload
+    environment:
+      # Development mode
+      NODE_ENV: development
+      # Enable hot reload
+      WATCHPACK_POLLING: "true"
+      # API URL for browser (localhost) - loaded from .env.local
+      # Note: NEXT_PUBLIC_API_URL should be set in frontend/.env.local, not here
+      # The setup-worktree-env.sh script automatically generates .env.local with correct port
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      # Mount source code for hot reload
+      - ./frontend/src:/app/src:ro
+      - ./frontend/public:/app/public:ro
+      - ./frontend/package.json:/app/package.json:ro
+      - ./frontend/pnpm-lock.yaml:/app/pnpm-lock.yaml:ro
+      - ./frontend/next.config.js:/app/next.config.js:ro
+      - ./frontend/tailwind.config.ts:/app/tailwind.config.ts:ro
+      - ./frontend/postcss.config.js:/app/postcss.config.js:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+      # Mount .env.local if exists (required for NEXT_PUBLIC_API_URL with correct port)
+      # The setup script creates this file automatically
+      - ./frontend/.env.local:/app/.env.local:ro
+    command: ["pnpm", "dev"]

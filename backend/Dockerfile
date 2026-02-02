@@ -1,22 +1,20 @@
 # Build stage
-FROM eclipse-temurin:23-jdk-alpine AS build
+FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+COPY backend/.mvn/ .mvn/
+COPY backend/mvnw backend/pom.xml ./
+COPY backend/src ./src
 
-# Download dependencies (cached layer)
-RUN ./mvnw dependency:go-offline
+# Copy OpenAPI specs (required for code generation)
+COPY specs ../specs
 
-# Copy source code
-COPY src ./src
-
-# Build application
-RUN ./mvnw clean package -DskipTests
+# Build application (dependencies will be downloaded as needed)
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 # Runtime stage
-FROM eclipse-temurin:23-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 
 # Create non-root user
@@ -30,7 +28,7 @@ COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # Run application

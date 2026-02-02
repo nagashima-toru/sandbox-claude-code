@@ -1,0 +1,81 @@
+ProblemDetail:
+  type: object
+  description: |
+    RFC 7807 Problem Details for HTTP APIs
+    エラー情報を標準化された形式で提供します。
+  required:
+    - type
+    - title
+    - status
+  properties:
+    type:
+      type: string
+      format: uri
+      description: |
+        エラーの種類を識別するURI（デフォルト: about:blank）
+        アプリケーション固有のエラータイプを定義可能
+      example: 'https://api.example.com/errors/validation-error'
+    title:
+      type: string
+      description: エラーの概要（人間が読める形式）
+      example: 'Validation Error'
+    status:
+      type: integer
+      format: int32
+      description: HTTPステータスコード
+      example: 400
+    detail:
+      type: string
+      description: エラーの詳細説明
+      example: 'The request body contains invalid fields.'
+    instance:
+      type: string
+      format: uri
+      description: |
+        エラーが発生したリクエストのURI
+        デバッグやログ追跡に使用
+      example: '/api/messages'
+    timestamp:
+      type: string
+      format: date-time
+      description: エラー発生日時（ISO 8601形式）
+      example: '2024-01-01T00:00:00Z'
+    errors:
+      type: array
+      description: |
+        バリデーションエラーの詳細リスト
+        （バリデーションエラーの場合のみ）
+      items:
+        $ref: '#/ValidationError'
+  example:
+    type: 'https://api.example.com/errors/validation-error'
+    title: 'Validation Error'
+    status: 400
+    detail: 'The request body contains invalid fields.'
+    instance: '/api/messages'
+    timestamp: '2024-01-01T00:00:00Z'
+    errors:
+      - field: 'code'
+        rejectedValue: ''
+        message: 'コードは必須です'
+
+ValidationError:
+  type: object
+  description: バリデーションエラーの詳細
+  required:
+    - field
+    - message
+  properties:
+    field:
+      type: string
+      description: エラーが発生したフィールド名
+      example: 'code'
+    rejectedValue:
+      type: string
+      nullable: true
+      description: 拒否された値
+      example: ''
+    message:
+      type: string
+      description: エラーメッセージ
+      example: 'コードは必須です'

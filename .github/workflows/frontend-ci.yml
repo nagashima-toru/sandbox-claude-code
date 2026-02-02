@@ -8,13 +8,19 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - '.github/workflows/shared-setup.yml'
   pull_request:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - '.github/workflows/shared-setup.yml'
 
 jobs:
+  setup:
+    uses: ./.github/workflows/shared-setup.yml
+
   lint:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,7 +35,7 @@ jobs:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -38,8 +44,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Run ESLint
         run: pnpm lint
@@ -48,6 +57,7 @@ jobs:
         run: pnpm format:check
 
   type-check:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -62,7 +72,7 @@ jobs:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -71,13 +81,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Run TypeScript type check
         run: pnpm type-check
 
   test:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -92,7 +106,7 @@ jobs:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -101,11 +115,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
-      - name: Run tests with coverage
-        run: pnpm test -- --coverage --passWithNoTests
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage --passWithNoTests
 
       - name: Generate coverage summary
         if: always()
@@ -159,6 +176,7 @@ jobs:
           retention-days: 30
 
   build:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -173,7 +191,7 @@ jobs:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -182,8 +200,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Build Next.js application
         run: pnpm build
@@ -198,6 +219,7 @@ jobs:
           retention-days: 7
 
   e2e:
+    needs: [setup, build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -209,16 +231,16 @@ jobs:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Set up JDK 23 for backend build
+      - name: Set up JDK 25 for backend build
         uses: actions/setup-java@v4
         with:
-          java-version: '23'
+          java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -227,24 +249,26 @@ jobs:
         run: ./mvnw clean package -DskipTests
 
       - name: Build backend Docker image
-        run: docker build -t sandbox-backend:e2e ./backend
+        run: docker build -f backend/Dockerfile -t sandbox-backend:e2e .
 
       - name: Start backend services with Docker Compose
-        run: docker compose -f docker-compose.e2e.yml up -d
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example up -d
 
       - name: Wait for backend to be ready
         run: |
           echo "Waiting for backend to be healthy..."
-          timeout 120 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 2; done'
+          timeout 120 bash -c 'until curl -f http://localhost:8081/actuator/health; do sleep 2; done'
           echo "Backend is ready!"
 
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
-        working-directory: ./frontend
-        run: pnpm generate:api
+      - name: Download generated API
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Install Playwright browsers
         working-directory: ./frontend
@@ -258,7 +282,7 @@ jobs:
 
       - name: Stop backend services
         if: always()
-        run: docker compose -f docker-compose.e2e.yml down -v
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example down -v
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
@@ -278,7 +302,7 @@ jobs:
 
       - name: Collect backend logs
         if: failure()
-        run: docker compose -f docker-compose.e2e.yml logs > backend-e2e-logs.txt
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example logs > backend-e2e-logs.txt
 
       - name: Upload backend logs
         uses: actions/upload-artifact@v4

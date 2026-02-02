@@ -1,51 +1,35 @@
 package com.sandbox.api.presentation.dto;
 
 import com.sandbox.api.domain.model.Message;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/** Response DTO representing a message. */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MessageResponse {
 
-    private Long id;
-    private String code;
-    private String content;
+  private Long id;
+  private String code;
+  private String content;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
-    public MessageResponse() {
-    }
-
-    public MessageResponse(Long id, String code, String content) {
-        this.id = id;
-        this.code = code;
-        this.content = content;
-    }
-
-    public static MessageResponse from(Message message) {
-        return new MessageResponse(
-                message.getId(),
-                message.getCode(),
-                message.getContent()
-        );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
+  /**
+   * Creates a MessageResponse from a Message domain model.
+   *
+   * @param message the domain model
+   * @return the response DTO
+   */
+  public static MessageResponse from(Message message) {
+    return new MessageResponse(
+        message.getId(),
+        message.getCode(),
+        message.getContent(),
+        message.getCreatedAt(),
+        message.getUpdatedAt());
+  }
 }

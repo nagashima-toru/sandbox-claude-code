@@ -1,0 +1,87 @@
+name: Task（実装タスク）
+description: 技術的な実装単位（1-2日で完了できる小さいPR）
+title: "[TASK] "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Task について
+
+        Taskは技術的な実装単位です。親StoryのStoryに `spec-approved` ラベルが付与されている必要があります。
+
+        **ガイドライン：**
+        - 1-2日で完了できる粒度
+        - Backend/Frontendは別Taskにする
+        - テストは実装Taskに含める
+
+  - type: input
+    id: parent_story
+    attributes:
+      label: 親Story（必須）
+      description: このTaskが属するStoryのIssue番号
+      placeholder: "#456"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 実装内容
+      description: このTaskで行う具体的な実装内容
+      placeholder: |
+        - MessageController の実装
+        - POST /api/messages エンドポイントの実装
+        - バリデーション処理の追加
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria_coverage
+    attributes:
+      label: 担当する受け入れ条件
+      description: 親Storyの受け入れ条件のうち、このTaskで検証する項目
+      placeholder: |
+        - [x] 有効なデータでメッセージを作成する
+        - [x] codeが空の場合バリデーションエラー
+        - [ ] contentが空の場合バリデーションエラー（別Taskで対応）
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: 変更対象ファイル
+      description: 変更予定のファイル一覧
+      placeholder: |
+        - backend/src/main/java/com/sandbox/api/presentation/MessageController.java
+        - backend/src/test/java/com/sandbox/api/presentation/MessageControllerTest.java
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 依存関係
+      description: このTaskの前に完了すべき他のTask
+      placeholder: |
+        - Depends on: #789 (Repository実装)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 実装チェックリスト
+      description: 完了すべき作業項目
+      options:
+        - label: 親Storyに `spec-approved` ラベルがあることを確認
+          required: false
+        - label: 実装コードを作成
+          required: false
+        - label: 単体テストを作成（カバレッジ要件を満たす）
+          required: false
+        - label: ローカルでCI検証を実行 (`./scripts/ci-check-local.sh`)
+          required: false
+        - label: 実装PRを作成してレビュー依頼
+          required: false

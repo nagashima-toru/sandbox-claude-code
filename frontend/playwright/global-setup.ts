@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { chromium, FullConfig } from '@playwright/test';
 
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log('🚀 Global setup: Starting backend services...');
 
   try {
@@ -22,7 +22,7 @@ async function globalSetup(config: FullConfig) {
 
     while (retries < maxRetries) {
       try {
-        const response = await page.goto('http://localhost:8080/actuator/health', {
+        const response = await page.goto('http://localhost:8081/actuator/health', {
           timeout: 5000,
         });
 
@@ -30,7 +30,7 @@ async function globalSetup(config: FullConfig) {
           console.log('✅ Backend health check passed');
           break;
         }
-      } catch (error) {
+      } catch (_error) {
         retries++;
         console.log(`⏳ Waiting for backend... (${retries}/${maxRetries})`);
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -65,7 +65,7 @@ async function globalSetup(config: FullConfig) {
             console.log(`⚠️  Frontend loaded but unexpected title: ${title}`);
           }
         }
-      } catch (error) {
+      } catch (_error) {
         retries++;
         console.log(`⏳ Waiting for frontend... (${retries}/${frontendMaxRetries})`);
         await new Promise((resolve) => setTimeout(resolve, 3000));

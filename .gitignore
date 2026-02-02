@@ -36,6 +36,7 @@ Thumbs.db
 
 # Environment Files (project-wide)
 .env
+.env.e2e
 .env.local
 .env.*.local
 
@@ -51,4 +52,5 @@ logs/
 *.temp
 *.swp
 *.swo
-*~.nib
+*~.nib.playwright-mcp/
+.playwright-mcp/
