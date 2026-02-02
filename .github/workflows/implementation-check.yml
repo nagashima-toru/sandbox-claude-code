@@ -13,7 +13,7 @@ jobs:
       !contains(github.event.pull_request.labels.*.name, 'spec')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get PR body
         id: pr-body
@@ -92,7 +92,7 @@ jobs:
       !contains(github.event.pull_request.labels.*.name, 'spec')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -118,7 +118,7 @@ jobs:
       !contains(github.event.pull_request.labels.*.name, 'spec')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get PR body
         id: pr-body
