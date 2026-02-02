@@ -85,6 +85,36 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles IllegalArgumentException and returns a 400 response in RFC 7807 format.
+   *
+   * @param ex the exception
+   * @param request the HTTP request
+   * @return response entity with RFC 7807 error details
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ErrorResponse> handleIllegalArgument(
+      IllegalArgumentException ex, HttpServletRequest request) {
+    LOGGER.warn(
+        "Invalid argument in request to URI: {} - {}",
+        sanitizeForLog(request.getRequestURI()),
+        sanitizeForLog(ex.getMessage()));
+
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .type(ERROR_TYPE_BASE_URI + "/invalid-argument")
+            .title("Invalid Argument")
+            .status(HttpStatus.BAD_REQUEST.value())
+            .detail(ex.getMessage())
+            .instance(request.getRequestURI())
+            .timestamp(LocalDateTime.now())
+            .build();
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .contentType(PROBLEM_JSON)
+        .body(error);
+  }
+
+  /**
    * Handles validation errors and returns a 400 response in RFC 7807 format with field-specific
    * error details.
    *

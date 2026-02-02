@@ -84,6 +84,25 @@ class GlobalExceptionHandlerTest {
   }
 
   @Test
+  void handleIllegalArgument_returns400WithErrorResponse() {
+    // Arrange
+    IllegalArgumentException exception = new IllegalArgumentException("Invalid sort field: malicious");
+
+    // Act
+    ResponseEntity<ErrorResponse> response =
+        exceptionHandler.handleIllegalArgument(exception, request);
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getStatus()).isEqualTo(400);
+    assertThat(response.getBody().getTitle()).isEqualTo("Invalid Argument");
+    assertThat(response.getBody().getDetail()).isEqualTo("Invalid sort field: malicious");
+    assertThat(response.getBody().getType()).contains("/invalid-argument");
+    assertThat(response.getBody().getInstance()).isEqualTo("/api/messages");
+  }
+
+  @Test
   void handleGeneralException_returns500WithErrorResponse() {
     Exception exception = new RuntimeException("Unexpected error");
     ResponseEntity<ErrorResponse> response =
