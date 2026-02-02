@@ -15,6 +15,7 @@ jobs:
     # Skip Dependabot and Renovate PRs (security updates and dependency updates)
     if: |
       github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.user.login != 'app/dependabot' &&
       github.event.pull_request.user.login != 'renovate[bot]'
 
     runs-on: ubuntu-latest
