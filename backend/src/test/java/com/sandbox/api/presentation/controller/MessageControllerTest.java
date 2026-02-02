@@ -1,5 +1,6 @@
 package com.sandbox.api.presentation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -186,4 +187,8 @@ class MessageControllerTest {
         .perform(delete("/api/messages/99999"))
         .andExpect(status().isNotFound());
   }
+
+  // Note: The current API doesn't expose sort parameters directly via URL.
+  // The security tests in MessageRepositoryImplTest verify that the validation logic
+  // prevents SQL injection when the repository is called with custom Pageable objects.
 }
