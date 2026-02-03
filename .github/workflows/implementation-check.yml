@@ -11,7 +11,8 @@ jobs:
     # 仕様PRまたはDependabot PRの場合はスキップ
     if: |
       !contains(github.event.pull_request.labels.*.name, 'spec') &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.user.login, 'dependabot')
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -92,7 +93,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !contains(github.event.pull_request.labels.*.name, 'spec') &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.user.login, 'dependabot')
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -119,7 +121,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !contains(github.event.pull_request.labels.*.name, 'spec') &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.user.login, 'dependabot')
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
