@@ -1,14 +1,15 @@
 package com.sandbox.api.application.usecase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.sandbox.api.domain.exception.DuplicateMessageCodeException;
 import com.sandbox.api.domain.model.Message;
 import com.sandbox.api.domain.repository.MessageRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

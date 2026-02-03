@@ -36,10 +36,47 @@ Spring Boot REST API application with PostgreSQL, MyBatis, and Flyway.
 
 # Compile only
 ./mvnw compile
+
+# Format code (Google Java Format via Spotless)
+./mvnw spotless:apply
+
+# Check code formatting
+./mvnw spotless:check
 ```
 
 **IMPORTANT**: To run integration tests and generate OpenAPI documentation, **always use `./mvnw verify`**.
 Do NOT use `./mvnw integration-test` as it will not stop the server properly, causing port conflicts on subsequent runs.
+
+## Code Formatting
+
+This project uses **Spotless** with **Google Java Format** for automatic code formatting.
+
+### Automatic Formatting
+
+Claude Code is configured to automatically format code after editing files via hooks in `.claude/settings.local.json`:
+- After `Edit` tool: runs `./scripts/format-code.sh`
+- After `Write` tool: runs `./scripts/format-code.sh`
+
+The script automatically detects Java files in the backend and applies Spotless formatting.
+
+### Manual Formatting
+
+If you need to manually format code:
+
+```bash
+# Format all Java files
+./mvnw spotless:apply
+
+# Check formatting without applying changes
+./mvnw spotless:check
+```
+
+### CI Integration
+
+- **verify phase**: `spotless:check` ensures code is formatted according to Google Java Format
+- **checkstyle**: validates code style compliance (Google Java Style Guide)
+
+Both Spotless and Checkstyle are enforced in CI via `./mvnw verify`.
 
 ## Architecture
 

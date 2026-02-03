@@ -1,6 +1,7 @@
 package com.sandbox.api.validation;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+
 import com.sandbox.api.ApiApplication;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,12 +60,14 @@ class OpenApiValidationTest {
   @DisplayName("POST /api/messages - 有効なリクエストで201を返す")
   void createMessage_withValidRequest_shouldReturn201() {
     String uniqueCode = "MSG_TEST_" + System.currentTimeMillis();
-    String requestBody = """
-            {
-              "code": "%s",
-              "content": "Test message for OpenAPI validation"
-            }
-            """.formatted(uniqueCode);
+    String requestBody =
+        """
+        {
+          "code": "%s",
+          "content": "Test message for OpenAPI validation"
+        }
+        """
+            .formatted(uniqueCode);
     given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(requestBody)
@@ -78,12 +81,13 @@ class OpenApiValidationTest {
   @Test
   @DisplayName("POST /api/messages - 無効なリクエストで400を返す")
   void createMessage_withInvalidRequest_shouldReturn400() {
-    String requestBody = """
-            {
-              "code": "",
-              "content": "Test message"
-            }
-            """;
+    String requestBody =
+        """
+        {
+          "code": "",
+          "content": "Test message"
+        }
+        """;
     given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(requestBody)
@@ -98,12 +102,14 @@ class OpenApiValidationTest {
   void getMessageById_withExistingId_shouldReturn200() {
     // まずメッセージを作成
     String uniqueCode = "MSG_FOR_GET_" + System.currentTimeMillis();
-    String requestBody = """
-            {
-              "code": "%s",
-              "content": "Message for GET test"
-            }
-            """.formatted(uniqueCode);
+    String requestBody =
+        """
+        {
+          "code": "%s",
+          "content": "Message for GET test"
+        }
+        """
+            .formatted(uniqueCode);
     String location =
         given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -126,23 +132,21 @@ class OpenApiValidationTest {
   @Test
   @DisplayName("GET /api/messages/{id} - 存在しないIDで404を返す")
   void getMessageById_withNonExistingId_shouldReturn404() {
-    given()
-        .when()
-        .get("/api/messages/99999")
-        .then()
-        .statusCode(404);
+    given().when().get("/api/messages/99999").then().statusCode(404);
   }
 
   @Test
   @DisplayName("DELETE /api/messages/{id} - 存在するIDで204を返す")
   void deleteMessage_withExistingId_shouldReturn204() {
     String uniqueCode = "MSG_FOR_DELETE_" + System.currentTimeMillis();
-    String requestBody = """
-            {
-              "code": "%s",
-              "content": "Message for DELETE test"
-            }
-            """.formatted(uniqueCode);
+    String requestBody =
+        """
+        {
+          "code": "%s",
+          "content": "Message for DELETE test"
+        }
+        """
+            .formatted(uniqueCode);
     String location =
         given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)

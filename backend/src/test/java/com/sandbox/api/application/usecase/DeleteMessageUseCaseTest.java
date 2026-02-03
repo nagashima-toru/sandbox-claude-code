@@ -1,9 +1,9 @@
 package com.sandbox.api.application.usecase;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import java.time.LocalDateTime;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.sandbox.api.domain.exception.MessageNotFoundException;
 import com.sandbox.api.domain.repository.MessageRepository;
 import org.junit.jupiter.api.Test;

@@ -2,10 +2,11 @@ package com.sandbox.api.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import java.time.LocalDateTime;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.sandbox.api.domain.model.Message;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,8 @@ class MessageRepositoryImplTest {
   @Test
   void findByCode_whenMapperReturnsMessage_returnsOptionalWithMessage() {
     // Arrange
-    Message expected = new Message(1L, "test-code", "Test Message", LocalDateTime.now(), LocalDateTime.now());
+    Message expected =
+        new Message(1L, "test-code", "Test Message", LocalDateTime.now(), LocalDateTime.now());
     when(messageMapper.findByCode("test-code")).thenReturn(expected);
     // Act
     Optional<Message> result = repository.findByCode("test-code");
@@ -54,7 +56,8 @@ class MessageRepositoryImplTest {
   @Test
   void findByCode_callsMapperExactlyOnce() {
     String code = "hello";
-    Message message = new Message(1L, code, "Hello, World!", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(1L, code, "Hello, World!", LocalDateTime.now(), LocalDateTime.now());
     when(messageMapper.findByCode(code)).thenReturn(message);
     repository.findByCode(code);
     verify(messageMapper).findByCode(code);
@@ -63,7 +66,9 @@ class MessageRepositoryImplTest {
   @Test
   void findAll_whenMapperReturnsMessages_returnsListOfMessages() {
     List<Message> expected =
-        Arrays.asList(new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()), new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
+        Arrays.asList(
+            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()),
+            new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
     when(messageMapper.findAll()).thenReturn(expected);
     List<Message> result = repository.findAll();
     assertThat(result).hasSize(2);
@@ -88,7 +93,8 @@ class MessageRepositoryImplTest {
 
   @Test
   void save_whenMessageHasNoId_callsInsert() {
-    Message message = new Message(null, "new-code", "New Content", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(null, "new-code", "New Content", LocalDateTime.now(), LocalDateTime.now());
     Message result = repository.save(message);
     assertThat(result).isEqualTo(message);
     verify(messageMapper).insert(message);
@@ -96,7 +102,8 @@ class MessageRepositoryImplTest {
 
   @Test
   void save_whenMessageHasId_callsUpdate() {
-    Message message = new Message(1L, "code", "Updated Content", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(1L, "code", "Updated Content", LocalDateTime.now(), LocalDateTime.now());
     Message result = repository.save(message);
     assertThat(result).isEqualTo(message);
     verify(messageMapper).update(message);

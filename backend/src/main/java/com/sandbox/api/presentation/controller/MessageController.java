@@ -64,24 +64,21 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse>
-      createMessage(com.sandbox.api.presentation.generated.model.MessageRequest messageRequest) {
+  public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse> createMessage(
+      com.sandbox.api.presentation.generated.model.MessageRequest messageRequest) {
     MessageRequest internal = MessageMapper.toInternal(messageRequest);
     Message message = createMessageUseCase.execute(internal.getCode(), internal.getContent());
 
     URI location =
-        UriComponentsBuilder.fromPath("/api/messages/{id}")
-            .buildAndExpand(message.getId())
-            .toUri();
+        UriComponentsBuilder.fromPath("/api/messages/{id}").buildAndExpand(message.getId()).toUri();
 
     MessageResponse response = MessageResponse.from(message);
     return ResponseEntity.created(location).body(MessageMapper.toGenerated(response));
   }
 
   @Override
-  public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse>
-      updateMessage(
-          Long id, com.sandbox.api.presentation.generated.model.MessageRequest messageRequest) {
+  public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse> updateMessage(
+      Long id, com.sandbox.api.presentation.generated.model.MessageRequest messageRequest) {
     MessageRequest internal = MessageMapper.toInternal(messageRequest);
     Message message = updateMessageUseCase.execute(id, internal.getCode(), internal.getContent());
     MessageResponse response = MessageResponse.from(message);
