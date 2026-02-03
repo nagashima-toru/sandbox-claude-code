@@ -25,7 +25,13 @@ class GetMessageByIdUseCaseTest {
   void execute_whenMessageExists_returnsMessage() {
     // Arrange
     Message expected =
-        new Message(1L, "hello", "Hello, World!", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(1L)
+            .code("hello")
+            .content("Hello, World!")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageRepository.findById(1L)).thenReturn(Optional.of(expected));
     // Act
     Message result = useCase.execute(1L);

@@ -26,8 +26,20 @@ class GetAllMessagesUseCaseTest {
     // Arrange
     List<Message> expected =
         Arrays.asList(
-            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()),
-            new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
+            Message.builder()
+                .id(1L)
+                .code("code1")
+                .content("Content 1")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build(),
+            Message.builder()
+                .id(2L)
+                .code("code2")
+                .content("Content 2")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
     when(messageRepository.findAll()).thenReturn(expected);
     // Act
     List<Message> result = useCase.execute();

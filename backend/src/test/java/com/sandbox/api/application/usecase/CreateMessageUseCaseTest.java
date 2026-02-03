@@ -26,7 +26,14 @@ class CreateMessageUseCaseTest {
     // Arrange
     String code = "new-code";
     String content = "New Content";
-    Message savedMessage = new Message(1L, code, content, LocalDateTime.now(), LocalDateTime.now());
+    Message savedMessage =
+        Message.builder()
+            .id(1L)
+            .code(code)
+            .content(content)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageRepository.existsByCode(code)).thenReturn(false);
     when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
     // Act
