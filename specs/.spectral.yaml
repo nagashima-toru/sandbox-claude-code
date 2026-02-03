@@ -1,0 +1,72 @@
+extends: [[spectral:oas, all]]
+
+rules:
+  # OpenAPI 3.0 標準ルール
+  info-contact: error
+  info-description: error
+  operation-description: warn
+  operation-operationId: error
+  operation-tags: error
+  path-params: error
+  no-$ref-siblings: error
+
+  # カスタムルール: 受け入れ条件の記載
+  operation-acceptance-criteria:
+    description: 各操作には受け入れ条件へのリンクが記載されていることが推奨されます
+    given: $.paths.*[get,post,put,delete,patch]
+    severity: warn
+    then:
+      field: description
+      function: pattern
+      functionOptions:
+        match: '.*受け入れ条件.*'
+
+  # カスタムルール: エラーレスポンスは RFC 7807 形式
+  error-response-rfc7807:
+    description: エラーレスポンスは RFC 7807 (Problem Details) 形式であるべきです
+    given: $.paths.*.*.responses[?(@property >= '400')]..content.*~
+    severity: error
+    then:
+      function: enumeration
+      functionOptions:
+        values:
+          - application/problem+json
+          - application/json  # 既存の互換性のため警告レベルで許可
+
+  # カスタムルール: 例の提供
+  operation-examples:
+    description: 各操作には例が提供されていることが推奨されます
+    given: $.paths.*.*.responses.*.content.application/json
+    severity: warn
+    then:
+      - field: examples
+        function: truthy
+      - field: example
+        function: truthy
+
+  # カスタムルール: ページネーション（コメントアウト - 複雑なため）
+  # pagination-parameters:
+  #   description: GET操作で配列を返す場合、ページネーションパラメータの使用を推奨します
+  #   given: $.paths.*.get
+  #   severity: hint
+  #   then:
+  #     function: truthy
+
+  # カスタムルール: セキュリティ
+  operation-security-defined:
+    description: 各操作にはセキュリティ定義が推奨されます（認証実装後）
+    given: $.paths.*.*
+    severity: hint
+    then:
+      field: security
+      function: truthy
+
+  # スネークケースではなくキャメルケースを使用
+  properties-case-convention:
+    description: プロパティ名はキャメルケースであるべきです
+    given: $..*[?(@.type == 'object')].properties.*~
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: '^[a-z][a-zA-Z0-9]*$'

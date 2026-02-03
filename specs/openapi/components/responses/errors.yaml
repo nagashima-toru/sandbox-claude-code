@@ -1,0 +1,119 @@
+BadRequest:
+  description: |
+    バリデーションエラー
+    リクエストの内容が不正です。
+  content:
+    application/problem+json:
+      schema:
+        $ref: '../schemas/common.yaml#/ProblemDetail'
+      examples:
+        validation-error:
+          summary: バリデーションエラー
+          value:
+            type: 'https://api.example.com/errors/validation-error'
+            title: 'Validation Error'
+            status: 400
+            detail: 'The request body contains invalid fields.'
+            instance: '/api/messages'
+            timestamp: '2024-01-01T00:00:00Z'
+            errors:
+              - field: 'code'
+                rejectedValue: ''
+                message: 'コードは必須です'
+              - field: 'content'
+                rejectedValue: null
+                message: 'コンテンツは必須です'
+        invalid-parameter:
+          summary: クエリパラメータ不正
+          value:
+            type: 'https://api.example.com/errors/invalid-parameter'
+            title: 'Invalid Parameter'
+            status: 400
+            detail: 'The query parameter is invalid.'
+            instance: '/api/messages?page=-1'
+            timestamp: '2024-01-01T00:00:00Z'
+
+Unauthorized:
+  description: |
+    認証エラー
+    認証が必要です。有効な認証トークンを提供してください。
+  content:
+    application/problem+json:
+      schema:
+        $ref: '../schemas/common.yaml#/ProblemDetail'
+      examples:
+        missing-token:
+          summary: 認証トークンなし
+          value:
+            type: 'https://api.example.com/errors/unauthorized'
+            title: 'Unauthorized'
+            status: 401
+            detail: 'Authentication is required to access this resource.'
+            instance: '/api/messages'
+            timestamp: '2024-01-01T00:00:00Z'
+        invalid-token:
+          summary: 認証トークン無効
+          value:
+            type: 'https://api.example.com/errors/invalid-token'
+            title: 'Invalid Token'
+            status: 401
+            detail: 'The authentication token is invalid or expired.'
+            instance: '/api/messages'
+            timestamp: '2024-01-01T00:00:00Z'
+
+NotFound:
+  description: |
+    リソースが見つかりません
+    指定されたIDのリソースが存在しません。
+  content:
+    application/problem+json:
+      schema:
+        $ref: '../schemas/common.yaml#/ProblemDetail'
+      examples:
+        not-found:
+          summary: メッセージが見つからない
+          value:
+            type: 'https://api.example.com/errors/not-found'
+            title: 'Not Found'
+            status: 404
+            detail: 'The requested message was not found.'
+            instance: '/api/messages/999'
+            timestamp: '2024-01-01T00:00:00Z'
+
+Conflict:
+  description: |
+    競合エラー
+    リソースが既に存在する、または競合する状態です。
+  content:
+    application/problem+json:
+      schema:
+        $ref: '../schemas/common.yaml#/ProblemDetail'
+      examples:
+        duplicate-code:
+          summary: コード重複
+          value:
+            type: 'https://api.example.com/errors/duplicate-code'
+            title: 'Duplicate Code'
+            status: 409
+            detail: 'A message with the same code already exists.'
+            instance: '/api/messages'
+            timestamp: '2024-01-01T00:00:00Z'
+
+InternalServerError:
+  description: |
+    サーバー内部エラー
+    予期しないエラーが発生しました。
+  content:
+    application/problem+json:
+      schema:
+        $ref: '../schemas/common.yaml#/ProblemDetail'
+      examples:
+        internal-error:
+          summary: 内部エラー
+          value:
+            type: 'https://api.example.com/errors/internal-error'
+            title: 'Internal Server Error'
+            status: 500
+            detail: 'An unexpected error occurred. Please try again later.'
+            instance: '/api/messages'
+            timestamp: '2024-01-01T00:00:00Z'

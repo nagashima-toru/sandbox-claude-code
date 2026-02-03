@@ -10,6 +10,7 @@ on:
       - 'frontend/**/*.js'
       - 'frontend/**/*.jsx'
       - '.github/workflows/codeql.yml'
+      - '.github/workflows/shared-setup.yml'
   pull_request:
     branches: [ master, main ]
     paths:
@@ -19,15 +20,21 @@ on:
       - 'frontend/**/*.js'
       - 'frontend/**/*.jsx'
       - '.github/workflows/codeql.yml'
+      - '.github/workflows/shared-setup.yml'
   schedule:
     - cron: '0 18 * * 0'  # 毎週月曜日 3:00 JST（日曜日 18:00 UTC）に実行
   workflow_dispatch: # 手動実行を許可
 
 jobs:
+  setup:
+    if: contains(fromJSON('["push", "pull_request", "schedule", "workflow_dispatch"]'), github.event_name)
+    uses: ./.github/workflows/shared-setup.yml
+
   analyze:
     name: Analyze ${{ matrix.language }} code
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    needs: [setup]
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: read
@@ -60,14 +67,14 @@ jobs:
 
       - name: Setup Node.js
         if: matrix.language == 'javascript-typescript'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
@@ -94,10 +101,12 @@ jobs:
         working-directory: ./frontend
         run: pnpm install --frozen-lockfile
 
-      - name: Generate API client
+      - name: Download generated API
         if: matrix.language == 'javascript-typescript'
-        working-directory: ./frontend
-        run: pnpm generate:api || echo "API generation skipped"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
 
       - name: Build Next.js
         if: matrix.language == 'javascript-typescript'
@@ -105,6 +114,6 @@ jobs:
         run: pnpm build
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{matrix.language}}"

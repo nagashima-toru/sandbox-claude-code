@@ -1,0 +1,122 @@
+MessageRequest:
+  type: object
+  description: メッセージ作成・更新リクエスト
+  required:
+    - code
+    - content
+  properties:
+    code:
+      type: string
+      description: |
+        メッセージコード（一意）
+        - 英数字、ハイフン、アンダースコアのみ
+        - 1〜50文字
+      minLength: 1
+      maxLength: 50
+      pattern: '^[a-zA-Z0-9_-]+$'
+      example: 'MSG_001'
+    content:
+      type: string
+      description: |
+        メッセージ内容
+        - 1〜1000文字
+      minLength: 1
+      maxLength: 1000
+      example: 'Hello, World!'
+  example:
+    code: 'MSG_001'
+    content: 'Hello, World!'
+
+MessageResponse:
+  type: object
+  description: メッセージレスポンス
+  required:
+    - id
+    - code
+    - content
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: メッセージID
+      example: 1
+    code:
+      type: string
+      description: メッセージコード
+      example: 'MSG_001'
+    content:
+      type: string
+      description: メッセージ内容
+      example: 'Hello, World!'
+    createdAt:
+      type: string
+      format: date-time
+      description: 作成日時（ISO 8601形式）
+      example: '2024-01-01T00:00:00Z'
+    updatedAt:
+      type: string
+      format: date-time
+      description: 更新日時（ISO 8601形式）
+      example: '2024-01-01T00:00:00Z'
+  example:
+    id: 1
+    code: 'MSG_001'
+    content: 'Hello, World!'
+    createdAt: '2024-01-01T00:00:00Z'
+    updatedAt: '2024-01-01T00:00:00Z'
+
+MessagePage:
+  type: object
+  description: ページネーション対応メッセージ一覧
+  required:
+    - content
+    - page
+  properties:
+    content:
+      type: array
+      description: メッセージのリスト
+      items:
+        $ref: '#/MessageResponse'
+    page:
+      type: object
+      description: ページネーション情報
+      required:
+        - size
+        - number
+        - totalElements
+        - totalPages
+      properties:
+        size:
+          type: integer
+          format: int32
+          description: 1ページあたりの件数
+          example: 20
+        number:
+          type: integer
+          format: int32
+          description: 現在のページ番号（0から始まる）
+          example: 0
+        totalElements:
+          type: integer
+          format: int64
+          description: 全体の件数
+          example: 100
+        totalPages:
+          type: integer
+          format: int32
+          description: 全ページ数
+          example: 5
+  example:
+    content:
+      - id: 1
+        code: 'MSG_001'
+        content: 'Hello, World!'
+        createdAt: '2024-01-01T00:00:00Z'
+        updatedAt: '2024-01-01T00:00:00Z'
+    page:
+      size: 20
+      number: 0
+      totalElements: 1
+      totalPages: 1

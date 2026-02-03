@@ -28,7 +28,8 @@ const SEARCH_DEBOUNCE_MS = 300;
  * @param onDelete - Callback function triggered when delete button is clicked
  */
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
-  const { data: messages, isLoading, error } = useGetAllMessages();
+  const { data, isLoading, error } = useGetAllMessages();
+  const messages = data?.content ?? [];
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [sortField, setSortField] = useState<SortField>('id');
@@ -51,8 +52,6 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   };
 
   const filteredAndSortedMessages = useMemo(() => {
-    if (!messages) return [];
-
     let result = [...messages];
 
     if (debouncedSearch) {
@@ -113,7 +112,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
     );
   }
 
-  if (!messages || messages.length === 0) {
+  if (messages.length === 0) {
     return (
       <div className="text-center py-12" role="status">
         <p className="text-muted-foreground text-lg">No messages found.</p>

@@ -179,8 +179,8 @@ grep -r "Next.js.*15" frontend/
 
 | ファイル | 記載されているバージョン |
 |---------|----------------------|
-| `README.md` | Next.js 15+, TypeScript, Node.js 20+ |
-| `frontend/CLAUDE.md` | Next.js 15+ (App Router), TypeScript |
+| `README.md` | Next.js 16+, TypeScript, Node.js 20+ |
+| `frontend/CLAUDE.md` | Next.js 16+ (App Router), TypeScript |
 | `frontend/package.json` | Next.js ^15.1.0, React ^19.0.0, TypeScript ^5.7.3 |
 | `frontend/Dockerfile` | node:20-alpine |
 

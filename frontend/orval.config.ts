@@ -3,7 +3,7 @@ import { defineConfig } from 'orval';
 export default defineConfig({
   api: {
     input: {
-      target: '../backend/src/main/resources/api/openapi.yaml',
+      target: '../specs/openapi/openapi.yaml',
     },
     output: {
       target: './src/lib/api/generated/messages.ts',

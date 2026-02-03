@@ -52,4 +52,5 @@ logs/
 *.temp
 *.swp
 *.swo
-*~.nib
+*~.nib.playwright-mcp/
+.playwright-mcp/

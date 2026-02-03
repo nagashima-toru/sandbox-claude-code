@@ -12,6 +12,14 @@ public interface MessageMapper {
 
   List<Message> findAll();
 
+  List<Message> findAllWithPagination(
+      @Param("offset") long offset,
+      @Param("limit") int limit,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection);
+
+  long count();
+
   Message findById(@Param("id") Long id);
 
   void insert(Message message);

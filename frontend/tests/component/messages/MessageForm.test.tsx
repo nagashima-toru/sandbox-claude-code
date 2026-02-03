@@ -33,6 +33,8 @@ describe('MessageForm', () => {
         id: 1,
         code: 'TEST001',
         content: 'Test message content',
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
       };
 
       render(<MessageForm {...defaultProps} initialData={initialData} />);
@@ -229,6 +231,8 @@ describe('MessageForm', () => {
         id: 1,
         code: 'TEST001',
         content: 'Original content',
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
       };
 
       render(<MessageForm {...defaultProps} initialData={initialData} />);

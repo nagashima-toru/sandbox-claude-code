@@ -44,7 +44,7 @@ jobs:
 
       - name: Post reminder comment
         if: steps.check.outputs.needs_update == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const prTitle = context.payload.pull_request.title;
@@ -68,44 +68,35 @@ jobs:
               dependencyType = "TypeScript";
             }
 
-            const comment = `## 📝 ドキュメント更新のリマインダー
+            const backtick = '`';
+            const tripleBacktick = '```';
 
-この依存関係の更新（**${dependencyType}**）は、ドキュメントへの影響がある可能性があります。
-
-### 確認が必要なドキュメント
-
-- \`CLAUDE.md\`
-- \`README.md\`
-- \`backend/README.md\`
-- \`backend/CLAUDE.md\`
-- \`frontend/CLAUDE.md\`
-- \`docs/DEPLOYMENT.md\`
-
-### @claude を使った自動更新
-
-以下のコメントを投稿すると、Claude が自動的にドキュメントを更新します：
-
-\`\`\`markdown
-@claude この PR の依存関係更新に伴い、関連するドキュメントのバージョン情報を更新してください。
-
-対象ファイル:
-- CLAUDE.md
-- README.md
-- backend/README.md
-- backend/CLAUDE.md
-- frontend/CLAUDE.md
-- docs/DEPLOYMENT.md
-
-変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。
-\`\`\`
-
-### 手動更新
-
-自分で更新する場合は、[Dependabot ドキュメント更新ガイド](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/master/docs/DEPENDABOT_DOCS_UPDATE.md) を参照してください。
-
----
-
-💡 このリマインダーは自動的に投稿されました。ドキュメント更新が不要な場合は、このコメントを無視してください。`;
+            const comment = '## 📝 ドキュメント更新のリマインダー\n\n' +
+              'この依存関係の更新（**' + dependencyType + '**）は、ドキュメントへの影響がある可能性があります。\n\n' +
+              '### 確認が必要なドキュメント\n\n' +
+              '- ' + backtick + 'CLAUDE.md' + backtick + '\n' +
+              '- ' + backtick + 'README.md' + backtick + '\n' +
+              '- ' + backtick + 'backend/README.md' + backtick + '\n' +
+              '- ' + backtick + 'backend/CLAUDE.md' + backtick + '\n' +
+              '- ' + backtick + 'frontend/CLAUDE.md' + backtick + '\n' +
+              '- ' + backtick + 'docs/DEPLOYMENT.md' + backtick + '\n\n' +
+              '### @claude を使った自動更新\n\n' +
+              '以下のコメントを投稿すると、Claude が自動的にドキュメントを更新します：\n\n' +
+              tripleBacktick + 'markdown\n' +
+              '@claude この PR の依存関係更新に伴い、関連するドキュメントのバージョン情報を更新してください。\n\n' +
+              '対象ファイル:\n' +
+              '- CLAUDE.md\n' +
+              '- README.md\n' +
+              '- backend/README.md\n' +
+              '- backend/CLAUDE.md\n' +
+              '- frontend/CLAUDE.md\n' +
+              '- docs/DEPLOYMENT.md\n\n' +
+              '変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。\n' +
+              tripleBacktick + '\n\n' +
+              '### 手動更新\n\n' +
+              '自分で更新する場合は、[Dependabot ドキュメント更新ガイド](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/blob/master/docs/DEPENDABOT_DOCS_UPDATE.md) を参照してください。\n\n' +
+              '---\n\n' +
+              '💡 このリマインダーは自動的に投稿されました。ドキュメント更新が不要な場合は、このコメントを無視してください。';
 
             await github.rest.issues.createComment({
               issue_number: prNumber,
