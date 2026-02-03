@@ -62,11 +62,11 @@ class OpenApiValidationTest {
     String uniqueCode = "MSG_TEST_" + System.currentTimeMillis();
     String requestBody =
         """
-            {
-              "code": "%s",
-              "content": "Test message for OpenAPI validation"
-            }
-            """
+        {
+          "code": "%s",
+          "content": "Test message for OpenAPI validation"
+        }
+        """
             .formatted(uniqueCode);
     given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -83,11 +83,11 @@ class OpenApiValidationTest {
   void createMessage_withInvalidRequest_shouldReturn400() {
     String requestBody =
         """
-            {
-              "code": "",
-              "content": "Test message"
-            }
-            """;
+        {
+          "code": "",
+          "content": "Test message"
+        }
+        """;
     given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(requestBody)
@@ -104,11 +104,11 @@ class OpenApiValidationTest {
     String uniqueCode = "MSG_FOR_GET_" + System.currentTimeMillis();
     String requestBody =
         """
-            {
-              "code": "%s",
-              "content": "Message for GET test"
-            }
-            """
+        {
+          "code": "%s",
+          "content": "Message for GET test"
+        }
+        """
             .formatted(uniqueCode);
     String location =
         given()
@@ -141,11 +141,11 @@ class OpenApiValidationTest {
     String uniqueCode = "MSG_FOR_DELETE_" + System.currentTimeMillis();
     String requestBody =
         """
-            {
-              "code": "%s",
-              "content": "Message for DELETE test"
-            }
-            """
+        {
+          "code": "%s",
+          "content": "Message for DELETE test"
+        }
+        """
             .formatted(uniqueCode);
     String location =
         given()
