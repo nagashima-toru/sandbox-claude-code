@@ -54,3 +54,6 @@ logs/
 *.swo
 *~.nib.playwright-mcp/
 .playwright-mcp/
+
+# Epic documents (local development planning)
+.epic/

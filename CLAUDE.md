@@ -46,121 +46,69 @@ docker compose -f docker-compose.yml up
 - **Node.js**: See frontend/.nvmrc
 - **Package Manager**: pnpm (frontend), Maven (backend)
 
-## 開発作業全体のプロセス
+## 開発作業全体のプロセス（SDD: 仕様駆動開発）
 
-1. 要求仕様の理解
-2. 現在の実装調査
-3. 実装計画策定
-4. 計画レビュー
-5. 実装/単体テスト実施
-6. 実装/単体テスト review 実施 & 指摘修正
-7. 結合テスト実施
-8. 結合テスト review 実施 & 指摘修正
-9. deploy 前確認
+1. **Epic Issue 作成**（簡易版）
+2. 要求仕様の理解
+3. 現在の実装調査
+4. **仕様 PR 作成**（OpenAPI + 受け入れ条件）
+5. 仕様 PR レビュー・マージ
+6. **Issue に仕様を明記** + spec-approved ラベル付与
+7. **実装計画策定**（.epic/ 作成）
+8. 計画レビュー
+9. 実装/単体テスト実施
+10. 実装/単体テスト review 実施 & 指摘修正
+11. 結合テスト実施
+12. 結合テスト review 実施 & 指摘修正
+13. deploy 前確認
+
+**重要**: 仕様が確定してから実装計画を立てる（手戻りを防ぐ）
+
+## Epic Documents
+
+開発作業の計画は `.epic/` ディレクトリで管理します。
+
+```
+.epic/[YYYYMMDD]-[issue-N]-[epicタイトル]/
+├── requirements.md  # 機能要求
+├── design.md        # 技術設計
+├── overview.md      # Epic 管理（エントリーポイント）
+└── story[N]-[Story名]/
+    └── tasklist.md  # Story タスク
+```
+
+**例**: `.epic/20260203-88-auth/`
+
+See [docs/EPIC_DOCUMENTS.md](docs/EPIC_DOCUMENTS.md) for details.
+
+## Git Workflow
+
+Epic-based development uses the following branch strategy:
+
+```
+master
+  └── feature/issue-[N]-[epic-name]
+       ├── feature/issue-[N]-[epic-name]-story1
+       └── ...
+```
+
+See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) for details.
 
 ## Code Formatting
 
-### Automatic Formatting (Claude Code)
+Code is automatically formatted after editing:
+- **Backend**: Spotless with Google Java Format
+- **Frontend**: Prettier + ESLint
 
-Claude Code automatically formats code after editing files:
-- **Backend** (Java): Spotless with Google Java Format
-- **Frontend** (TypeScript/JavaScript): Prettier + ESLint
+See [backend/CLAUDE.md](backend/CLAUDE.md) and [frontend/CLAUDE.md](frontend/CLAUDE.md) for manual formatting commands.
 
-Configuration: `.claude/settings.local.json` hooks run `./scripts/format-code.sh` after `Edit` and `Write` operations.
-
-### Manual Formatting
-
-```bash
-# Backend
-cd backend && ./mvnw spotless:apply
-
-# Frontend
-cd frontend && pnpm format
-```
-
-## Development Workflows
-
-### After Backend API Changes
-
-```bash
-# 1. Generate OpenAPI spec
-cd backend && ./mvnw verify
-
-# 2. Regenerate frontend API client
-cd frontend && pnpm generate:api
-
-# 3. TypeScript will show type errors if contract changed
-```
-
-### Adding npm Packages (Docker)
-
-```bash
-# With running container
-docker exec sandbox-frontend pnpm add <package>
-
-# Or rebuild
-cd frontend && pnpm add <package>
-docker compose build frontend
-```
-
-### Creating a New Component
-
-1. Create component in `frontend/src/components/`
-2. Create story: `ComponentName.stories.tsx`
-3. Create test: `ComponentName.test.tsx`
-4. Develop in Storybook: `pnpm storybook`
-
-## Docker Quick Reference
-
-| Mode | Command | Access |
-|------|---------|--------|
-| Development | `docker compose up` | localhost:3000 (frontend), localhost:8080 (backend) |
-| Production | `docker compose -f docker-compose.yml up` | localhost:80 (nginx) |
-
-**Key features**:
-- Development: Hot reload, debug port (5005)
-- Production: Nginx reverse proxy, optimized builds
+## Docker
 
 See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for details.
 
-## Git Worktree Quick Reference
-
-Run multiple environments simultaneously:
-
-```bash
-# Create worktree
-git worktree add ../sandbox-feature feature/name
-
-# Setup environment
-cd ../sandbox-feature && ./scripts/setup-worktree-env.sh
-
-# Start (uses different ports)
-docker compose up
-```
-
-See [docs/GIT_WORKTREE.md](docs/GIT_WORKTREE.md) for details.
-
 ## Local CI Verification
 
-```bash
-# Standard check (before PR)
-./scripts/ci-check-local.sh
-
-# Backend only
-./scripts/ci-check-local.sh --backend-only
-
-# Frontend only
-./scripts/ci-check-local.sh --frontend-only
-
-# Full with E2E
-./scripts/ci-check-local.sh --e2e
-```
-
-**Coverage Requirements**:
-- Backend: ≥80% lines, ≥75% branches
-- Frontend: ≥80% statements/functions/lines, ≥70% branches
-
-**Golden Rule**: If `./scripts/ci-check-local.sh` passes locally, CI should pass.
+Run `./scripts/ci-check-local.sh` before creating PRs.
 
 See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
 
@@ -189,6 +137,9 @@ See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
 
 | Document | Description |
 |----------|-------------|
+| [Epic Documents](docs/EPIC_DOCUMENTS.md) | Epic-based development planning |
+| [Spec PR Guide](docs/SPEC_PR_GUIDE.md) | How to create specification PRs |
+| [Git Workflow](docs/GIT_WORKFLOW.md) | Branch strategy and PR workflow |
 | [Docker Deployment](docs/DOCKER_DEPLOYMENT.md) | Docker dev/prod modes, workflows, troubleshooting |
 | [Git Worktree](docs/GIT_WORKTREE.md) | Multi-environment development |
 | [Local CI Verification](docs/LOCAL_CI_VERIFICATION.md) | CI checks, coverage, hooks |
