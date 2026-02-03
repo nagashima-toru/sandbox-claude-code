@@ -38,7 +38,7 @@ jobs:
         run: pnpm generate:api
 
       - name: Upload generated API
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: generated-api-${{ github.sha }}
           path: frontend/src/lib/api/generated
