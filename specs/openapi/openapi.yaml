@@ -17,10 +17,84 @@ servers:
     description: Docker production server
 
 tags:
+  - name: Auth
+    description: 認証・認可API
   - name: Message
     description: メッセージ管理API
 
 paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: ログイン
+      description: |
+        ユーザー名とパスワードでログインし、JWTトークンを取得します。
+
+        **受け入れ条件:** specs/acceptance/auth/login.feature
+      operationId: login
+      security: []  # 認証不要
+      requestBody:
+        description: ログイン情報
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: トークンリフレッシュ
+      description: |
+        リフレッシュトークンを使用して新しいアクセストークンを取得します。
+
+        **受け入れ条件:** specs/acceptance/auth/refresh-token.feature
+      operationId: refreshToken
+      security: []  # トークン検証のみ
+      requestBody:
+        description: リフレッシュトークン
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: リフレッシュ成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: ログアウト
+      description: |
+        リフレッシュトークンを無効化してログアウトします。
+
+        **受け入れ条件:** specs/acceptance/auth/logout.feature
+      operationId: logout
+      responses:
+        '204':
+          description: ログアウト成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /api/messages:
     get:
       tags:
@@ -95,6 +169,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '409':
           $ref: '#/components/responses/Conflict'
 
@@ -158,6 +234,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -182,6 +260,8 @@ paths:
           description: 削除成功
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -252,6 +332,64 @@ components:
           type: string
           description: エラーメッセージ
           example: 'コードは必須です'
+
+    # 認証関連スキーマ
+    LoginRequest:
+      type: object
+      description: ログインリクエスト
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: ユーザー名
+          minLength: 1
+          maxLength: 50
+          example: 'admin'
+        password:
+          type: string
+          description: パスワード
+          minLength: 1
+          example: 'admin123'
+
+    LoginResponse:
+      type: object
+      description: ログインレスポンス
+      required:
+        - accessToken
+        - refreshToken
+        - tokenType
+        - expiresIn
+      properties:
+        accessToken:
+          type: string
+          description: アクセストークン（JWT）
+          example: 'eyJhbGciOiJIUzI1NiIs...'
+        refreshToken:
+          type: string
+          description: リフレッシュトークン（JWT）
+          example: 'eyJhbGciOiJIUzI1NiIs...'
+        tokenType:
+          type: string
+          description: トークンタイプ
+          example: 'Bearer'
+        expiresIn:
+          type: integer
+          format: int32
+          description: アクセストークンの有効期限（秒）
+          example: 3600
+
+    RefreshRequest:
+      type: object
+      description: トークンリフレッシュリクエスト
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: リフレッシュトークン
+          example: 'eyJhbGciOiJIUzI1NiIs...'
 
     # メッセージ関連スキーマ
     MessageRequest:
@@ -367,6 +505,13 @@ components:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
 
+    Forbidden:
+      description: 認可エラー（権限不足）
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
     NotFound:
       description: リソースが見つかりません
       content:
@@ -396,6 +541,6 @@ components:
       description: JWT認証トークン
 
 # デフォルトでは全エンドポイントで認証が必要
-# （認証実装後に有効化）
-# security:
-#   - BearerAuth: []
+# （個別のエンドポイントで security: [] を指定すると認証不要にできる）
+security:
+  - BearerAuth: []
