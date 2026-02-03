@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -98,7 +98,7 @@ jobs:
           pnpm audit > audit-report.txt || true
 
       - name: Upload audit report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: security-audit-report
@@ -116,7 +116,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -169,7 +169,7 @@ jobs:
           echo "Total packages checked: $(jq '. | length' licenses.json 2>/dev/null || echo 'N/A')" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload license report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: license-report
@@ -185,7 +185,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -244,7 +244,7 @@ jobs:
           fi
 
       - name: Upload depcheck report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: depcheck-report
