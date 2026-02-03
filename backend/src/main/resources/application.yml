@@ -37,6 +37,13 @@ springdoc:
     description: Spring Boot REST API with Clean Architecture
     version: 1.0.0
 
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:default-dev-secret-key-change-in-production-minimum-256-bits}
+    access-token-expiration: 3600000  # 1時間（ミリ秒）
+    refresh-token-expiration: 604800000  # 7日間（ミリ秒）
+    issuer: sandbox-api
+
 logging:
   level:
     root: INFO

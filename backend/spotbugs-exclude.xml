@@ -16,4 +16,11 @@
     <Match>
         <Class name="~com\.sandbox\.api\.presentation\.generated\..*"/>
     </Match>
+
+    <!-- Suppress CT_CONSTRUCTOR_THROW for JwtTokenProvider -->
+    <!-- Spring manages the lifecycle and the constructor parameters are validated -->
+    <Match>
+        <Class name="com.sandbox.api.infrastructure.security.JwtTokenProvider"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
 </FindBugsFilter>
