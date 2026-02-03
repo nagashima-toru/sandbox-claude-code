@@ -1,11 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
-import {
-  MessageTableHeader,
-  SortField,
-  SortDirection,
-} from '@/components/messages/MessageTableHeader';
+import { MessageTableHeader } from '@/components/messages/MessageTableHeader';
 
 describe('MessageTableHeader', () => {
   it('すべてのカラムヘッダーが表示される', () => {
