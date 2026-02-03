@@ -82,8 +82,7 @@ public class Message {
       throw new IllegalArgumentException("Code cannot be null or blank");
     }
     if (code.length() > MAX_CODE_LENGTH) {
-      throw new IllegalArgumentException(
-          "Code must be " + MAX_CODE_LENGTH + " characters or less");
+      throw new IllegalArgumentException("Code must be " + MAX_CODE_LENGTH + " characters or less");
     }
   }
 

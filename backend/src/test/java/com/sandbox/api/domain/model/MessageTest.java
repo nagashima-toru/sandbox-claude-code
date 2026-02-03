@@ -128,8 +128,7 @@ class MessageTest {
   @Test
   void builder_createsMessage() {
     // Arrange & Act
-    Message message =
-        Message.builder().id(1L).code("test-code").content("Test Content").build();
+    Message message = Message.builder().id(1L).code("test-code").content("Test Content").build();
 
     // Assert
     assertThat(message.getId()).isEqualTo(1L);
