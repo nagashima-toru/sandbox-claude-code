@@ -48,9 +48,8 @@ public class UpdateMessageUseCase {
       }
     }
 
-    existingMessage.setCode(code);
-    existingMessage.setContent(content);
-    Message saved = messageRepository.save(existingMessage);
+    Message updatedMessage = existingMessage.update(code, content);
+    Message saved = messageRepository.save(updatedMessage);
     log.info("Updated message with id: {}", saved.getId());
     return saved;
   }

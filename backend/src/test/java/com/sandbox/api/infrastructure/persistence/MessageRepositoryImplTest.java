@@ -28,7 +28,13 @@ class MessageRepositoryImplTest {
   void findByCode_whenMapperReturnsMessage_returnsOptionalWithMessage() {
     // Arrange
     Message expected =
-        new Message(1L, "test-code", "Test Message", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(1L)
+            .code("test-code")
+            .content("Test Message")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageMapper.findByCode("test-code")).thenReturn(expected);
     // Act
     Optional<Message> result = repository.findByCode("test-code");
@@ -57,7 +63,13 @@ class MessageRepositoryImplTest {
   void findByCode_callsMapperExactlyOnce() {
     String code = "hello";
     Message message =
-        new Message(1L, code, "Hello, World!", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(1L)
+            .code(code)
+            .content("Hello, World!")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageMapper.findByCode(code)).thenReturn(message);
     repository.findByCode(code);
     verify(messageMapper).findByCode(code);
@@ -67,8 +79,20 @@ class MessageRepositoryImplTest {
   void findAll_whenMapperReturnsMessages_returnsListOfMessages() {
     List<Message> expected =
         Arrays.asList(
-            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()),
-            new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
+            Message.builder()
+                .id(1L)
+                .code("code1")
+                .content("Content 1")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build(),
+            Message.builder()
+                .id(2L)
+                .code("code2")
+                .content("Content 2")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
     when(messageMapper.findAll()).thenReturn(expected);
     List<Message> result = repository.findAll();
     assertThat(result).hasSize(2);
@@ -78,7 +102,14 @@ class MessageRepositoryImplTest {
 
   @Test
   void findById_whenMapperReturnsMessage_returnsOptionalWithMessage() {
-    Message expected = new Message(1L, "code", "Content", LocalDateTime.now(), LocalDateTime.now());
+    Message expected =
+        Message.builder()
+            .id(1L)
+            .code("code")
+            .content("Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageMapper.findById(1L)).thenReturn(expected);
     Optional<Message> result = repository.findById(1L);
     verify(messageMapper).findById(1L);
@@ -94,7 +125,12 @@ class MessageRepositoryImplTest {
   @Test
   void save_whenMessageHasNoId_callsInsert() {
     Message message =
-        new Message(null, "new-code", "New Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .code("new-code")
+            .content("New Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     Message result = repository.save(message);
     assertThat(result).isEqualTo(message);
     verify(messageMapper).insert(message);
@@ -103,7 +139,13 @@ class MessageRepositoryImplTest {
   @Test
   void save_whenMessageHasId_callsUpdate() {
     Message message =
-        new Message(1L, "code", "Updated Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(1L)
+            .code("code")
+            .content("Updated Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     Message result = repository.save(message);
     assertThat(result).isEqualTo(message);
     verify(messageMapper).update(message);
@@ -139,7 +181,13 @@ class MessageRepositoryImplTest {
     // Arrange
     List<Message> messages =
         Arrays.asList(
-            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+            Message.builder()
+                .id(1L)
+                .code("code1")
+                .content("Content 1")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
     when(messageMapper.findAllWithPagination(0L, 10, "id", "ASC")).thenReturn(messages);
     when(messageMapper.count()).thenReturn(1L);
 
@@ -158,7 +206,13 @@ class MessageRepositoryImplTest {
     // Arrange
     List<Message> messages =
         Arrays.asList(
-            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+            Message.builder()
+                .id(1L)
+                .code("code1")
+                .content("Content 1")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
     when(messageMapper.findAllWithPagination(0L, 10, "created_at", "DESC")).thenReturn(messages);
     when(messageMapper.count()).thenReturn(1L);
 
@@ -203,7 +257,13 @@ class MessageRepositoryImplTest {
     // but we test the validation logic anyway.
     List<Message> messages =
         Arrays.asList(
-            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+            Message.builder()
+                .id(1L)
+                .code("code1")
+                .content("Content 1")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
     when(messageMapper.findAllWithPagination(0L, 10, "id", "ASC")).thenReturn(messages);
     when(messageMapper.count()).thenReturn(1L);
 
@@ -234,7 +294,13 @@ class MessageRepositoryImplTest {
 
       List<Message> messages =
           Arrays.asList(
-              new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()));
+              Message.builder()
+                  .id(1L)
+                  .code("code1")
+                  .content("Content 1")
+                  .createdAt(LocalDateTime.now())
+                  .updatedAt(LocalDateTime.now())
+                  .build());
       when(messageMapper.findAllWithPagination(0L, 10, snakeCase, "ASC")).thenReturn(messages);
       when(messageMapper.count()).thenReturn(1L);
 

@@ -92,8 +92,12 @@ class MessageMapperTest {
   @Test
   void insert_withValidMessage_insertsAndGeneratesId() {
     Message message =
-        new Message(
-            null, "test-insert", "Test Insert Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .code("test-insert")
+            .content("Test Insert Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     messageMapper.insert(message);
     assertThat(message.getId()).isNotNull();
     Message inserted = messageMapper.findByCode("test-insert");
@@ -104,11 +108,16 @@ class MessageMapperTest {
   @Test
   void update_withExistingMessage_updatesSuccessfully() {
     Message message =
-        new Message(
-            null, "test-update", "Original Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .code("test-update")
+            .content("Original Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     messageMapper.insert(message);
-    message.setContent("Updated Content");
-    messageMapper.update(message);
+    Message updatedMessage =
+        message.toBuilder().content("Updated Content").updatedAt(LocalDateTime.now()).build();
+    messageMapper.update(updatedMessage);
     Message updated = messageMapper.findById(message.getId());
     assertThat(updated).isNotNull();
     assertThat(updated.getContent()).isEqualTo("Updated Content");
@@ -117,7 +126,12 @@ class MessageMapperTest {
   @Test
   void deleteById_withExistingId_deletesMessage() {
     Message message =
-        new Message(null, "test-delete", "To Be Deleted", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .code("test-delete")
+            .content("To Be Deleted")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     messageMapper.insert(message);
     Long id = message.getId();
     messageMapper.deleteById(id);

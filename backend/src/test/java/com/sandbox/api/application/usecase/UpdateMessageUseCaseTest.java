@@ -30,9 +30,21 @@ class UpdateMessageUseCaseTest {
     String code = "updated-code";
     String content = "Updated Content";
     Message existingMessage =
-        new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(id)
+            .code("old-code")
+            .content("Old Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     Message updatedMessage =
-        new Message(id, code, content, LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(id)
+            .code(code)
+            .content(content)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.existsByCode(code)).thenReturn(false);
     when(messageRepository.save(any(Message.class))).thenReturn(updatedMessage);
@@ -53,9 +65,21 @@ class UpdateMessageUseCaseTest {
     String code = "same-code";
     String newContent = "Updated Content";
     Message existingMessage =
-        new Message(id, code, "Old Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(id)
+            .code(code)
+            .content("Old Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     Message updatedMessage =
-        new Message(id, code, newContent, LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(id)
+            .code(code)
+            .content(newContent)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.save(any(Message.class))).thenReturn(updatedMessage);
     Message result = useCase.execute(id, code, newContent);
@@ -77,7 +101,13 @@ class UpdateMessageUseCaseTest {
     Long id = 1L;
     String newCode = "duplicate-code";
     Message existingMessage =
-        new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
+        Message.builder()
+            .id(id)
+            .code("old-code")
+            .content("Old Content")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
     when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.existsByCode(newCode)).thenReturn(true);
     assertThatThrownBy(() -> useCase.execute(id, newCode, "content"))
