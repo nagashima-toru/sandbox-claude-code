@@ -77,7 +77,7 @@ export default function Home() {
         updateMutation.mutate({ id: selectedMessage.id, data });
       }
     },
-    [selectedMessage?.id, updateMutation]
+    [selectedMessage, updateMutation]
   );
 
   const handleEditClick = useCallback(
@@ -102,7 +102,7 @@ export default function Home() {
     if (selectedMessage?.id) {
       deleteMutation.mutate({ id: selectedMessage.id });
     }
-  }, [selectedMessage?.id, deleteMutation]);
+  }, [selectedMessage, deleteMutation]);
 
   return (
     <main className="min-h-screen p-8">

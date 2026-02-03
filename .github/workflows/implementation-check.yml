@@ -8,9 +8,11 @@ jobs:
   check-spec-approved:
     name: Check Spec Approved Label
     runs-on: ubuntu-latest
-    # 仕様PRの場合はスキップ
+    # 仕様PRまたはDependabot PRの場合はスキップ
     if: |
-      !contains(github.event.pull_request.labels.*.name, 'spec')
+      !contains(github.event.pull_request.labels.*.name, 'spec') &&
+      github.actor != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.user.login, 'dependabot')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,7 +92,9 @@ jobs:
     name: Check OpenAPI Consistency
     runs-on: ubuntu-latest
     if: |
-      !contains(github.event.pull_request.labels.*.name, 'spec')
+      !contains(github.event.pull_request.labels.*.name, 'spec') &&
+      github.actor != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.user.login, 'dependabot')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -116,7 +120,9 @@ jobs:
     name: Run Acceptance Tests
     runs-on: ubuntu-latest
     if: |
-      !contains(github.event.pull_request.labels.*.name, 'spec')
+      !contains(github.event.pull_request.labels.*.name, 'spec') &&
+      github.actor != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.user.login, 'dependabot')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

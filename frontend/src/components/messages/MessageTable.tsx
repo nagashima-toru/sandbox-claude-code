@@ -29,18 +29,20 @@ const SEARCH_DEBOUNCE_MS = 300;
  */
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   const { data, isLoading, error } = useGetAllMessages();
-  const messages = data?.content ?? [];
+  const messages = useMemo(() => data?.content ?? [], [data?.content]);
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [previousSearch, setPreviousSearch] = useState(debouncedSearch);
 
   // Reset to page 1 when search query changes
-  useEffect(() => {
+  if (debouncedSearch !== previousSearch) {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+    setPreviousSearch(debouncedSearch);
+  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
