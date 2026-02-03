@@ -1,15 +1,16 @@
 package com.sandbox.api.application.usecase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.sandbox.api.domain.exception.DuplicateMessageCodeException;
 import com.sandbox.api.domain.exception.MessageNotFoundException;
 import com.sandbox.api.domain.model.Message;
 import com.sandbox.api.domain.repository.MessageRepository;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +29,10 @@ class UpdateMessageUseCaseTest {
     Long id = 1L;
     String code = "updated-code";
     String content = "Updated Content";
-    Message existingMessage = new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
-    Message updatedMessage = new Message(id, code, content, LocalDateTime.now(), LocalDateTime.now());
+    Message existingMessage =
+        new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
+    Message updatedMessage =
+        new Message(id, code, content, LocalDateTime.now(), LocalDateTime.now());
     when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.existsByCode(code)).thenReturn(false);
     when(messageRepository.save(any(Message.class))).thenReturn(updatedMessage);
@@ -49,8 +52,10 @@ class UpdateMessageUseCaseTest {
     Long id = 1L;
     String code = "same-code";
     String newContent = "Updated Content";
-    Message existingMessage = new Message(id, code, "Old Content", LocalDateTime.now(), LocalDateTime.now());
-    Message updatedMessage = new Message(id, code, newContent, LocalDateTime.now(), LocalDateTime.now());
+    Message existingMessage =
+        new Message(id, code, "Old Content", LocalDateTime.now(), LocalDateTime.now());
+    Message updatedMessage =
+        new Message(id, code, newContent, LocalDateTime.now(), LocalDateTime.now());
     when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.save(any(Message.class))).thenReturn(updatedMessage);
     Message result = useCase.execute(id, code, newContent);
@@ -71,7 +76,8 @@ class UpdateMessageUseCaseTest {
   void execute_withDuplicateCode_throwsDuplicateMessageCodeException() {
     Long id = 1L;
     String newCode = "duplicate-code";
-    Message existingMessage = new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
+    Message existingMessage =
+        new Message(id, "old-code", "Old Content", LocalDateTime.now(), LocalDateTime.now());
     when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
     when(messageRepository.existsByCode(newCode)).thenReturn(true);
     assertThatThrownBy(() -> useCase.execute(id, newCode, "content"))

@@ -1,8 +1,9 @@
 package com.sandbox.api.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.time.LocalDateTime;
+
 import com.sandbox.api.domain.model.Message;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -90,7 +91,9 @@ class MessageMapperTest {
 
   @Test
   void insert_withValidMessage_insertsAndGeneratesId() {
-    Message message = new Message(null, "test-insert", "Test Insert Content", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(
+            null, "test-insert", "Test Insert Content", LocalDateTime.now(), LocalDateTime.now());
     messageMapper.insert(message);
     assertThat(message.getId()).isNotNull();
     Message inserted = messageMapper.findByCode("test-insert");
@@ -100,7 +103,9 @@ class MessageMapperTest {
 
   @Test
   void update_withExistingMessage_updatesSuccessfully() {
-    Message message = new Message(null, "test-update", "Original Content", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(
+            null, "test-update", "Original Content", LocalDateTime.now(), LocalDateTime.now());
     messageMapper.insert(message);
     message.setContent("Updated Content");
     messageMapper.update(message);
@@ -111,7 +116,8 @@ class MessageMapperTest {
 
   @Test
   void deleteById_withExistingId_deletesMessage() {
-    Message message = new Message(null, "test-delete", "To Be Deleted", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(null, "test-delete", "To Be Deleted", LocalDateTime.now(), LocalDateTime.now());
     messageMapper.insert(message);
     Long id = message.getId();
     messageMapper.deleteById(id);

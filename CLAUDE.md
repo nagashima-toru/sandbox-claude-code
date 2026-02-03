@@ -58,6 +58,26 @@ docker compose -f docker-compose.yml up
 8. 結合テスト review 実施 & 指摘修正
 9. deploy 前確認
 
+## Code Formatting
+
+### Automatic Formatting (Claude Code)
+
+Claude Code automatically formats code after editing files:
+- **Backend** (Java): Spotless with Google Java Format
+- **Frontend** (TypeScript/JavaScript): Prettier + ESLint
+
+Configuration: `.claude/settings.local.json` hooks run `./scripts/format-code.sh` after `Edit` and `Write` operations.
+
+### Manual Formatting
+
+```bash
+# Backend
+cd backend && ./mvnw spotless:apply
+
+# Frontend
+cd frontend && pnpm format
+```
+
 ## Development Workflows
 
 ### After Backend API Changes

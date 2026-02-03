@@ -1,6 +1,7 @@
 package com.sandbox.api.domain.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +9,8 @@ class MessageTest {
   @Test
   void constructor_withAllParameters_createsMessage() {
     // Arrange & Act
-    Message message = new Message(1L, "test-code", "Test Content", LocalDateTime.now(), LocalDateTime.now());
+    Message message =
+        new Message(1L, "test-code", "Test Content", LocalDateTime.now(), LocalDateTime.now());
     // Assert
     assertThat(message.getId()).isEqualTo(1L);
     assertThat(message.getCode()).isEqualTo("test-code");

@@ -2,6 +2,7 @@ package com.sandbox.api.presentation.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+
 import com.sandbox.api.domain.exception.DuplicateMessageCodeException;
 import com.sandbox.api.domain.exception.MessageNotFoundException;
 import com.sandbox.api.presentation.dto.ErrorResponse;
@@ -86,7 +87,8 @@ class GlobalExceptionHandlerTest {
   @Test
   void handleIllegalArgument_returns400WithErrorResponse() {
     // Arrange
-    IllegalArgumentException exception = new IllegalArgumentException("Invalid sort field: malicious");
+    IllegalArgumentException exception =
+        new IllegalArgumentException("Invalid sort field: malicious");
 
     // Act
     ResponseEntity<ErrorResponse> response =

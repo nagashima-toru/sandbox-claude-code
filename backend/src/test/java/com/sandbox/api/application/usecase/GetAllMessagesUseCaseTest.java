@@ -1,11 +1,12 @@
 package com.sandbox.api.application.usecase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.time.LocalDateTime;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.sandbox.api.domain.model.Message;
 import com.sandbox.api.domain.repository.MessageRepository;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +25,9 @@ class GetAllMessagesUseCaseTest {
   void execute_whenMessagesExist_returnsAllMessages() {
     // Arrange
     List<Message> expected =
-        Arrays.asList(new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()), new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
+        Arrays.asList(
+            new Message(1L, "code1", "Content 1", LocalDateTime.now(), LocalDateTime.now()),
+            new Message(2L, "code2", "Content 2", LocalDateTime.now(), LocalDateTime.now()));
     when(messageRepository.findAll()).thenReturn(expected);
     // Act
     List<Message> result = useCase.execute();

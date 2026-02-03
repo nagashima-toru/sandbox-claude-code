@@ -43,8 +43,7 @@ public class GetAllMessagesUseCase {
   @Transactional(readOnly = true)
   public Page<Message> execute(int page, int size) {
     log.debug("Fetching messages with pagination: page={}, size={}", page, size);
-    Pageable pageable =
-        PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     Page<Message> messages = messageRepository.findAll(pageable);
     log.debug("Found {} messages in page {}", messages.getNumberOfElements(), page);
     return messages;

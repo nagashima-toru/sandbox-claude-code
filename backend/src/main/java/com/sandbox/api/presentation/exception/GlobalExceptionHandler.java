@@ -54,9 +54,7 @@ public class GlobalExceptionHandler {
             .timestamp(LocalDateTime.now())
             .build();
 
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .contentType(PROBLEM_JSON)
-        .body(error);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(PROBLEM_JSON).body(error);
   }
 
   /**
@@ -79,9 +77,7 @@ public class GlobalExceptionHandler {
             .timestamp(LocalDateTime.now())
             .build();
 
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-        .contentType(PROBLEM_JSON)
-        .body(error);
+    return ResponseEntity.status(HttpStatus.CONFLICT).contentType(PROBLEM_JSON).body(error);
   }
 
   /**
@@ -109,9 +105,7 @@ public class GlobalExceptionHandler {
             .timestamp(LocalDateTime.now())
             .build();
 
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .contentType(PROBLEM_JSON)
-        .body(error);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(PROBLEM_JSON).body(error);
   }
 
   /**
@@ -130,9 +124,7 @@ public class GlobalExceptionHandler {
             .map(
                 error ->
                     new ErrorResponse.ValidationError(
-                        error.getField(),
-                        error.getRejectedValue(),
-                        error.getDefaultMessage()))
+                        error.getField(), error.getRejectedValue(), error.getDefaultMessage()))
             .collect(Collectors.toList());
 
     ErrorResponse error =
@@ -146,9 +138,7 @@ public class GlobalExceptionHandler {
             .errors(validationErrors)
             .build();
 
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .contentType(PROBLEM_JSON)
-        .body(error);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(PROBLEM_JSON).body(error);
   }
 
   /**

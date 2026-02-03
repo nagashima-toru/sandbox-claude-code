@@ -7,10 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * RFC 7807 Problem Details for HTTP APIs.
- * エラー情報を標準化された形式で提供します。
- */
+/** RFC 7807 Problem Details for HTTP APIs. エラー情報を標準化された形式で提供します。 */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,9 +35,7 @@ public class ErrorResponse {
   /** バリデーションエラーの詳細リスト（バリデーションエラーの場合のみ）. */
   private List<ValidationError> errors;
 
-  /**
-   * バリデーションエラーの詳細.
-   */
+  /** バリデーションエラーの詳細. */
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
