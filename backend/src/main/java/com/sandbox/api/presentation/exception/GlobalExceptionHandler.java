@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -106,6 +107,32 @@ public class GlobalExceptionHandler {
             .build();
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(PROBLEM_JSON).body(error);
+  }
+
+  /**
+   * Handles BadCredentialsException and returns a 401 response in RFC 7807 format.
+   *
+   * @param ex the exception
+   * @param request the HTTP request
+   * @return response entity with RFC 7807 error details
+   */
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleBadCredentials(
+      BadCredentialsException ex, HttpServletRequest request) {
+    LOGGER.warn(
+        "Authentication failed for request to URI: {}", sanitizeForLog(request.getRequestURI()));
+
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .type(ERROR_TYPE_BASE_URI + "/unauthorized")
+            .title("Unauthorized")
+            .status(HttpStatus.UNAUTHORIZED.value())
+            .detail("Authentication failed. Please check your credentials.")
+            .instance(request.getRequestURI())
+            .timestamp(LocalDateTime.now())
+            .build();
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(PROBLEM_JSON).body(error);
   }
 
   /**

@@ -1,0 +1,15 @@
+package com.sandbox.api.application.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/** Request DTO for refreshing access token. */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RefreshRequest {
+
+  @NotBlank(message = "Refresh token is required") private String refreshToken;
+}
