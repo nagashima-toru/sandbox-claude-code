@@ -136,6 +136,31 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles AccessDeniedException and returns a 403 response in RFC 7807 format.
+   *
+   * @param ex the exception
+   * @param request the HTTP request
+   * @return response entity with RFC 7807 error details
+   */
+  @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDenied(
+      org.springframework.security.access.AccessDeniedException ex, HttpServletRequest request) {
+    LOGGER.warn("Access denied for request to URI: {}", sanitizeForLog(request.getRequestURI()));
+
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .type(ERROR_TYPE_BASE_URI + "/forbidden")
+            .title("Forbidden")
+            .status(HttpStatus.FORBIDDEN.value())
+            .detail("You don't have permission to access this resource")
+            .instance(request.getRequestURI())
+            .timestamp(LocalDateTime.now())
+            .build();
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(PROBLEM_JSON).body(error);
+  }
+
+  /**
    * Handles validation errors and returns a 400 response in RFC 7807 format with field-specific
    * error details.
    *

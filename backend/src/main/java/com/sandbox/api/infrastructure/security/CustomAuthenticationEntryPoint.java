@@ -30,14 +30,16 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     logger.error("Unauthorized error: {}", authException.getMessage());
 
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
+    // RFC 7807 Problem Details format
     Map<String, Object> body = new HashMap<>();
+    body.put("type", "about:blank");
+    body.put("title", "Unauthorized");
     body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-    body.put("error", "Unauthorized");
-    body.put("message", "Authentication is required to access this resource");
-    body.put("path", request.getServletPath());
+    body.put("detail", "Authentication is required to access this resource");
+    body.put("instance", request.getRequestURI());
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.writeValue(response.getOutputStream(), body);

@@ -29,14 +29,16 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     logger.error("Access denied error: {}", accessDeniedException.getMessage());
 
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
+    // RFC 7807 Problem Details format
     Map<String, Object> body = new HashMap<>();
+    body.put("type", "about:blank");
+    body.put("title", "Forbidden");
     body.put("status", HttpServletResponse.SC_FORBIDDEN);
-    body.put("error", "Forbidden");
-    body.put("message", "You don't have permission to access this resource");
-    body.put("path", request.getServletPath());
+    body.put("detail", "You don't have permission to access this resource");
+    body.put("instance", request.getRequestURI());
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.writeValue(response.getOutputStream(), body);
