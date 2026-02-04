@@ -1,5 +1,6 @@
 package com.sandbox.api.infrastructure.security;
 
+import com.sandbox.api.application.service.TokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 /** JWT token provider for generating and validating JWT tokens */
 @Component
-public class JwtTokenProvider {
+public class JwtTokenProvider implements TokenProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
