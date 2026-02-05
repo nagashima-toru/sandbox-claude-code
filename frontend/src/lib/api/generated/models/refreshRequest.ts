@@ -8,9 +8,11 @@
 
  * OpenAPI spec version: 1.0.0
  */
-import type { ProblemDetail } from './problemDetail';
 
 /**
- * 認証エラー
+ * トークンリフレッシュリクエスト
  */
-export type UnauthorizedResponse = ProblemDetail;
+export interface RefreshRequest {
+  /** リフレッシュトークン */
+  refreshToken: string;
+}

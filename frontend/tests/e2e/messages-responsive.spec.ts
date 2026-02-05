@@ -1,12 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { waitForFrontend, createMessage, openCreateModal } from './helpers';
+import { setupAuthenticatedSession, createMessage, openCreateModal } from './helpers';
 
 test.describe('Messages Responsive Behavior', () => {
   test.describe('Desktop viewport', () => {
     test('should display table layout on desktop', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Desktop should show table
       const table = page.locator('table');
@@ -24,8 +23,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should display card layout on mobile', async ({ page }) => {
       // iPhone 12 viewport
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Create a test message to verify card display
       const timestamp = Date.now();
@@ -51,8 +49,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should have touch-friendly buttons on mobile', async ({ page }) => {
       // iPhone 12 viewport
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Create a test message
       const timestamp = Date.now();
@@ -81,8 +78,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should display modal in full screen on mobile', async ({ page }) => {
       // iPhone 12 viewport
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Open create modal
       await openCreateModal(page);
@@ -107,8 +103,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should display appropriate layout on tablet', async ({ page }) => {
       // iPad viewport
       await page.setViewportSize({ width: 768, height: 1024 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Tablet should show table (iPad is typically >= 768px)
       const table = page.locator('table');
@@ -118,8 +113,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should handle orientation changes', async ({ page }) => {
       // Start in portrait
       await page.setViewportSize({ width: 768, height: 1024 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Verify table is visible in portrait
       const table = page.locator('table');
@@ -138,8 +132,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should be usable on small screens', async ({ page }) => {
       // iPhone SE viewport
       await page.setViewportSize({ width: 375, height: 667 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Create button should be visible and accessible
       const createButton = page.getByRole('button', { name: /new message/i });
@@ -173,8 +166,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should adapt layout when resizing from desktop to mobile', async ({ page }) => {
       // Start at desktop size
       await page.setViewportSize({ width: 1280, height: 720 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Verify table is visible
       let table = page.locator('table');
@@ -192,8 +184,7 @@ test.describe('Messages Responsive Behavior', () => {
     test('should adapt layout when resizing from mobile to desktop', async ({ page }) => {
       // Start at mobile size
       await page.setViewportSize({ width: 375, height: 667 });
-      await page.goto('/');
-      await waitForFrontend(page);
+      await setupAuthenticatedSession(page);
 
       // Table should be hidden
       let table = page.locator('table');

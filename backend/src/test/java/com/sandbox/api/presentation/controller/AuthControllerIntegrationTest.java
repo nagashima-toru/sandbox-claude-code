@@ -176,7 +176,43 @@ class AuthControllerIntegrationTest {
   }
 
   @Test
-  void logout_returns204() throws Exception {
-    mockMvc.perform(post("/api/auth/logout")).andExpect(status().isNoContent());
+  void logout_withRefreshToken_returns204() throws Exception {
+    // First, login to get a refresh token
+    String loginRequest =
+        """
+        {
+            "username": "testuser",
+            "password": "password123"
+        }
+        """;
+
+    MvcResult loginResult =
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginRequest))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    String loginResponse = loginResult.getResponse().getContentAsString();
+    var loginResponseMap = objectMapper.readValue(loginResponse, java.util.Map.class);
+    String refreshToken = (String) loginResponseMap.get("refreshToken");
+
+    // Logout with the refresh token
+    String logoutRequest = String.format("{\"refreshToken\":\"%s\"}", refreshToken);
+
+    mockMvc
+        .perform(
+            post("/api/auth/logout").contentType(MediaType.APPLICATION_JSON).content(logoutRequest))
+        .andExpect(status().isNoContent());
+
+    // Verify that the refresh token is invalidated by trying to use it again
+    mockMvc
+        .perform(
+            post("/api/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(logoutRequest))
+        .andExpect(status().isUnauthorized());
   }
 }

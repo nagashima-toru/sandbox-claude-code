@@ -1,6 +1,56 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 /**
+ * Login to the application
+ */
+export async function login(page: Page, username = 'admin', password = 'admin123'): Promise<void> {
+  // Listen for console messages to debug
+  const consoleMessages: string[] = [];
+  page.on('console', (msg) => {
+    consoleMessages.push(`${msg.type()}: ${msg.text()}`);
+  });
+
+  // Navigate to login page
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+
+  // Wait for login form to be ready
+  await expect(page.locator('input[id="username"]')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('input[id="password"]')).toBeVisible({ timeout: 10000 });
+
+  // Fill in credentials using input selectors
+  await page.locator('input[id="username"]').fill(username);
+  await page.locator('input[id="password"]').fill(password);
+
+  // Submit the form
+  await page.getByRole('button', { name: /ログイン/i }).click();
+
+  // Wait for navigation to complete (either success or error)
+  await page.waitForTimeout(3000);
+
+  // Check if we're still on login page (login failed) or redirected (login succeeded)
+  const currentUrl = page.url();
+  if (currentUrl.includes('/login')) {
+    // Still on login page - check for error message
+    const errorMessage = await page
+      .locator('[role="alert"]')
+      .textContent()
+      .catch(() => null);
+    const consoleLog = consoleMessages.join('\n');
+    if (errorMessage) {
+      throw new Error(`Login failed: ${errorMessage}\nConsole: ${consoleLog}`);
+    } else {
+      throw new Error(
+        `Login failed: No error message displayed but still on login page.\nConsole: ${consoleLog}`
+      );
+    }
+  }
+
+  // Wait for home page to fully load
+  await page.waitForLoadState('networkidle', { timeout: 15000 });
+}
+
+/**
  * Wait for a modal/dialog to be visible and ready for interaction
  */
 export async function waitForModal(page: Page): Promise<Locator> {
@@ -207,6 +257,7 @@ export async function deleteMessage(page: Page, code: string): Promise<void> {
 
 /**
  * Wait for the frontend to be ready
+ * This assumes the user is already logged in
  */
 export async function waitForFrontend(page: Page): Promise<void> {
   await page.waitForLoadState('networkidle');
@@ -219,4 +270,13 @@ export async function waitForFrontend(page: Page): Promise<void> {
   // (SearchBar is only rendered after React Query finishes loading)
   const searchInput = page.getByPlaceholder(/search/i);
   await expect(searchInput).toBeVisible({ timeout: 15000 });
+}
+
+/**
+ * Setup authenticated session for E2E tests
+ * Call this in beforeEach for tests that require authentication
+ */
+export async function setupAuthenticatedSession(page: Page): Promise<void> {
+  await login(page);
+  await waitForFrontend(page);
 }

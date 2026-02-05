@@ -8,9 +8,20 @@
 
  * OpenAPI spec version: 1.0.0
  */
-import type { ProblemDetail } from './problemDetail';
 
 /**
- * 認証エラー
+ * ログインリクエスト
  */
-export type UnauthorizedResponse = ProblemDetail;
+export interface LoginRequest {
+  /**
+   * ユーザー名
+   * @minLength 1
+   * @maxLength 50
+   */
+  username: string;
+  /**
+   * パスワード
+   * @minLength 1
+   */
+  password: string;
+}

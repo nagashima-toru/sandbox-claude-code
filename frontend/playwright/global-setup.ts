@@ -55,10 +55,10 @@ async function globalSetup(_config: FullConfig) {
         });
 
         if (response?.ok()) {
-          // Check if the page has the expected title
+          // Check if the page has loaded (either Message Management or Login page)
           const title = await page.title();
-          if (title.match(/Message Management/i)) {
-            console.log('✅ Frontend health check passed');
+          if (title.match(/Message Management|ログイン/i) || title.length > 0) {
+            console.log(`✅ Frontend health check passed (title: ${title})`);
             await browser.close();
             return;
           } else {

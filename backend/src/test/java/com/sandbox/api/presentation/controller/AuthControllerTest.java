@@ -1,7 +1,6 @@
 package com.sandbox.api.presentation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -78,12 +77,17 @@ class AuthControllerTest {
   }
 
   @Test
-  void logout_returnsNoContent() {
+  void logout_withRefreshToken_returnsNoContent() {
+    // Arrange
+    com.sandbox.api.presentation.generated.model.RefreshRequest request =
+        new com.sandbox.api.presentation.generated.model.RefreshRequest();
+    request.setRefreshToken("refresh-token-to-invalidate");
+
     // Act
-    ResponseEntity<Void> response = authController.logout();
+    ResponseEntity<Void> response = authController.logout(request);
 
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    verify(logoutUseCase).execute(anyString());
+    verify(logoutUseCase).execute("refresh-token-to-invalidate");
   }
 }
