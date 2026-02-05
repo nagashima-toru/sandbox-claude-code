@@ -137,6 +137,14 @@ AXIOS_INSTANCE.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+    // Silently handle request cancellation (normal behavior in React Query with Strict Mode)
+    if (axios.isCancel(error)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[API] Request cancelled (normal in dev mode)', originalRequest?.url);
+      }
+      return Promise.reject(error);
+    }
+
     // Handle 401 errors with token refresh
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       // Don't retry auth endpoints
