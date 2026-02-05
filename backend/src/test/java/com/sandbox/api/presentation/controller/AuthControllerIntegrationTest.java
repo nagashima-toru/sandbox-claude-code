@@ -204,9 +204,7 @@ class AuthControllerIntegrationTest {
 
     mockMvc
         .perform(
-            post("/api/auth/logout")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(logoutRequest))
+            post("/api/auth/logout").contentType(MediaType.APPLICATION_JSON).content(logoutRequest))
         .andExpect(status().isNoContent());
 
     // Verify that the refresh token is invalidated by trying to use it again

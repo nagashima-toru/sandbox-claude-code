@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Utility test to generate BCrypt password hashes for migration scripts.
- * Run this test and copy the output hashes to your migration files.
+ * Utility test to generate BCrypt password hashes for migration scripts. Run this test and copy the
+ * output hashes to your migration files.
  */
 public class PasswordHashGenerator {
 
