@@ -141,7 +141,7 @@ describe('useAuth', () => {
   });
 
   describe('logout', () => {
-    it('ログアウトすると、トークンがlocalStorageから削除される', async () => {
+    it('ログアウトすると、リフレッシュトークンがサーバーに送信され、トークンがlocalStorageから削除される', async () => {
       localStorage.setItem('access_token', 'test-access-token');
       localStorage.setItem('refresh_token', 'test-refresh-token');
 
@@ -157,6 +157,9 @@ describe('useAuth', () => {
         await result.current.logout();
       });
 
+      expect(mockLogoutMutateAsync).toHaveBeenCalledWith({
+        data: { refreshToken: 'test-refresh-token' },
+      });
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.accessToken).toBeNull();
       expect(result.current.refreshToken).toBeNull();
@@ -180,6 +183,24 @@ describe('useAuth', () => {
         await result.current.logout();
       });
 
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(localStorage.getItem('access_token')).toBeNull();
+    });
+
+    it('リフレッシュトークンがない場合でも、ローカル状態はクリアされる', async () => {
+      localStorage.setItem('access_token', 'test-access-token');
+
+      const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      await act(async () => {
+        await result.current.logout();
+      });
+
+      expect(mockLogoutMutateAsync).not.toHaveBeenCalled();
       expect(result.current.isAuthenticated).toBe(false);
       expect(localStorage.getItem('access_token')).toBeNull();
     });

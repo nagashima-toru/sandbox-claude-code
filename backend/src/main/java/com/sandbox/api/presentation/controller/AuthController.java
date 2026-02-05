@@ -51,11 +51,10 @@ public class AuthController implements AuthApi {
   }
 
   @Override
-  public ResponseEntity<Void> logout() {
-    // TODO: Extract refresh token from request header or body
-    // For now, this is a placeholder implementation
-    // In a real implementation, we would need to get the refresh token from the request
-    logoutUseCase.execute(""); // Placeholder
+  public ResponseEntity<Void> logout(
+      com.sandbox.api.presentation.generated.model.RefreshRequest refreshRequest) {
+    com.sandbox.api.application.dto.RefreshRequest internal = AuthMapper.toInternal(refreshRequest);
+    logoutUseCase.execute(internal.getRefreshToken());
     return ResponseEntity.noContent().build();
   }
 }

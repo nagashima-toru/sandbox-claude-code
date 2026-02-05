@@ -89,6 +89,13 @@ paths:
 
         **受け入れ条件:** specs/acceptance/auth/logout.feature
       operationId: logout
+      requestBody:
+        description: リフレッシュトークン
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
       responses:
         '204':
           description: ログアウト成功

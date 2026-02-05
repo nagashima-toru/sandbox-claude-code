@@ -94,8 +94,12 @@ export const useAuth = (): UseAuthReturn => {
   );
 
   const logout = useCallback(async () => {
+    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+
     try {
-      await logoutMutation.mutateAsync();
+      if (storedRefreshToken) {
+        await logoutMutation.mutateAsync({ data: { refreshToken: storedRefreshToken } });
+      }
     } catch (error) {
       // Suppress error - local cleanup should always succeed
       console.warn('Logout API call failed, but clearing local tokens', error);

@@ -174,13 +174,15 @@ export const useRefreshToken = <TError = UnauthorizedResponse,
  * @summary ログアウト
  */
 export const logout = (
-    
+    refreshRequest: RefreshRequest,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<void>(
-      {url: `/api/auth/logout`, method: 'POST', signal
+      {url: `/api/auth/logout`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: refreshRequest, signal
     },
       options);
     }
@@ -188,8 +190,8 @@ export const logout = (
 
 
 export const getLogoutMutationOptions = <TError = UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,{data: RefreshRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,{data: RefreshRequest}, TContext> => {
 
 const mutationKey = ['logout'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -201,10 +203,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logout>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logout>>, {data: RefreshRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  logout(requestOptions)
+          return  logout(data,requestOptions)
         }
 
 
@@ -215,18 +217,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
-    
+    export type LogoutMutationBody = RefreshRequest
     export type LogoutMutationError = UnauthorizedResponse
 
     /**
  * @summary ログアウト
  */
 export const useLogout = <TError = UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,{data: RefreshRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof logout>>,
         TError,
-        void,
+        {data: RefreshRequest},
         TContext
       > => {
       return useMutation(getLogoutMutationOptions(options), queryClient);
