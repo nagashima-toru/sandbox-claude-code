@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import {
-  waitForFrontend,
+  setupAuthenticatedSession,
   createMessage,
   getSearchInput,
   performSearch,
@@ -9,9 +9,8 @@ import {
 
 test.describe('Messages Search and Filter', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to the messages page
-    await page.goto('/');
-    await waitForFrontend(page);
+    // Navigate to the messages page with authentication
+    await setupAuthenticatedSession(page);
 
     // Create test messages for searching
     const testMessages = [
@@ -26,7 +25,7 @@ test.describe('Messages Search and Filter', () => {
 
     // Reload to ensure all messages are loaded
     await page.reload();
-    await waitForFrontend(page);
+    await setupAuthenticatedSession(page);
 
     // Verify at least one test message is accessible by searching for it
     const searchInput = await getSearchInput(page);
