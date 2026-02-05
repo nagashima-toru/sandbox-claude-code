@@ -11,6 +11,6 @@
 import type { ProblemDetail } from './problemDetail';
 
 /**
- * 認証エラー
+ * 認可エラー（権限不足）
  */
-export type UnauthorizedResponse = ProblemDetail;
+export type ForbiddenResponse = ProblemDetail;
