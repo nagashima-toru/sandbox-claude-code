@@ -47,6 +47,7 @@ public class SecurityConfig {
     // JWT tokens sent in Authorization headers. Since there are no cookies or session state,
     // CSRF protection is not needed and would only add unnecessary overhead.
     // See: https://spring.io/blog/2019/08/14/spring-security-5-2-0-rc1-released
+    // lgtm[java/spring-disabled-csrf-protection]
     http.csrf(csrf -> csrf.disable())
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .sessionManagement(

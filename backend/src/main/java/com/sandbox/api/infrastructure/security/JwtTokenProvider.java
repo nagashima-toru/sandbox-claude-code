@@ -46,6 +46,7 @@ public class JwtTokenProvider implements TokenProvider {
    * @param role user role
    * @return JWT access token
    */
+  @Override
   public String generateAccessToken(String username, String role) {
     Instant now = Instant.now();
     Instant expiration = now.plusMillis(accessTokenExpiration);
@@ -66,6 +67,7 @@ public class JwtTokenProvider implements TokenProvider {
    * @param username username
    * @return JWT refresh token
    */
+  @Override
   public String generateRefreshToken(String username) {
     Instant now = Instant.now();
     Instant expiration = now.plusMillis(refreshTokenExpiration);
@@ -85,6 +87,7 @@ public class JwtTokenProvider implements TokenProvider {
    * @param token JWT token
    * @return true if valid, false otherwise
    */
+  @Override
   public boolean validateToken(String token) {
     try {
       Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
@@ -109,6 +112,7 @@ public class JwtTokenProvider implements TokenProvider {
    * @param token JWT token
    * @return username
    */
+  @Override
   public String getUsernameFromToken(String token) {
     Claims claims =
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
@@ -121,6 +125,7 @@ public class JwtTokenProvider implements TokenProvider {
    * @param token JWT token
    * @return role
    */
+  @Override
   public String getRoleFromToken(String token) {
     Claims claims =
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();

@@ -56,16 +56,21 @@ public class LoginUseCase {
   }
 
   /**
-   * Sanitizes a string for safe logging by removing potentially dangerous characters.
+   * Sanitizes a string for safe logging by allowing only safe characters.
+   *
+   * <p>This method prevents log injection attacks by removing all characters except alphanumerics,
+   * hyphens, underscores, and dots. Any potentially dangerous characters (control characters,
+   * newlines, special symbols) are stripped out.
    *
    * @param input the input string
-   * @return sanitized string safe for logging
+   * @return sanitized string safe for logging, containing only [a-zA-Z0-9._-]
    */
   private String sanitizeForLogging(String input) {
     if (input == null) {
       return "null";
     }
-    // Remove newlines, carriage returns, and other control characters to prevent log injection
-    return input.replaceAll("[\\r\\n\\t]", "_");
+    // Only allow alphanumerics, dots, hyphens, and underscores to prevent log injection
+    // This is a whitelist approach which is more secure than blacklisting specific characters
+    return input.replaceAll("[^a-zA-Z0-9._-]", "_");
   }
 }
