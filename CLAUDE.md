@@ -133,6 +133,37 @@ See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
 - Branch: `feature/`, `bugfix/`, `hotfix/`
 - Run CI check before PR: `./scripts/ci-check-local.sh`
 
+## Working Agreement
+
+This section defines the working agreement between developers and Claude Code for this project.
+
+### Communication Style
+
+- **Detail Level**: Moderate explanation (explain what was done and why briefly)
+- **Confirmation Frequency**: Only for critical decisions (destructive operations, architecture changes, security-related changes)
+- **Language**: Primarily Japanese (explanations in Japanese, code comments in English, technical terms can be in English)
+
+### Work Approach
+
+- **Autonomy**: High (implement autonomously after plan approval, self-correct errors, report only when stuck)
+- **Plan Mode**: Use proactively (always plan for multi-file changes, new features, architecture changes)
+- **Error Handling**: Self-correction (investigate and fix common errors independently, consult only for complex cases or specification decisions)
+- **Testing**: TDD (Test-Driven Development)
+
+### Development Process
+
+- **Git Workflow**: Automatic (create necessary branches after plan approval, commit at each story completion)
+- **Documentation**: Detailed before implementation (create .epic/ documents first, finalize API specs before implementation)
+- **PR Creation**: After implementation completion (create PR after implementation, tests pass, and CI checks pass)
+- **CI Checks**: Before PR creation (always run `./scripts/ci-check-local.sh` before creating PR)
+
+### Quality Standards
+
+- **Code Quality**: Strict compliance (strictly follow CLAUDE.md conventions, assume Spotless/Prettier auto-formatting)
+- **Security**: High level (be aware of OWASP Top 10, actively prevent SQL injection, XSS, command injection, etc.)
+- **Test Quality**: High coverage (unit tests for all classes, add integration tests for critical features)
+- **Performance**: Basic consideration (avoid obvious bottlenecks, but don't over-optimize)
+
 ## Documentation Index
 
 | Document | Description |
