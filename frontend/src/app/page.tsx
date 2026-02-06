@@ -6,10 +6,12 @@ import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, LogOut } from 'lucide-react';
 import { useMessageMutations } from '@/hooks/useMessageMutations';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 /**
  * Home page component for message management.
@@ -17,6 +19,8 @@ import { MessageResponse } from '@/lib/api/generated/models';
  * Manages modal states for creating, editing, and deleting messages.
  */
 export default function Home() {
+  const router = useRouter();
+  const { logout } = useAuth();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -104,6 +108,15 @@ export default function Home() {
     }
   }, [selectedMessage, deleteMutation]);
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }, [logout, router]);
+
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -119,6 +132,12 @@ export default function Home() {
             >
               <Plus className="h-4 w-4 mr-2" />
               New Message
+            </Button>
+          }
+          rightContent={
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
             </Button>
           }
         />

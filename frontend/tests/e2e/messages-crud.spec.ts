@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import {
-  waitForFrontend,
+  setupAuthenticatedSession,
   fillMessageForm,
   openCreateModal,
   saveModalForm,
@@ -12,9 +12,8 @@ import {
 
 test.describe('Messages CRUD Operations', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to the messages page
-    await page.goto('/');
-    await waitForFrontend(page);
+    // Navigate to the messages page with authentication
+    await setupAuthenticatedSession(page);
   });
 
   test('should display messages list', async ({ page }) => {

@@ -98,6 +98,13 @@ com.sandbox.api
     └── controller/   # REST controllers
 ```
 
+## Architecture Rules
+- Follow Clean Architecture: domain → application → infrastructure (never reverse)
+- Application layer must NOT depend on infrastructure layer
+- Run `./mvnw verify` after any structural changes to catch ArchitectureTest failures early
+
+**IMPORTANT**: When implementing features, verify import statements don't create forbidden dependencies (e.g., application classes importing from infrastructure package)
+
 ### Dependency Rules
 
 - `domain` has no dependencies on other layers
@@ -107,13 +114,13 @@ com.sandbox.api
 
 ## Package Structure
 
-| Package | Responsibility |
-|---------|----------------|
-| `domain.model` | Domain entities (e.g., Message) |
-| `domain.repository` | Repository interfaces |
-| `application.usecase` | Business use cases |
+| Package                      | Responsibility                              |
+|------------------------------|---------------------------------------------|
+| `domain.model`               | Domain entities (e.g., Message)             |
+| `domain.repository`          | Repository interfaces                       |
+| `application.usecase`        | Business use cases                          |
 | `infrastructure.persistence` | MyBatis mappers, repository implementations |
-| `presentation.controller` | REST API endpoints |
+| `presentation.controller`    | REST API endpoints                          |
 
 ## Database
 
@@ -141,6 +148,8 @@ com.sandbox.api
 ## Testing
 
 **IMPORTANT**: When writing tests, follow the comprehensive test strategy documented in `docs/TEST_STRATEGY.md`.
+
+**IMPORTANT**: After modifying Java code in application/ or domain/ packages, always run `./mvnw test -Dtest=ArchitectureTest` before proceeding
 
 Tests use Testcontainers to automatically start a PostgreSQL container.
 

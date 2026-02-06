@@ -13,6 +13,7 @@ import com.sandbox.api.presentation.generated.api.MessageApi;
 import java.net.URI;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,6 +50,7 @@ public class MessageController implements MessageApi {
   }
 
   @Override
+  @PreAuthorize("hasAnyRole('ADMIN', 'VIEWER')")
   public ResponseEntity<com.sandbox.api.presentation.generated.model.MessagePage> getAllMessages(
       Integer page, Integer size) {
     Page<Message> messagePage = getAllMessagesUseCase.execute(page, size);
@@ -56,6 +58,7 @@ public class MessageController implements MessageApi {
   }
 
   @Override
+  @PreAuthorize("hasAnyRole('ADMIN', 'VIEWER')")
   public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse>
       getMessageById(Long id) {
     Message message = getMessageByIdUseCase.execute(id);
@@ -64,6 +67,7 @@ public class MessageController implements MessageApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse> createMessage(
       com.sandbox.api.presentation.generated.model.MessageRequest messageRequest) {
     MessageRequest internal = MessageMapper.toInternal(messageRequest);
@@ -77,6 +81,7 @@ public class MessageController implements MessageApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<com.sandbox.api.presentation.generated.model.MessageResponse> updateMessage(
       Long id, com.sandbox.api.presentation.generated.model.MessageRequest messageRequest) {
     MessageRequest internal = MessageMapper.toInternal(messageRequest);
@@ -86,6 +91,7 @@ public class MessageController implements MessageApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteMessage(Long id) {
     deleteMessageUseCase.execute(id);
     return ResponseEntity.noContent().build();
