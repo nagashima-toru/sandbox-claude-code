@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@isaacs/brace-expansion@<=5.0.0': '>=5.0.1'
+  js-yaml@>=4.0.0 <4.1.1: '>=4.1.1'
+  micromatch@<4.0.8: '>=4.0.8'
+
 importers:
   .:
     dependencies:
@@ -1370,10 +1375,10 @@ packages:
       }
     engines: { node: 20 || >=22 }
 
-  '@isaacs/brace-expansion@5.0.0':
+  '@isaacs/brace-expansion@5.0.1':
     resolution:
       {
-        integrity: sha512-ZT55BDLV0yv0RBm2czMiZ+SqCGO7AvmOM3G/w2xhVPH+te0aKgFjmBvGlL1dH+ql2tgGO3MVrbb3jCKyvpgnxA==,
+        integrity: sha512-WMz71T1JS624nWj2n2fnYAuPovhv7EUhk69R6i9dsVyzxt5eM3bjwvgk9L+APE1TRscGysAVMANkB0jh0LQZrQ==,
       }
     engines: { node: 20 || >=22 }
 
@@ -5209,13 +5214,6 @@ packages:
         integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==,
       }
 
-  js-yaml@4.1.0:
-    resolution:
-      {
-        integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==,
-      }
-    hasBin: true
-
   js-yaml@4.1.1:
     resolution:
       {
@@ -5627,13 +5625,6 @@ packages:
         integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==,
       }
     engines: { node: '>= 8' }
-
-  micromatch@4.0.5:
-    resolution:
-      {
-        integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==,
-      }
-    engines: { node: '>=8.6' }
 
   micromatch@4.0.8:
     resolution:
@@ -8094,7 +8085,7 @@ snapshots:
 
   '@isaacs/balanced-match@4.0.1': {}
 
-  '@isaacs/brace-expansion@5.0.0':
+  '@isaacs/brace-expansion@5.0.1':
     dependencies:
       '@isaacs/balanced-match': 4.0.1
 
@@ -10632,10 +10623,6 @@ snapshots:
 
   js-tokens@9.0.1: {}
 
-  js-yaml@4.1.0:
-    dependencies:
-      argparse: 2.0.1
-
   js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
@@ -10856,11 +10843,11 @@ snapshots:
   markdownlint-cli2@0.13.0:
     dependencies:
       globby: 14.0.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       jsonc-parser: 3.2.1
       markdownlint: 0.34.0
       markdownlint-cli2-formatter-default: 0.0.4(markdownlint-cli2@0.13.0)
-      micromatch: 4.0.5
+      micromatch: 4.0.8
 
   markdownlint-micromark@0.1.9: {}
 
@@ -10876,11 +10863,6 @@ snapshots:
   mdurl@2.0.0: {}
 
   merge2@1.4.1: {}
-
-  micromatch@4.0.5:
-    dependencies:
-      braces: 3.0.3
-      picomatch: 2.3.1
 
   micromatch@4.0.8:
     dependencies:
@@ -10899,7 +10881,7 @@ snapshots:
 
   minimatch@10.1.1:
     dependencies:
-      '@isaacs/brace-expansion': 5.0.0
+      '@isaacs/brace-expansion': 5.0.1
 
   minimatch@3.1.2:
     dependencies:
