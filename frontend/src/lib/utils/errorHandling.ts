@@ -1,18 +1,25 @@
 /**
+ * Type guard to check if an object has a specific property
+ */
+function hasProperty<K extends PropertyKey>(obj: unknown, key: K): obj is Record<K, unknown> {
+  return typeof obj === 'object' && obj !== null && key in obj;
+}
+
+/**
  * Extract user-friendly error message from API error
  */
 export function getApiErrorMessage(error: unknown): string | null {
   if (!error) return null;
 
   // Type guard for axios-like error structure
-  const hasResponse = typeof error === 'object' && error !== null && 'response' in error;
-  const response = hasResponse
-    ? (error as { response?: { status?: number; data?: { message?: string } } }).response
+  const response = hasProperty(error, 'response')
+    ? (error.response as { status?: number; data?: { message?: string } })
     : undefined;
   const status = response?.status;
 
-  const hasMessage = typeof error === 'object' && error !== null && 'message' in error;
-  const errorMessage = hasMessage ? (error as { message?: string }).message : undefined;
+  const errorMessage = hasProperty(error, 'message')
+    ? (error.message as string | undefined)
+    : undefined;
   const message = response?.data?.message || errorMessage;
 
   if (status === 409) {
@@ -27,8 +34,7 @@ export function getApiErrorMessage(error: unknown): string | null {
   if (status === 500) {
     return 'Server error. Please try again later.';
   }
-  const hasCode = typeof error === 'object' && error !== null && 'code' in error;
-  const code = hasCode ? (error as { code?: string }).code : undefined;
+  const code = hasProperty(error, 'code') ? (error.code as string | undefined) : undefined;
   if (code === 'ECONNABORTED' || code === 'ERR_NETWORK') {
     return 'Network error. Please check your connection and try again.';
   }
