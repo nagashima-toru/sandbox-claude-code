@@ -31,7 +31,9 @@ public class LoginUseCase {
    * @throws BadCredentialsException if authentication fails
    */
   public LoginResponse execute(String username, String password) {
-    log.debug("Login attempt for username: {}", username);
+    // Sanitize username for logging to prevent log injection attacks
+    String sanitizedUsername = sanitizeForLogging(username);
+    log.debug("Login attempt for username: {}", sanitizedUsername);
 
     User user =
         userRepository
@@ -39,7 +41,7 @@ public class LoginUseCase {
             .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
     if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-      log.warn("Failed login attempt for username: {}", username);
+      log.warn("Failed login attempt for username: {}", sanitizedUsername);
       throw new BadCredentialsException("Invalid username or password");
     }
 
@@ -49,7 +51,21 @@ public class LoginUseCase {
 
     tokenStore.store(refreshToken, user.getId());
 
-    log.info("Successful login for username: {}", username);
+    log.info("Successful login for username: {}", sanitizedUsername);
     return new LoginResponse(accessToken, refreshToken, 3600);
+  }
+
+  /**
+   * Sanitizes a string for safe logging by removing potentially dangerous characters.
+   *
+   * @param input the input string
+   * @return sanitized string safe for logging
+   */
+  private String sanitizeForLogging(String input) {
+    if (input == null) {
+      return "null";
+    }
+    // Remove newlines, carriage returns, and other control characters to prevent log injection
+    return input.replaceAll("[\\r\\n\\t]", "_");
   }
 }
