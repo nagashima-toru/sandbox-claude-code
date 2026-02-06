@@ -59,9 +59,12 @@ export function Pagination({
   }, [currentPage, totalPages]);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
+    <div
+      data-testid="pagination"
+      className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4"
+    >
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span>
+        <span data-testid="pagination-info">
           Showing {startItem} to {endItem} of {totalItems} results
         </span>
         <span className="hidden sm:inline">|</span>
@@ -89,6 +92,7 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          data-testid="pagination-prev-button"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="hidden sm:inline ml-1">Previous</span>
@@ -103,6 +107,7 @@ export function Pagination({
                 size="sm"
                 onClick={() => onPageChange(page)}
                 className="min-w-[2.5rem]"
+                data-testid={`pagination-page-${page}`}
               >
                 {page}
               </Button>
@@ -119,6 +124,7 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          data-testid="pagination-next-button"
         >
           <span className="hidden sm:inline mr-1">Next</span>
           <ChevronRight className="h-4 w-4" />
