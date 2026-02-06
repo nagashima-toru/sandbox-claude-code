@@ -8,13 +8,11 @@ on:
     paths:
       - 'frontend/package.json'
       - 'frontend/pnpm-lock.yaml'
-      - 'frontend/pnpm-workspace.yaml'
       - '.github/workflows/frontend-security.yml'
   pull_request:
     paths:
       - 'frontend/package.json'
       - 'frontend/pnpm-lock.yaml'
-      - 'frontend/pnpm-workspace.yaml'
       - '.github/workflows/frontend-security.yml'
   schedule:
     # 毎週月曜日の深夜0時（UTC）に実行

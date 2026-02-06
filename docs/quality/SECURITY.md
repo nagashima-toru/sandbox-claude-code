@@ -41,7 +41,7 @@
 
 #### 実行タイミング
 
-- Push/PR: `frontend/package.json`, `frontend/pnpm-lock.yaml`, または `frontend/pnpm-workspace.yaml` の変更時
+- Push/PR: `frontend/package.json` または `frontend/pnpm-lock.yaml` の変更時
 - スケジュール: 毎週月曜日 0:00 UTC（日本時間 9:00）
 - 手動実行: GitHub Actions の UI から実行可能
 
@@ -197,7 +197,7 @@ cd frontend
 # 脆弱性のあるパッケージを確認
 pnpm audit
 
-# 自動修正を試みる（pnpm-workspace.yaml に overrides を追加）
+# 自動修正を試みる（package.json の pnpm.overrides に追加）
 pnpm audit --fix
 
 # 修正を適用
@@ -213,7 +213,7 @@ pnpm update <package-name>
 pnpm add <package-name>@latest
 ```
 
-**Note**: `pnpm audit --fix` は `pnpm-workspace.yaml` に `overrides` セクションを追加します。これにより、間接的な依存関係（transitive dependencies）のバージョンを強制的に上書きできます。
+**Note**: `pnpm audit --fix` は `package.json` の `pnpm.overrides` セクションを追加します。これにより、間接的な依存関係（transitive dependencies）のバージョンを強制的に上書きできます。
 
 ##### バックエンド
 
@@ -349,16 +349,21 @@ codeql database analyze codeql-db --format=sarif-latest --output=results.sarif
 1. `pnpm audit --fix` で自動修正を試す（推奨）
 2. 手動でパッケージを更新
 3. 代替パッケージの検討
-4. 一時的な回避策（override）の使用
+4. 手動で override を追加
 
-```yaml
-# pnpm-workspace.yaml
-overrides:
-  'vulnerable-package@<safe-version': '>=safe-version'
-  '@scope/package@vulnerable-range': 'safe-version'
+```json
+// package.json
+{
+  "pnpm": {
+    "overrides": {
+      "vulnerable-package@<safe-version": ">=safe-version",
+      "@scope/package@vulnerable-range": "safe-version"
+    }
+  }
+}
 ```
 
-**Note**: `pnpm audit --fix` を実行すると、`pnpm-workspace.yaml` に自動的に `overrides` が追加されます。その後、`pnpm install` で適用してください。
+**Note**: `pnpm audit --fix` を実行すると、`package.json` の `pnpm.overrides` に自動的に追加されます。その後、`pnpm install` で適用してください。
 
 ### CodeQL スキャンが失敗する
 

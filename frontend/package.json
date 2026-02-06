@@ -92,5 +92,12 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1",
+      "js-yaml@>=4.0.0 <4.1.1": ">=4.1.1",
+      "micromatch@<4.0.8": ">=4.0.8"
+    }
   }
 }
