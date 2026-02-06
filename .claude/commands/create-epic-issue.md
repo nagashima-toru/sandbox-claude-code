@@ -107,20 +107,17 @@ URL: https://github.com/nagashima-toru/sandbox-claude-code/issues/88
 
 ## Next Steps
 
-1. **要求仕様の理解**
-   - Issue の内容を詳細化
-   - ステークホルダーと要件を確認
+**仕様 PR 作成**（ステップ2-4を一括実行）
+```bash
+/create-spec-pr 88
+```
 
-2. **現在の実装調査**
-   - 既存コードを調査
-   - 影響範囲を把握
+このコマンドは以下を自動的に実行します：
+- **Step 2**: 要求仕様の理解（Issue内容の分析）
+- **Step 3**: 現在の実装調査（既存コード・API・DB調査）
+- **Step 4**: 仕様PR作成（OpenAPI + 受け入れ条件）
 
-3. **仕様 PR 作成**（ステップ4）
-   ```bash
-   /create-spec-pr 88
-   ```
-   - OpenAPI仕様の定義
-   - 受け入れ条件（.feature）の作成
+要求理解と実装調査を踏まえた上で、適切な仕様を作成します。
 ```
 
 ---
