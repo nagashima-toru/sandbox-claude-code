@@ -1,7 +1,13 @@
 # Orval API Generation
 
-## Command
+## Quick Command
 
+**Recommended**:
+```bash
+./scripts/generate-api.sh
+```
+
+**Direct command** (alternative):
 ```bash
 cd frontend && pnpm generate:api
 ```

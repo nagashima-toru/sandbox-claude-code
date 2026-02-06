@@ -1,7 +1,14 @@
 # Storybook Development
 
-## Commands
+## Quick Command
 
+**Recommended**:
+```bash
+./scripts/storybook.sh        # Start dev server
+./scripts/storybook.sh --build # Build static
+```
+
+**Direct commands** (alternative):
 ```bash
 cd frontend
 pnpm storybook      # Start (port 6006)

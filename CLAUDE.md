@@ -19,7 +19,25 @@ sandbox-claude-code/
 
 ## Quick Start
 
-### Local Development (without Docker)
+### Scripts (推奨)
+
+```bash
+# Docker environments
+./scripts/docker-dev.sh         # Development mode (hot reload)
+./scripts/docker-prod.sh        # Production test mode
+
+# Frontend development
+./scripts/generate-api.sh       # Generate API client from OpenAPI
+./scripts/storybook.sh          # Start Storybook (port 6006)
+
+# Multi-environment development
+./scripts/setup-worktree-env.sh # Configure worktree environment
+
+# CI verification
+./scripts/ci-check-local.sh     # Run all CI checks locally
+```
+
+### Direct Commands (代替方法)
 
 ```bash
 # Backend (port 8080)
@@ -27,16 +45,10 @@ cd backend && ./mvnw spring-boot:run
 
 # Frontend (port 3000)
 cd frontend && pnpm install && pnpm dev
-```
 
-### Docker Development
-
-```bash
-# Development mode (hot reload)
-docker compose up
-
-# Production mode test
-docker compose -f docker-compose.yml up
+# Docker (直接実行)
+docker compose up                        # Development mode
+docker compose -f docker-compose.yml up  # Production mode
 ```
 
 ## Development Environment

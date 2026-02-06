@@ -5,7 +5,17 @@
 - `docker-compose.yml` - Base/production configuration
 - `docker-compose.override.yml` - Development overrides (auto-applied)
 
-## Development Mode (`docker compose up`)
+## Development Mode
+
+**Recommended**:
+```bash
+./scripts/docker-dev.sh
+```
+
+**Direct command** (alternative):
+```bash
+docker compose up
+```
 
 | Service | Port | Features |
 |---------|------|----------|
@@ -14,7 +24,17 @@
 | Debug | 5005 | Remote debugging |
 | Nginx | 80 | Optional |
 
-## Production Mode (`docker compose -f docker-compose.yml up`)
+## Production Mode
+
+**Recommended**:
+```bash
+./scripts/docker-prod.sh
+```
+
+**Direct command** (alternative):
+```bash
+docker compose -f docker-compose.yml up
+```
 
 | Service | Port | Features |
 |---------|------|----------|
