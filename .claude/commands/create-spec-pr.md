@@ -499,7 +499,7 @@ URL: https://github.com/nagashima-toru/sandbox-claude-code/pull/102
 
 ## 参考資料
 
-- [Spec PR Guide](../../docs/SPEC_PR_GUIDE.md) - 仕様PR作成の詳細ガイド
+- [Spec PR Guide](../../docs/development/SPEC_PR_GUIDE.md) - 仕様PR作成の詳細ガイド
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [Gherkin Reference](https://cucumber.io/docs/gherkin/reference/)
 - [RFC 7807 - Problem Details](https://tools.ietf.org/html/rfc7807)

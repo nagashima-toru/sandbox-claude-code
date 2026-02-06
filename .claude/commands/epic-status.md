@@ -308,13 +308,13 @@ Epic Documentsの進捗を最新に保つため、以下のタイミングで更
 - `tasklist.md` の進捗セクションを更新
 - `overview.md` の該当Storyにチェック
 
-詳細は [Epic Documents](../../docs/EPIC_DOCUMENTS.md) の「更新タイミング」セクションを参照。
+詳細は [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) の「更新タイミング」セクションを参照。
 
 ---
 
 ## 参考資料
 
-- [Epic Documents](../../docs/EPIC_DOCUMENTS.md) - Epic構造と更新タイミング
+- [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) - Epic構造と更新タイミング
 - [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
 
 ---

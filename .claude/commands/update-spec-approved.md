@@ -245,8 +245,8 @@ PR番号を確認してください
 
 ## 参考資料
 
-- [Spec PR Guide](../../docs/SPEC_PR_GUIDE.md) - 仕様PR作成と承認の流れ
-- [Epic Documents](../../docs/EPIC_DOCUMENTS.md) - Epic構造
+- [Spec PR Guide](../../docs/development/SPEC_PR_GUIDE.md) - 仕様PR作成と承認の流れ
+- [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) - Epic構造
 - [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
 
 ---

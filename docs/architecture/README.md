@@ -221,8 +221,8 @@ sandbox-claude-code/
 
 ### API 設計
 
-- [API 設計ガイドライン](../api/README.md)
-- [エラーハンドリング仕様](../api/error-handling.md)
+- [API 設計ガイドライン](./api/README.md)
+- [エラーハンドリング仕様](./api/error-handling.md)
 
 ### 設計判断記録（ADR）
 
@@ -230,9 +230,9 @@ sandbox-claude-code/
 
 ### プロジェクトドキュメント
 
-- [Docker Deployment](../DOCKER_DEPLOYMENT.md)
-- [Git Worktree](../GIT_WORKTREE.md)
-- [Local CI Verification](../LOCAL_CI_VERIFICATION.md)
+- [Docker Deployment](../environment/DOCKER_DEPLOYMENT.md)
+- [Git Worktree](../environment/GIT_WORKTREE.md)
+- [Local CI Verification](../quality/LOCAL_CI_VERIFICATION.md)
 - [Test Strategy](../../backend/docs/TEST_STRATEGY.md)
 
 ## メンテナンス

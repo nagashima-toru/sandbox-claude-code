@@ -79,7 +79,7 @@ jobs:
               '- ' + backtick + 'backend/README.md' + backtick + '\n' +
               '- ' + backtick + 'backend/CLAUDE.md' + backtick + '\n' +
               '- ' + backtick + 'frontend/CLAUDE.md' + backtick + '\n' +
-              '- ' + backtick + 'docs/DEPLOYMENT.md' + backtick + '\n\n' +
+              '- ' + backtick + 'docs/deployment/DEPLOYMENT.md' + backtick + '\n\n' +
               '### @claude を使った自動更新\n\n' +
               '以下のコメントを投稿すると、Claude が自動的にドキュメントを更新します：\n\n' +
               tripleBacktick + 'markdown\n' +
@@ -90,11 +90,11 @@ jobs:
               '- backend/README.md\n' +
               '- backend/CLAUDE.md\n' +
               '- frontend/CLAUDE.md\n' +
-              '- docs/DEPLOYMENT.md\n\n' +
+              '- docs/deployment/DEPLOYMENT.md\n\n' +
               '変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。\n' +
               tripleBacktick + '\n\n' +
               '### 手動更新\n\n' +
-              '自分で更新する場合は、[Dependabot ドキュメント更新ガイド](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/blob/master/docs/DEPENDABOT_DOCS_UPDATE.md) を参照してください。\n\n' +
+              '自分で更新する場合は、[Dependabot ドキュメント更新ガイド](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/blob/master/docs/deployment/DEPENDABOT_DOCS_UPDATE.md) を参照してください。\n\n' +
               '---\n\n' +
               '💡 このリマインダーは自動的に投稿されました。ドキュメント更新が不要な場合は、このコメントを無視してください。';
 

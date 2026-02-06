@@ -186,7 +186,7 @@ else
   echo "  3. Verify OpenAPI spec is valid:"
   echo "     cat backend/target/openapi/openapi.yaml"
   echo ""
-  echo "  4. See docs/ORVAL_API_GENERATION.md for details"
+  echo "  4. See docs/frontend/ORVAL_API_GENERATION.md for details"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 

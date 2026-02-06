@@ -23,7 +23,7 @@ Dependabot は依存関係を自動的に更新しますが、ドキュメント
 |---------|-----------------|
 | **Next.js** のバージョン変更（メジャー） | `README.md`, `frontend/CLAUDE.md` |
 | **React** のバージョン変更（メジャー） | `README.md`, `frontend/CLAUDE.md` |
-| **Node.js** バージョン変更（Docker イメージ） | `README.md`, `frontend/Dockerfile`, `docs/DEPLOYMENT.md` |
+| **Node.js** バージョン変更（Docker イメージ） | `README.md`, `frontend/Dockerfile`, `docs/deployment/DEPLOYMENT.md` |
 | **TypeScript** のバージョン変更（メジャー） | `frontend/CLAUDE.md` |
 
 ### その他（推奨）
@@ -54,7 +54,7 @@ Dependabot は依存関係を自動的に更新しますが、ドキュメント
 - backend/README.md
 - backend/CLAUDE.md
 - frontend/CLAUDE.md
-- docs/DEPLOYMENT.md（該当する場合）
+- docs/deployment/DEPLOYMENT.md（該当する場合）
 
 変更内容を確認し、影響を受けるすべてのバージョン番号を更新してください。
 ```
@@ -97,7 +97,7 @@ package.json の実際のバージョンと整合性を確認してください�
 @claude Node.js の Docker ベースイメージが node:20-alpine から node:22-alpine に変更されました。以下のドキュメントを更新してください：
 - README.md
 - frontend/CLAUDE.md
-- docs/DEPLOYMENT.md
+- docs/deployment/DEPLOYMENT.md
 
 frontend/Dockerfile の実際のバージョンと整合性を確認してください。
 ```
@@ -189,7 +189,7 @@ grep -r "Next.js.*15" frontend/
 | ファイル | 記載されているバージョン |
 |---------|----------------------|
 | `docker-compose.yml` | PostgreSQL 16, Node.js 20-alpine |
-| `docs/DEPLOYMENT.md` | Node.js 20-alpine |
+| `docs/deployment/DEPLOYMENT.md` | Node.js 20-alpine |
 
 ## 整合性チェックスクリプト
 

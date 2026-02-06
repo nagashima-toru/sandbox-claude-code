@@ -677,7 +677,7 @@ Issue #88 のコメントに仕様ファイルのパスが記載されている�
 
 ## 参考資料
 
-- [Epic Documents](../../docs/EPIC_DOCUMENTS.md) - Epic構造の詳細
+- [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) - Epic構造の詳細
 - [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
 - 既存Epic例: `.epic/20260203-88-auth/` - 参考実装
 

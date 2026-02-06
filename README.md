@@ -11,8 +11,7 @@ A sandbox repository for experimenting with Claude Code.
 sandbox-claude-code/
 ├── backend/          # Spring Boot API application (Java 25, Maven)
 ├── frontend/         # Next.js application (TypeScript, pnpm)
-├── docs/             # Project documentation
-│   └── GITIGNORE_RULES.md
+├── docs/             # Project documentation (organized by category)
 ├── CLAUDE.md         # Root project guidance for Claude Code
 ├── .gitignore        # Common rules (IDE, OS)
 ├── backend/.gitignore    # Backend-specific rules
@@ -43,7 +42,12 @@ See [frontend/README.md](frontend/README.md) for setup instructions.
 
 ## Documentation
 
-- [GITIGNORE_RULES.md](docs/GITIGNORE_RULES.md) - `.gitignore` management rules and guidelines
+See [docs/README.md](docs/README.md) for complete documentation index organized by category.
+
+Key documents:
+- [CLAUDE.md](CLAUDE.md) - Project-wide development guidance
+- [Epic Documents](docs/development/EPIC_DOCUMENTS.md) - Epic-based development workflow
+- [Git Workflow](docs/development/GIT_WORKFLOW.md) - Branch strategy and PR workflow
 
 ## Quick Start with Docker
 

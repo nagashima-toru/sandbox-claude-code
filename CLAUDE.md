@@ -137,7 +137,7 @@ SDDワークフローを効率化するため、各ステップに対応する�
 
 **例**: `.epic/20260203-88-auth/`
 
-See [docs/EPIC_DOCUMENTS.md](docs/EPIC_DOCUMENTS.md) for details.
+See [docs/development/EPIC_DOCUMENTS.md](docs/development/EPIC_DOCUMENTS.md) for details.
 
 ## Git Workflow
 
@@ -150,7 +150,7 @@ master
        └── ...
 ```
 
-See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) for details.
+See [docs/development/GIT_WORKFLOW.md](docs/development/GIT_WORKFLOW.md) for details.
 
 ## Code Formatting
 
@@ -162,13 +162,13 @@ See [backend/CLAUDE.md](backend/CLAUDE.md) and [frontend/CLAUDE.md](frontend/CLA
 
 ## Docker
 
-See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for details.
+See [docs/environment/DOCKER_DEPLOYMENT.md](docs/environment/DOCKER_DEPLOYMENT.md) for details.
 
 ## Local CI Verification
 
 Run `./scripts/ci-check-local.sh` before creating PRs.
 
-See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
+See [docs/quality/LOCAL_CI_VERIFICATION.md](docs/quality/LOCAL_CI_VERIFICATION.md) for details.
 
 ## Key Conventions
 
@@ -224,18 +224,28 @@ This section defines the working agreement between developers and Claude Code fo
 
 ## Documentation Index
 
-| Document | Description |
-|----------|-------------|
-| [Epic Documents](docs/EPIC_DOCUMENTS.md) | Epic-based development planning |
-| [Spec PR Guide](docs/SPEC_PR_GUIDE.md) | How to create specification PRs |
-| [Git Workflow](docs/GIT_WORKFLOW.md) | Branch strategy and PR workflow |
-| [Docker Deployment](docs/DOCKER_DEPLOYMENT.md) | Docker dev/prod modes, workflows, troubleshooting |
-| [Git Worktree](docs/GIT_WORKTREE.md) | Multi-environment development |
-| [Local CI Verification](docs/LOCAL_CI_VERIFICATION.md) | CI checks, coverage, hooks |
-| [Storybook](docs/STORYBOOK.md) | Component development, MSW, a11y |
-| [Orval API Generation](docs/ORVAL_API_GENERATION.md) | API client generation |
-| [Test Strategy](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines |
-| [Security](docs/SECURITY.md) | Security guidelines |
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [Epic Documents](docs/development/EPIC_DOCUMENTS.md) | Epic-based development planning | All developers |
+| [Spec PR Guide](docs/development/SPEC_PR_GUIDE.md) | How to create specification PRs | Backend/Frontend |
+| [Git Workflow](docs/development/GIT_WORKFLOW.md) | Branch strategy and PR workflow | All developers |
+| [Docker Deployment](docs/environment/DOCKER_DEPLOYMENT.md) | Docker dev/prod modes | All developers |
+| [Git Worktree](docs/environment/GIT_WORKTREE.md) | Multi-environment development | All developers |
+| [.gitignore Rules](docs/environment/GITIGNORE_RULES.md) | .gitignore management | All developers |
+| [Local CI Verification](docs/quality/LOCAL_CI_VERIFICATION.md) | CI checks before push | All developers |
+| [Security](docs/quality/SECURITY.md) | Security checks & Dependabot | All developers |
+| [Storybook](docs/frontend/STORYBOOK.md) | Component development | Frontend |
+| [Orval API Generation](docs/frontend/ORVAL_API_GENERATION.md) | API client generation | Frontend |
+| [Frontend Performance](docs/frontend/FRONTEND_PERFORMANCE_MONITORING.md) | Bundle size monitoring | Frontend |
+| [Deployment](docs/deployment/DEPLOYMENT.md) | CD pipeline & deployment | DevOps |
+| [Dependabot Docs Update](docs/deployment/DEPENDABOT_DOCS_UPDATE.md) | Docs update for dependencies | All developers |
+| [Architecture Overview](docs/architecture/README.md) | System architecture | Architects |
+| [C4 Context](docs/architecture/c4-context.md) | System context diagram | Architects |
+| [C4 Container](docs/architecture/c4-container.md) | Container architecture | Architects |
+| [API Design](docs/architecture/api/README.md) | API design guidelines | Backend/Frontend |
+| [Error Handling](docs/architecture/api/error-handling.md) | RFC 7807 error handling | Backend/Frontend |
+| [ADR-0001](docs/adr/0001-use-openapi-first.md) | OpenAPI-First decision | Architects |
+| [Test Strategy](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines | Backend |
 
 ### Subdirectory Documentation
 

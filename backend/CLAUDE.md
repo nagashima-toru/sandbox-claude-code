@@ -147,7 +147,7 @@ com.sandbox.api
 
 ## Testing
 
-**IMPORTANT**: When writing tests, follow the comprehensive test strategy documented in `docs/TEST_STRATEGY.md`.
+**IMPORTANT**: When writing tests, follow the comprehensive test strategy documented in `backend/docs/TEST_STRATEGY.md`.
 
 **IMPORTANT**: After modifying Java code in application/ or domain/ packages, always run `./mvnw test -Dtest=ArchitectureTest` before proceeding
 

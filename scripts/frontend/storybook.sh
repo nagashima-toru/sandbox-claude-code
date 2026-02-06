@@ -177,7 +177,7 @@ else
     echo "  3. Check Storybook configuration:"
     echo "     frontend/.storybook/"
     echo ""
-    echo "  4. See docs/STORYBOOK.md for details"
+    echo "  4. See docs/frontend/STORYBOOK.md for details"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
