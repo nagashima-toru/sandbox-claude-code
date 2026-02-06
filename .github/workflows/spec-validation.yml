@@ -130,8 +130,8 @@ jobs:
       - name: Generate API documentation
         run: |
           if [ -f specs/openapi/openapi.yaml ]; then
-            mkdir -p docs/api
-            redoc-cli bundle specs/openapi/openapi.yaml -o docs/api/index.html
+            mkdir -p docs/architecture/api
+            redoc-cli bundle specs/openapi/openapi.yaml -o docs/architecture/api/index.html
             echo "API documentation generated"
           else
             echo "OpenAPI file not found, skipping documentation generation"

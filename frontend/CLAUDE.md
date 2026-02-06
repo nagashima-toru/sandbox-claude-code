@@ -209,7 +209,7 @@ const { data, isLoading } = useGetAllMessages();
 const mutation = useCreateMessage();
 ```
 
-See [docs/ORVAL_API_GENERATION.md](../docs/ORVAL_API_GENERATION.md) for details.
+See [docs/frontend/ORVAL_API_GENERATION.md](../docs/frontend/ORVAL_API_GENERATION.md) for details.
 
 ## Storybook Quick Reference
 
@@ -239,7 +239,7 @@ export const Default: Story = {
 };
 ```
 
-See [docs/STORYBOOK.md](../docs/STORYBOOK.md) for details.
+See [docs/frontend/STORYBOOK.md](../docs/frontend/STORYBOOK.md) for details.
 
 ## Error Handling
 
@@ -318,11 +318,11 @@ See [docs/STORYBOOK.md](../docs/STORYBOOK.md) for details.
 
 ## Documentation Index
 
-| Document                                          | Description                             |
-| ------------------------------------------------- | --------------------------------------- |
-| [Storybook](../docs/STORYBOOK.md)                 | Full Storybook guide, MSW, a11y testing |
-| [Orval API](../docs/ORVAL_API_GENERATION.md)      | API client generation details           |
-| [Docker Deployment](../docs/DOCKER_DEPLOYMENT.md) | Docker development modes                |
+| Document                                                      | Description                             |
+| ------------------------------------------------------------- | --------------------------------------- |
+| [Storybook](../docs/frontend/STORYBOOK.md)                    | Full Storybook guide, MSW, a11y testing |
+| [Orval API](../docs/frontend/ORVAL_API_GENERATION.md)         | API client generation details           |
+| [Docker Deployment](../docs/environment/DOCKER_DEPLOYMENT.md) | Docker development modes                |
 
 ## Notes
 

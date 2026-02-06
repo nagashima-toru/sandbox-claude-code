@@ -135,6 +135,7 @@
 **種類**: Web Application
 
 **技術スタック**:
+
 - **Runtime**: Node.js 20+
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript 5
@@ -144,6 +145,7 @@
 - **API Client**: Orval (OpenAPI generated)
 
 **責務**:
+
 - ユーザーインターフェースの提供
 - Server-Side Rendering (SSR)
 - Static Site Generation (SSG)
@@ -152,12 +154,14 @@
 - 状態管理
 
 **API 通信**:
+
 - **Protocol**: HTTPS
 - **Format**: JSON
 - **Endpoints**: `/api/*`
 - **Authentication**: （将来）JWT Bearer Token
 
 **ポート**:
+
 - Development: 3000
 - Production (Docker): 3000
 
@@ -168,6 +172,7 @@
 **種類**: API Application
 
 **技術スタック**:
+
 - **Runtime**: JVM (Java 25)
 - **Framework**: Spring Boot 3.5.10
 - **Architecture**: Clean Architecture
@@ -178,6 +183,7 @@
 **アーキテクチャ層**:
 
 #### Presentation Layer
+
 ```java
 com.sandbox.api.presentation
 ├── controller/          // REST Controllers
@@ -189,23 +195,27 @@ com.sandbox.api.presentation
 ```
 
 **責務**:
+
 - HTTP リクエスト/レスポンス処理
 - リクエストバリデーション
 - DTO ↔ Domain モデル変換
 - エラーハンドリング（RFC 7807）
 
 #### Application Layer
+
 ```java
 com.sandbox.api.application
 └── usecase/            // Use Case implementations
 ```
 
 **責務**:
+
 - ビジネスロジックの調整
 - トランザクション管理
 - ドメインサービスの呼び出し
 
 #### Domain Layer
+
 ```java
 com.sandbox.api.domain
 ├── model/              // Domain models
@@ -214,17 +224,20 @@ com.sandbox.api.domain
 ```
 
 **責務**:
+
 - ビジネスルールの実装
 - ドメインモデルの管理
 - 不変条件の保護
 
 #### Infrastructure Layer
+
 ```java
 com.sandbox.api.infrastructure
 └── persistence/        // MyBatis mappers, Repository impl
 ```
 
 **責務**:
+
 - データベースアクセス
 - Repository インターフェースの実装
 - SQL マッピング
@@ -239,6 +252,7 @@ com.sandbox.api.infrastructure
 | DELETE | /api/messages/{id} | メッセージ削除 |
 
 **ポート**:
+
 - Development: 8080
 - Integration Test: 8081
 - Production (Docker): 8080
@@ -250,6 +264,7 @@ com.sandbox.api.infrastructure
 **種類**: Relational Database
 
 **技術スタック**:
+
 - **RDBMS**: PostgreSQL 16
 - **Connection Pool**: HikariCP
 - **Migration**: Flyway
@@ -271,12 +286,14 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 ```
 
 **責務**:
+
 - データ永続化
 - ACID トランザクション保証
 - インデックスによる高速検索
 - データ整合性制約
 
 **ポート**:
+
 - Development: 5432
 - Test: 5432
 
@@ -287,15 +304,18 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 **種類**: Documentation Tool
 
 **技術**:
+
 - springdoc-openapi-ui
 - OpenAPI 3.0
 
 **責務**:
+
 - API ドキュメント提供
 - インタラクティブ API Explorer
 - リクエスト/レスポンス例示
 
 **アクセス**:
+
 - URL: `http://localhost:8080/swagger-ui.html`
 - OpenAPI Spec: `http://localhost:8080/api-docs.yaml`
 
@@ -308,6 +328,7 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 **ワークフロー**:
 
 #### Backend CI
+
 - ビルド・テスト
 - コードカバレッジチェック（80%以上）
 - SpotBugs 静的解析
@@ -317,6 +338,7 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 - **Contract Tests** ← Phase 3 追加
 
 #### Frontend CI
+
 - Lint（ESLint）
 - Type Check（TypeScript）
 - Unit Tests（Vitest）
@@ -324,11 +346,13 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 - E2E Tests（Playwright）
 
 #### Spec Validation ← Phase 4 追加
+
 - Spectral による OpenAPI lint
 - Gherkin 構文チェック
 - Breaking Changes 検出
 
 **成果物**:
+
 - Test Reports
 - Coverage Reports
 - Security Reports
@@ -447,5 +471,6 @@ services:
 ---
 
 **メンテナンス情報**:
+
 - 最終更新: 2026-01-29
 - 更新タイミング: 新しいコンテナ追加時、技術スタック変更時

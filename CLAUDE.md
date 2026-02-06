@@ -19,7 +19,25 @@ sandbox-claude-code/
 
 ## Quick Start
 
-### Local Development (without Docker)
+### Scripts (推奨)
+
+```bash
+# Docker environments
+./scripts/docker-dev.sh         # Development mode (hot reload)
+./scripts/docker-prod.sh        # Production test mode
+
+# Frontend development
+./scripts/generate-api.sh       # Generate API client from OpenAPI
+./scripts/storybook.sh          # Start Storybook (port 6006)
+
+# Multi-environment development
+./scripts/setup-worktree-env.sh # Configure worktree environment
+
+# CI verification
+./scripts/ci-check-local.sh     # Run all CI checks locally
+```
+
+### Direct Commands (代替方法)
 
 ```bash
 # Backend (port 8080)
@@ -27,16 +45,10 @@ cd backend && ./mvnw spring-boot:run
 
 # Frontend (port 3000)
 cd frontend && pnpm install && pnpm dev
-```
 
-### Docker Development
-
-```bash
-# Development mode (hot reload)
-docker compose up
-
-# Production mode test
-docker compose -f docker-compose.yml up
+# Docker (直接実行)
+docker compose up                        # Development mode
+docker compose -f docker-compose.yml up  # Production mode
 ```
 
 ## Development Environment
@@ -64,6 +76,54 @@ docker compose -f docker-compose.yml up
 
 **重要**: 仕様が確定してから実装計画を立てる（手戻りを防ぐ）
 
+### カスタムスラッシュコマンドとの対応
+
+SDDワークフローを効率化するため、各ステップに対応するカスタムスラッシュコマンドを提供しています。
+
+| ステップ | 内容 | コマンド | 実行方法 | 備考 |
+|---------|------|---------|---------|------|
+| 1 | Epic Issue 作成 | `/create-epic-issue` | `/create-epic-issue [タイトル]` | GitHub に Epic Issue を作成 |
+| 2-4 | 要求理解+実装調査+仕様PR | `/create-spec-pr` | `/create-spec-pr [Issue番号]` | OpenAPI + 受け入れ条件を作成 |
+| 5 | 仕様 PR レビュー・マージ | - | 手動 | レビュアーによる承認 |
+| 6 | Issue更新 + spec-approved | `/update-spec-approved` | `/update-spec-approved [Issue番号] [PR番号]` | Issue に仕様を明記しラベル付与 |
+| 7 | 実装計画策定 + セルフレビュー | `/plan-epic` | `/plan-epic [Issue番号]` | .epic/ 作成と自動品質チェック |
+| 8 | 計画レビュー | - | 手動 | 人による最終確認 |
+| 9-12 | 実装/テスト | `/implement-epic` | `/implement-epic [Issue番号]` | Story実装と PR 作成 |
+| - | Epic進捗確認 | `/epic-status` | `/epic-status [Issue番号]` | いつでも実行可能 |
+| 13 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
+
+**コマンドの特徴**:
+
+- `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（仕様PR作成）を一括実行
+- `/plan-epic`: ステップ7で計画を作成後、自動的にセルフレビューを実行
+- ステップ8（計画レビュー）は人が行うが、ステップ7の自動レビューで品質を担保
+
+**使用例**:
+
+```bash
+# 1. Epic Issue作成
+/create-epic-issue 認証・認可機能
+
+# 2-4. 仕様PR作成（要求理解・実装調査・PR作成を自動実行）
+/create-spec-pr 88
+
+# 5. 仕様PRレビュー・マージ（手動）
+
+# 6. Issue更新
+/update-spec-approved 88 102
+
+# 7. 実装計画策定（自動セルフレビュー含む）
+/plan-epic 88
+
+# 8. 計画レビュー（手動）
+
+# 9-12. Epic実装
+/implement-epic 88
+
+# 進捗確認（いつでも）
+/epic-status 88
+```
+
 ## Epic Documents
 
 開発作業の計画は `.epic/` ディレクトリで管理します。
@@ -79,7 +139,7 @@ docker compose -f docker-compose.yml up
 
 **例**: `.epic/20260203-88-auth/`
 
-See [docs/EPIC_DOCUMENTS.md](docs/EPIC_DOCUMENTS.md) for details.
+See [docs/development/EPIC_DOCUMENTS.md](docs/development/EPIC_DOCUMENTS.md) for details.
 
 ## Git Workflow
 
@@ -92,25 +152,27 @@ master
        └── ...
 ```
 
-See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) for details.
+See [docs/development/GIT_WORKFLOW.md](docs/development/GIT_WORKFLOW.md) for details.
 
 ## Code Formatting
 
 Code is automatically formatted after editing:
+
 - **Backend**: Spotless with Google Java Format
 - **Frontend**: Prettier + ESLint
+- **Documentation**: markdownlint-cli2
 
 See [backend/CLAUDE.md](backend/CLAUDE.md) and [frontend/CLAUDE.md](frontend/CLAUDE.md) for manual formatting commands.
 
 ## Docker
 
-See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for details.
+See [docs/environment/DOCKER_DEPLOYMENT.md](docs/environment/DOCKER_DEPLOYMENT.md) for details.
 
 ## Local CI Verification
 
 Run `./scripts/ci-check-local.sh` before creating PRs.
 
-See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
+See [docs/quality/LOCAL_CI_VERIFICATION.md](docs/quality/LOCAL_CI_VERIFICATION.md) for details.
 
 ## Key Conventions
 
@@ -133,20 +195,62 @@ See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
 - Branch: `feature/`, `bugfix/`, `hotfix/`
 - Run CI check before PR: `./scripts/ci-check-local.sh`
 
+## Working Agreement
+
+This section defines the working agreement between developers and Claude Code for this project.
+
+### Communication Style
+
+- **Detail Level**: Moderate explanation (explain what was done and why briefly)
+- **Confirmation Frequency**: Only for critical decisions (destructive operations, architecture changes, security-related changes)
+- **Language**: Primarily Japanese (explanations in Japanese, code comments in English, technical terms can be in English)
+
+### Work Approach
+
+- **Autonomy**: High (implement autonomously after plan approval, self-correct errors, report only when stuck)
+- **Plan Mode**: Use proactively (always plan for multi-file changes, new features, architecture changes)
+- **Error Handling**: Self-correction (investigate and fix common errors independently, consult only for complex cases or specification decisions)
+- **Testing**: TDD (Test-Driven Development)
+
+### Development Process
+
+- **Git Workflow**: Automatic (create necessary branches after plan approval, commit at each story completion)
+- **Documentation**: Detailed before implementation (create .epic/ documents first, finalize API specs before implementation)
+- **PR Creation**: After implementation completion (create PR after implementation, tests pass, and CI checks pass)
+- **CI Checks**: Before PR creation (always run `./scripts/ci-check-local.sh` before creating PR)
+
+### Quality Standards
+
+- **Code Quality**: Strict compliance (strictly follow CLAUDE.md conventions, assume Spotless/Prettier auto-formatting)
+- **Security**: High level (be aware of OWASP Top 10, actively prevent SQL injection, XSS, command injection, etc.)
+- **Test Quality**: High coverage (unit tests for all classes, add integration tests for critical features)
+- **Performance**: Basic consideration (avoid obvious bottlenecks, but don't over-optimize)
+
 ## Documentation Index
 
-| Document | Description |
-|----------|-------------|
-| [Epic Documents](docs/EPIC_DOCUMENTS.md) | Epic-based development planning |
-| [Spec PR Guide](docs/SPEC_PR_GUIDE.md) | How to create specification PRs |
-| [Git Workflow](docs/GIT_WORKFLOW.md) | Branch strategy and PR workflow |
-| [Docker Deployment](docs/DOCKER_DEPLOYMENT.md) | Docker dev/prod modes, workflows, troubleshooting |
-| [Git Worktree](docs/GIT_WORKTREE.md) | Multi-environment development |
-| [Local CI Verification](docs/LOCAL_CI_VERIFICATION.md) | CI checks, coverage, hooks |
-| [Storybook](docs/STORYBOOK.md) | Component development, MSW, a11y |
-| [Orval API Generation](docs/ORVAL_API_GENERATION.md) | API client generation |
-| [Test Strategy](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines |
-| [Security](docs/SECURITY.md) | Security guidelines |
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [Epic Documents](docs/development/EPIC_DOCUMENTS.md) | Epic-based development planning | All developers |
+| [Spec PR Guide](docs/development/SPEC_PR_GUIDE.md) | How to create specification PRs | Backend/Frontend |
+| [Git Workflow](docs/development/GIT_WORKFLOW.md) | Branch strategy and PR workflow | All developers |
+| [Docker Deployment](docs/environment/DOCKER_DEPLOYMENT.md) | Docker dev/prod modes | All developers |
+| [Git Worktree](docs/environment/GIT_WORKTREE.md) | Multi-environment development | All developers |
+| [.gitignore Rules](docs/environment/GITIGNORE_RULES.md) | .gitignore management | All developers |
+| [Local CI Verification](docs/quality/LOCAL_CI_VERIFICATION.md) | CI checks before push | All developers |
+| [Markdown Linting](docs/quality/MARKDOWN_LINTING.md) | Markdown validation | All developers |
+| [Security](docs/quality/SECURITY.md) | Security checks & Dependabot | All developers |
+| [Storybook](docs/frontend/STORYBOOK.md) | Component development | Frontend |
+| [Orval API Generation](docs/frontend/ORVAL_API_GENERATION.md) | API client generation | Frontend |
+| [Frontend Performance](docs/frontend/FRONTEND_PERFORMANCE_MONITORING.md) | Bundle size monitoring | Frontend |
+| [Deployment](docs/deployment/DEPLOYMENT.md) | CD pipeline & deployment | DevOps |
+| [Dependabot Docs Update](docs/deployment/DEPENDABOT_DOCS_UPDATE.md) | Docs update for dependencies | All developers |
+| [Architecture Overview](docs/architecture/README.md) | System architecture | Architects |
+| [C4 Context](docs/architecture/c4-context.md) | System context diagram | Architects |
+| [C4 Container](docs/architecture/c4-container.md) | Container architecture | Architects |
+| [API Design](docs/architecture/api/README.md) | API design guidelines | Backend/Frontend |
+| [Error Handling](docs/architecture/api/error-handling.md) | RFC 7807 error handling | Backend/Frontend |
+| [ADR-0001](docs/adr/0001-use-openapi-first.md) | OpenAPI-First decision | Architects |
+| [Test Strategy](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines | Backend |
 
 ### Subdirectory Documentation
 
@@ -155,5 +259,5 @@ See [docs/LOCAL_CI_VERIFICATION.md](docs/LOCAL_CI_VERIFICATION.md) for details.
 
 ## Repository
 
-- **Remote**: https://github.com/nagashima-toru/sandbox-claude-code.git
+- **Remote**: <https://github.com/nagashima-toru/sandbox-claude-code.git>
 - **Main branch**: master

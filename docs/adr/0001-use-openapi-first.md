@@ -80,6 +80,7 @@ API を開発する際、以下のアプローチが考えられます：
 #### 2. コード生成
 
 **Backend（Java）:**
+
 ```xml
 <plugin>
     <groupId>org.openapitools</groupId>
@@ -98,6 +99,7 @@ API を開発する際、以下のアプローチが考えられます：
 ```
 
 **Frontend（TypeScript）:**
+
 ```typescript
 // orval.config.ts
 export default defineConfig({
@@ -116,15 +118,18 @@ export default defineConfig({
 #### 3. 仕様強制の仕組み
 
 **Issue テンプレート:**
+
 - Epic: 大機能のスコープ定義
 - Story: ユーザーストーリー + 受け入れ条件（Gherkin 必須）
 - Task: 実装タスク（親 Story 参照必須）
 
 **PR テンプレート:**
+
 - 仕様 PR: OpenAPI + Gherkin ファイル追加
 - 実装 PR: 親 Story の spec-approved ラベル必須
 
 **CI ワークフロー:**
+
 ```yaml
 # implementation-check.yml
 - name: Check spec-approved label
@@ -137,6 +142,7 @@ export default defineConfig({
 #### 4. テスト自動化
 
 **OpenAPI Validation Test:**
+
 ```java
 @Test
 void createMessage_shouldConformToOpenApiSpec() {
@@ -151,6 +157,7 @@ void createMessage_shouldConformToOpenApiSpec() {
 ```
 
 **Contract Testing:**
+
 - Spring Cloud Contract で Frontend/Backend 間の契約を検証
 - Gherkin で定義された受け入れ条件を自動テスト
 
@@ -222,19 +229,23 @@ void createMessage_shouldConformToOpenApiSpec() {
 ### リスク軽減策
 
 **学習曲線 → ドキュメント整備**
+
 - API 設計ガイドライン作成
 - OpenAPI サンプル提供
 - チーム内勉強会
 
 **セットアップ複雑性 → 自動化**
+
 - CI/CD パイプラインで自動化
 - ローカル検証スクリプト提供
 
 **仕様更新コスト → ツール活用**
+
 - Spectral による lint で品質維持
 - テンプレート提供
 
 **カスタマイズ困難 → アーキテクチャ設計**
+
 - 生成コードと手動コードの分離
 - Clean Architecture による層分離
 
@@ -245,6 +256,7 @@ void createMessage_shouldConformToOpenApiSpec() {
 springdoc を使い続け、コードから仕様を生成。
 
 **却下理由:**
+
 - 仕様と実装の不一致リスク
 - API 設計の事前レビュー困難
 - 仕様なしで実装可能
@@ -254,6 +266,7 @@ springdoc を使い続け、コードから仕様を生成。
 一部 API は Specification-First、一部は Code-First。
 
 **却下理由:**
+
 - 一貫性がない
 - チームの混乱
 - 品質のばらつき
@@ -263,6 +276,7 @@ springdoc を使い続け、コードから仕様を生成。
 OpenAPI 以外の API 定義言語を使用。
 
 **却下理由:**
+
 - OpenAPI がデファクトスタンダード
 - ツールエコシステムが豊富
 - コミュニティサポートが充実

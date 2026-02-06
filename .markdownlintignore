@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build outputs
+frontend/.next/
+backend/target/
+
+# Generated files
+frontend/src/lib/api/generated/
+
+# External resources
+frontend/playwright-report/
+frontend/coverage/
+backend/docs/jacoco/

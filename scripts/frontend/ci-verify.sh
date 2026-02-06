@@ -21,6 +21,7 @@
 #   11 - ESLint failure
 #   12 - Prettier failure
 #   13 - TypeScript error
+#   14 - Markdown linting failure
 #   21 - Coverage below threshold
 #   30 - Build failure
 #   40 - E2E test failure
@@ -260,6 +261,24 @@ else
   fi
 
   print_success "Prettier check passed"
+
+  print_header "3.5. Markdown Linting"
+
+  print_info "Running: pnpm lint:md"
+  if [ "$VERBOSE" = true ]; then
+    pnpm lint:md
+  else
+    if ! pnpm lint:md > /tmp/pnpm-lint-md.log 2>&1; then
+      print_error "Markdown linting failed"
+      echo ""
+      cat /tmp/pnpm-lint-md.log
+      echo ""
+      print_info "Run 'pnpm lint:md:fix' to auto-fix most issues"
+      exit 14
+    fi
+  fi
+
+  print_success "Markdown linting passed"
 
   print_header "4. Type-Check"
 
@@ -562,6 +581,7 @@ echo ""
 echo "Summary:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ Lint and format checks passed"
+echo "✅ Markdown linting passed"
 echo "✅ Type checking passed"
 echo "✅ Tests passed with coverage"
 

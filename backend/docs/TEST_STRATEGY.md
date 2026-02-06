@@ -24,6 +24,7 @@ Clean Architectureに最適化したテスト配分:
 ```
 
 ### 推奨比率
+
 - **Unit Tests**: 70% - 高速、独立、詳細なエッジケース
 - **Integration Tests**: 25% - レイヤー間の結合、実際のDB
 - **E2E Tests**: 5% - クリティカルなユーザーシナリオ
@@ -37,11 +38,13 @@ Clean Architectureに最適化したテスト配分:
 **テストタイプ**: Pure Unit Tests
 
 **特徴**:
+
 - 外部依存なし（モック不要）
 - 高速実行
 - ビジネスロジックの正確性を検証
 
 **例**: `MessageTest.java`
+
 ```java
 class MessageTest {
     @Test
@@ -70,11 +73,13 @@ class MessageTest {
 **テストタイプ**: Unit Tests with Mocks
 
 **特徴**:
+
 - Repositoryインターフェースをモック
 - ビジネスロジックのフローを検証
 - 高速実行
 
 **例**: `GetMessageUseCaseTest.java`
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class GetMessageUseCaseTest {
@@ -122,6 +127,7 @@ class GetMessageUseCaseTest {
 **テストタイプ**: Unit Tests with Mocked Mapper
 
 **例**: `MessageRepositoryImplTest.java`
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class MessageRepositoryImplTest {
@@ -157,6 +163,7 @@ class MessageRepositoryImplTest {
 **テストタイプ**: Integration Tests with Real Database
 
 **例**: `MessageMapperTest.java`
+
 ```java
 @SpringBootTest
 @Testcontainers
@@ -207,12 +214,14 @@ class MessageMapperTest {
 **テストタイプ**: Integration Tests with MockMvc
 
 **特徴**:
+
 - HTTP層の検証（リクエスト/レスポンス）
 - JSONシリアライゼーション
 - バリデーション
 - エラーハンドリング
 
 **例**: `MessageControllerTest.java`（既存を拡張）
+
 ```java
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -289,6 +298,7 @@ class MessageControllerTest {
 ## 5. テスト命名規則とパターン
 
 ### クラス命名
+
 ```
 [TestTarget] + "Test"
 
@@ -301,12 +311,14 @@ class MessageControllerTest {
 ### メソッド命名
 
 **パターン1**: `methodName_condition_expectedBehavior`
+
 ```java
 getMessage_whenMessageExists_returnsMessage()
 getMessage_whenMessageNotFound_throwsException()
 ```
 
 **パターン2**: `should_expectedBehavior_when_condition`
+
 ```java
 should_returnMessage_when_messageExists()
 should_throwException_when_messageNotFound()
@@ -343,12 +355,14 @@ void testName() {
 | Presentation | 80%+ | API契約の保証 |
 
 ### プロジェクト全体
+
 - **Line Coverage**: 80%以上
 - **Branch Coverage**: 75%以上
 
 ### カバレッジ測定（JaCoCo導入）
 
 **pom.xml に追加**:
+
 ```xml
 <plugin>
     <groupId>org.jacoco</groupId>
@@ -372,6 +386,7 @@ void testName() {
 ```
 
 **実行**:
+
 ```bash
 ./mvnw clean test jacoco:report
 # レポート: target/site/jacoco/index.html
@@ -424,6 +439,7 @@ jobs:
 ### 8.1 DO（推奨）
 
 ✅ **独立性**: 各テストは独立して実行可能
+
 ```java
 @BeforeEach
 void setUp() {
@@ -432,17 +448,20 @@ void setUp() {
 ```
 
 ✅ **決定性**: 同じ入力で常に同じ結果
+
 ```java
 // NG: ランダム値、現在時刻
 // OK: 固定値、モック化した時刻
 ```
 
 ✅ **高速実行**: Unit Testは数ミリ秒で完了
+
 ```java
 // モックを使って外部依存を排除
 ```
 
 ✅ **明確な失敗メッセージ**:
+
 ```java
 assertThat(result)
     .as("User should be active after registration")
@@ -450,6 +469,7 @@ assertThat(result)
 ```
 
 ✅ **1テスト1検証**: 1つのテストで1つの観点
+
 ```java
 @Test
 void getMessage_returnsCorrectContent() {
@@ -465,23 +485,27 @@ void getMessage_returnsCorrectId() {
 ### 8.2 DON'T（非推奨）
 
 ❌ **テスト間の依存**:
+
 ```java
 // NG: Test1の結果にTest2が依存
 ```
 
 ❌ **実装詳細のテスト**:
+
 ```java
 // NG: private メソッドの直接テスト
 // OK: public API経由で間接的に検証
 ```
 
 ❌ **過剰なモック**:
+
 ```java
 // NG: すべてをモック化
 // OK: 必要な依存のみモック
 ```
 
 ❌ **テストコードの重複**:
+
 ```java
 // NG: 同じセットアップを各テストでコピペ
 // OK: @BeforeEach や helper メソッドで共通化
@@ -494,6 +518,7 @@ void getMessage_returnsCorrectId() {
 ### 9.1 統合テスト用データ
 
 **test-data.sql の活用**:
+
 ```sql
 -- src/test/resources/test-data.sql
 DELETE FROM messages;
@@ -504,6 +529,7 @@ INSERT INTO messages (id, content) VALUES
 ```
 
 **実行タイミング**:
+
 ```yaml
 # application-test.yml
 spring:
@@ -516,6 +542,7 @@ spring:
 ### 9.2 Test Fixtures
 
 **Builder Patternの活用**:
+
 ```java
 public class MessageTestFixtures {
     public static Message.MessageBuilder defaultMessage() {
@@ -539,6 +566,7 @@ Clean Architectureの依存規則を自動検証:
 ### ArchUnit導入
 
 **pom.xml**:
+
 ```xml
 <dependency>
     <groupId>com.tngtech.archunit</groupId>
@@ -549,6 +577,7 @@ Clean Architectureの依存規則を自動検証:
 ```
 
 **テスト例**: `ArchitectureTest.java`
+
 ```java
 @AnalyzeClasses(packages = "com.sandbox.api")
 class ArchitectureTest {
@@ -613,6 +642,7 @@ class MessageControllerTest { }
 ### 11.3 並列実行（高速化）
 
 **junit-platform.properties**:
+
 ```properties
 junit.jupiter.execution.parallel.enabled=true
 junit.jupiter.execution.parallel.mode.default=concurrent
@@ -626,24 +656,28 @@ junit.jupiter.execution.parallel.config.strategy=dynamic
 新機能追加時のテスト実装ガイド:
 
 ### Domain Layer
+
 - [ ] エンティティの生成テスト
 - [ ] ビジネスルール検証テスト
 - [ ] 等価性・ハッシュコードテスト
 - [ ] バリデーションロジックテスト
 
 ### Application Layer
+
 - [ ] 正常系テスト
 - [ ] 異常系テスト（例外ケース）
 - [ ] Repositoryモックによる単体テスト
 - [ ] エッジケーステスト
 
 ### Infrastructure Layer
+
 - [ ] Mapper単体テスト（モック使用）
 - [ ] Mapper統合テスト（実DB使用）
 - [ ] トランザクション動作テスト
 - [ ] エラーハンドリングテスト
 
 ### Presentation Layer
+
 - [ ] 正常系HTTPレスポンステスト
 - [ ] 異常系HTTPステータステスト
 - [ ] リクエストバリデーションテスト
@@ -665,16 +699,19 @@ junit.jupiter.execution.parallel.config.strategy=dynamic
 ### 段階的な導入
 
 **Phase 1（即座に実施）**:
+
 - 既存の `MessageController` テストを拡張
 - `GetMessageUseCase` の単体テストを追加
 - JaCoCo導入でカバレッジ測定開始
 
 **Phase 2（短期目標）**:
+
 - 全レイヤーのテスト実装
 - カバレッジ80%達成
 - CI/CD統合
 
 **Phase 3（中長期目標）**:
+
 - ArchUnitでアーキテクチャ保護
 - テストパフォーマンス最適化
 - E2Eテスト追加（必要に応じて）

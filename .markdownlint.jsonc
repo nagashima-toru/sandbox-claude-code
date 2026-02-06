@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint/main/schema/markdownlint-config-schema.json",
+  "default": true,
+
+  // プロジェクト全体のベースルール
+  "MD013": {
+    "line_length": 200,
+    "code_blocks": false,
+    "tables": false,
+    "headings": false,
+    "strict": false
+  },
+  "MD033": {
+    "allowed_elements": ["details", "summary", "img", "br", "kbd", "sub", "sup"]
+  },
+  "MD024": false,  // 重複見出しを許可
+  "MD029": false,  // 番号リストの形式を柔軟に
+  "MD036": false,  // 強調を見出しとして使用することを許可
+  "MD040": false,  // コードブロックの言語指定を任意に
+  "MD041": false,  // ドキュメント先頭の見出しは任意に
+  "MD046": {
+    "style": "fenced"
+  },
+
+  // ディレクトリ別カスタマイズ
+  "overrides": {
+    // .claude/: カスタムコマンド説明、柔軟なルール
+    ".claude/**/*.md": {
+      "MD024": false,  // 重複見出しを許可
+      "MD029": false   // 番号リストの形式を柔軟に
+    },
+
+    // Epic documents: タスクリストなどで柔軟なルール
+    ".epic/**/*.md": {
+      "MD004": { "style": "dash" },
+      "MD029": { "style": "ordered" }
+    },
+
+    // PRテンプレート: 厳密なルール
+    ".github/PULL_REQUEST_TEMPLATE/*.md": {
+      "MD022": true,
+      "MD032": true
+    },
+
+    // 技術ドキュメント: 比較的厳密なルール
+    "docs/**/*.md": {
+      "MD022": true,
+      "MD032": true,
+      "MD024": false  // 重複見出しを許可（セクションごとに同じ見出しを使うことがある）
+    }
+  }
+}

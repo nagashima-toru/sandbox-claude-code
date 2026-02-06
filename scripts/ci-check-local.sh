@@ -480,7 +480,7 @@ else
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "• Run with --verbose flag to see detailed output"
   echo "• Check specific error messages above"
-  echo "• See docs/LOCAL_CI_VERIFICATION.md for detailed troubleshooting"
+  echo "• See docs/quality/LOCAL_CI_VERIFICATION.md for detailed troubleshooting"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 

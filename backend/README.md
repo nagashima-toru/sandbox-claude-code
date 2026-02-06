@@ -55,7 +55,7 @@ docker.host=unix://${HOME}/.colima/default/docker.sock
 
 Install Docker Desktop:
 
-1. Download from https://www.docker.com/products/docker-desktop/
+1. Download from <https://www.docker.com/products/docker-desktop/>
 2. Run installer and follow instructions
 3. Restart PC if required
 
