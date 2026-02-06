@@ -64,6 +64,52 @@ docker compose -f docker-compose.yml up
 
 **重要**: 仕様が確定してから実装計画を立てる（手戻りを防ぐ）
 
+### カスタムスラッシュコマンドとの対応
+
+SDDワークフローを効率化するため、各ステップに対応するカスタムスラッシュコマンドを提供しています。
+
+| ステップ | 内容 | コマンド | 実行方法 | 備考 |
+|---------|------|---------|---------|------|
+| 1 | Epic Issue 作成 | `/create-epic-issue` | `/create-epic-issue [タイトル]` | GitHub に Epic Issue を作成 |
+| 2-4 | 要求理解+実装調査+仕様PR | `/create-spec-pr` | `/create-spec-pr [Issue番号]` | OpenAPI + 受け入れ条件を作成 |
+| 5 | 仕様 PR レビュー・マージ | - | 手動 | レビュアーによる承認 |
+| 6 | Issue更新 + spec-approved | `/update-spec-approved` | `/update-spec-approved [Issue番号] [PR番号]` | Issue に仕様を明記しラベル付与 |
+| 7 | 実装計画策定 + セルフレビュー | `/plan-epic` | `/plan-epic [Issue番号]` | .epic/ 作成と自動品質チェック |
+| 8 | 計画レビュー | - | 手動 | 人による最終確認 |
+| 9-12 | 実装/テスト | `/implement-epic` | `/implement-epic [Issue番号]` | Story実装と PR 作成 |
+| - | Epic進捗確認 | `/epic-status` | `/epic-status [Issue番号]` | いつでも実行可能 |
+| 13 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
+
+**コマンドの特徴**:
+- `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（仕様PR作成）を一括実行
+- `/plan-epic`: ステップ7で計画を作成後、自動的にセルフレビューを実行
+- ステップ8（計画レビュー）は人が行うが、ステップ7の自動レビューで品質を担保
+
+**使用例**:
+```bash
+# 1. Epic Issue作成
+/create-epic-issue 認証・認可機能
+
+# 2-4. 仕様PR作成（要求理解・実装調査・PR作成を自動実行）
+/create-spec-pr 88
+
+# 5. 仕様PRレビュー・マージ（手動）
+
+# 6. Issue更新
+/update-spec-approved 88 102
+
+# 7. 実装計画策定（自動セルフレビュー含む）
+/plan-epic 88
+
+# 8. 計画レビュー（手動）
+
+# 9-12. Epic実装
+/implement-epic 88
+
+# 進捗確認（いつでも）
+/epic-status 88
+```
+
 ## Epic Documents
 
 開発作業の計画は `.epic/` ディレクトリで管理します。
