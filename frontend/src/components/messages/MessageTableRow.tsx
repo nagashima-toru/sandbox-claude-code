@@ -13,7 +13,7 @@ interface MessageTableRowProps {
 
 export function MessageTableRow({ message, onEdit, onDelete }: MessageTableRowProps) {
   return (
-    <TableRow>
+    <TableRow data-testid={`message-row-${message.id}`}>
       <TableCell className="font-medium">{message.id}</TableCell>
       <TableCell>
         <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
@@ -26,6 +26,7 @@ export function MessageTableRow({ message, onEdit, onDelete }: MessageTableRowPr
             size="sm"
             onClick={() => onEdit?.(message)}
             aria-label={`Edit message ${message.code}`}
+            data-testid={`edit-message-button-${message.id}`}
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -34,6 +35,7 @@ export function MessageTableRow({ message, onEdit, onDelete }: MessageTableRowPr
             size="sm"
             onClick={() => onDelete?.(message)}
             aria-label={`Delete message ${message.code}`}
+            data-testid={`delete-message-button-${message.id}`}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -51,7 +53,7 @@ interface MessageCardProps {
 
 export function MessageCard({ message, onEdit, onDelete }: MessageCardProps) {
   return (
-    <div className="p-4 space-y-3">
+    <div data-testid={`message-row-${message.id}`} className="p-4 space-y-3">
       <div className="flex items-start justify-between">
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
@@ -69,6 +71,7 @@ export function MessageCard({ message, onEdit, onDelete }: MessageCardProps) {
             size="sm"
             onClick={() => onEdit?.(message)}
             aria-label={`Edit message ${message.code}`}
+            data-testid={`edit-message-button-${message.id}`}
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -77,6 +80,7 @@ export function MessageCard({ message, onEdit, onDelete }: MessageCardProps) {
             size="sm"
             onClick={() => onDelete?.(message)}
             aria-label={`Delete message ${message.code}`}
+            data-testid={`delete-message-button-${message.id}`}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
