@@ -19,9 +19,12 @@ This document provides detailed guidance for Storybook development, configuratio
 
 ## Overview
 
-Storybook provides an isolated development environment for building, testing, and documenting UI components independently from the main application. This project uses Storybook 10+ with Next.js integration and MSW for API mocking.
+Storybook provides an isolated development environment for building, testing, and documenting UI components
+independently from the main application. This project uses Storybook 10+ with Next.js integration and MSW for API
+mocking.
 
 **Benefits**:
+
 - Develop components in isolation
 - Visual testing and documentation
 - Interactive component playground
@@ -71,6 +74,7 @@ export default config;
 ```
 
 **Key Configuration Points**:
+
 - **stories**: Glob patterns to find story files (`*.stories.tsx`)
 - **framework**: Uses `@storybook/nextjs-vite` for Next.js + Vite integration
 - **staticDirs**: Serves `public/` folder for static assets
@@ -134,6 +138,7 @@ export default preview;
 ```
 
 **Key Configuration Points**:
+
 - **MSW Initialization**: Mocks API requests in stories
 - **React Query Provider**: Wraps all stories with QueryClientProvider
 - **Theme Decorator**: Enables light/dark theme switching
@@ -332,6 +337,7 @@ const meta = {
 - **`test: 'off'`**: Skip a11y checks
 
 **Common A11y Checks**:
+
 - Color contrast ratios
 - ARIA labels
 - Keyboard navigation
@@ -341,6 +347,7 @@ const meta = {
 ### Theme Switching (addon-themes)
 
 Switch between light and dark themes:
+
 - Configured in `.storybook/preview.tsx` with `withThemeByClassName`
 - Uses Tailwind's `dark:` class strategy
 - Theme toggle appears in Storybook toolbar
@@ -363,6 +370,7 @@ const meta = {
 ```
 
 **Generated Documentation Includes**:
+
 - Component description (from JSDoc comments)
 - Prop types table (from TypeScript types)
 - Interactive controls (from argTypes)
@@ -411,6 +419,7 @@ export const Primary: Story = {
 ### 5. Test Different States
 
 Create stories for:
+
 - Default state
 - Loading state
 - Error state
@@ -441,11 +450,13 @@ const meta = {
 ### Creating a New Story
 
 1. **Create Story File**:
+
    ```bash
    touch src/components/ui/new-component.stories.tsx
    ```
 
 2. **Define Meta and Stories**:
+
    ```typescript
    import type { Meta, StoryObj } from '@storybook/nextjs-vite';
    import { NewComponent } from './new-component';

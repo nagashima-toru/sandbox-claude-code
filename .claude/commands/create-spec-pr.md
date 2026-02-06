@@ -33,6 +33,7 @@ gh issue view [Issue番号] --json title,labels,state,body
 ```
 
 **確認項目**:
+
 - Issue に `epic` ラベルがあるか
 - Issue がオープン状態か
 
@@ -47,6 +48,7 @@ gh issue view [Issue番号] --json title,labels,state,body
 Issue本文から以下を抽出・理解：
 
 **必須項目**:
+
 - **背景**: なぜこの機能が必要か
 - **目的**: 何を達成するか
 - **スコープ**: Phase定義、含むもの/含まないもの
@@ -54,6 +56,7 @@ Issue本文から以下を抽出・理解：
 - **非機能要求**: セキュリティ、パフォーマンス、可用性
 
 **分析観点**:
+
 ```markdown
 1. ユーザーストーリー
    - 誰が（Who）
@@ -92,6 +95,7 @@ Issue本文から以下を抽出・理解：
 #### 2.3 不明点の確認
 
 要求が不明確な場合、AskUserQuestion で確認：
+
 - 認証方式（JWT、OAuth、Basic Auth）
 - エラーハンドリング方針
 - データモデルの詳細
@@ -104,12 +108,14 @@ Issue本文から以下を抽出・理解：
 #### 3.1 既存のAPI構造を調査
 
 **OpenAPI仕様の確認**:
+
 ```bash
 # 既存のエンドポイントを確認
 cat specs/openapi/openapi.yaml
 ```
 
 **確認項目**:
+
 - 既存のエンドポイント構造（パスの命名規則）
 - 既存のスキーマ定義（再利用可能なスキーマ）
 - 認証・認可の設定（security schemes）
@@ -118,6 +124,7 @@ cat specs/openapi/openapi.yaml
 #### 3.2 関連する既存コードを調査
 
 **バックエンドの調査**:
+
 ```bash
 # Serenaツールで関連クラスを検索
 mcp__serena__find_symbol [関連シンボル名]
@@ -131,6 +138,7 @@ mcp__serena__search_for_pattern [関連パターン]
 ```
 
 **データベーススキーマの確認**:
+
 ```bash
 # Flywayマイグレーションファイルを確認
 ls backend/src/main/resources/db/migration/
@@ -143,6 +151,7 @@ cat backend/src/main/resources/db/migration/V*.sql
 ```
 
 **フロントエンドの確認**:
+
 ```bash
 # 既存のAPI呼び出しパターンを確認
 cat frontend/src/api/*
@@ -154,6 +163,7 @@ ls frontend/src/components/
 #### 3.3 影響範囲の特定
 
 **調査結果のまとめ**:
+
 ```markdown
 ## 影響範囲分析
 
@@ -176,6 +186,7 @@ ls frontend/src/components/
 #### 3.4 技術選定
 
 調査結果を元に技術を選定：
+
 ```markdown
 ## 技術選定
 
@@ -208,6 +219,7 @@ git checkout -b spec/issue-[N]-[name]
 ```
 
 **ブランチ名の形式**:
+
 - `spec/issue-88-auth`（Issue番号 + 短い識別子）
 - Issue タイトルから識別子を自動生成（スペース→ハイフン、小文字化）
 
@@ -218,6 +230,7 @@ git checkout -b spec/issue-[N]-[name]
 #### 5.1 調査結果を元にエンドポイントを設計
 
 **Step 2（要求理解）とStep 3（実装調査）の結果を統合**：
+
 - 要求仕様から必要なエンドポイントを特定
 - 既存のパス命名規則に従う
 - 既存のスキーマを可能な限り再利用
@@ -227,6 +240,7 @@ git checkout -b spec/issue-[N]-[name]
 `specs/openapi/openapi.yaml` に以下を追加：
 
 **paths セクション**:
+
 ```yaml
   /api/[resource]/[action]:
     [method]:
@@ -254,6 +268,7 @@ git checkout -b spec/issue-[N]-[name]
 ```
 
 **components/schemas セクション**:
+
 ```yaml
     [RequestSchema]:
       type: object
@@ -285,12 +300,14 @@ mkdir -p specs/acceptance/[機能名]
 ```
 
 **機能名の決定**:
+
 - Issue タイトルから抽出（例: `auth`, `user-management`）
 - 英数字とハイフンのみ使用
 
 #### 6.2 要求仕様から受け入れ条件を抽出
 
 **Step 2（要求理解）から受け入れ基準を特定**：
+
 - 各機能の成功条件
 - 異常系の挙動
 - 境界値条件
@@ -302,6 +319,7 @@ mkdir -p specs/acceptance/[機能名]
 `specs/acceptance/[機能名]/[サブ機能名].feature`
 
 **Gherkin形式（調査結果を反映）**:
+
 ```gherkin
 # language: ja
 @[tag1] @[tag2] @api
@@ -335,6 +353,7 @@ Feature: [機能名]
 ```
 
 **作成すべきシナリオ**:
+
 - ✅ 正常系（Happy Path）
 - ✅ 異常系（バリデーションエラー、認証エラーなど）
 - ✅ 境界値テスト
@@ -445,15 +464,19 @@ URL: https://github.com/nagashima-toru/sandbox-claude-code/pull/102
    ```bash
    /update-spec-approved 88 102
    ```
-   - Issue に仕様を明記
-   - spec-approved ラベルを付与
+
+- Issue に仕様を明記
+- spec-approved ラベルを付与
 
 3. **実装計画策定**（ステップ7）
+
    ```bash
    /plan-epic 88
    ```
+
    - .epic/ ディレクトリ作成
    - Story分割と実装計画
+
 ```
 
 ---
@@ -462,26 +485,34 @@ URL: https://github.com/nagashima-toru/sandbox-claude-code/pull/102
 
 ### Issue が存在しない
 ```
+
 ❌ Issue #88 が見つかりません
+
 ```
 
 ### epic ラベルがない
 ```
+
 ❌ Issue #88 には epic ラベルが付与されていません
 まず /create-epic-issue コマンドでEpic Issueを作成してください
+
 ```
 
 ### ブランチがすでに存在
 ```
+
 ❌ ブランチ spec/issue-88-auth は既に存在します
 既存のブランチを削除するか、別の名前を使用してください
+
 ```
 
 ### OpenAPI構文エラー
 ```
+
 ❌ OpenAPI仕様に構文エラーがあります
 [エラー詳細]
 修正してから再度コミットしてください
+
 ```
 
 ---

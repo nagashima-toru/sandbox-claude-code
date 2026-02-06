@@ -18,24 +18,29 @@ sandbox-claude-code/
 ## レベル1: ルート `.gitignore`
 
 ### 対象
+
 プロジェクト全体に共通する、技術スタックに依存しないファイル
 
 ### 管理すべきファイル
+
 - ✅ IDE設定ファイル（IntelliJ IDEA, Eclipse, VS Code）
 - ✅ OS固有ファイル（.DS_Store, Thumbs.db など）
-- ✅ エディタ一時ファイル（*.swp, *.swo, *~ など）
+- ✅ エディタ一時ファイル（*.swp,*.swo, *~ など）
 - ✅ Git関連（*.orig など）
 - ✅ プロジェクト全体の環境変数（.env）
 - ✅ プロジェクト全体のログ（*.log, logs/）
 - ✅ バージョン管理ツール（.java-version など）
 
 ### 追加基準
+
 以下の質問に **すべて YES** の場合、ルート `.gitignore` に追加：
+
 1. バックエンドとフロントエンドの両方で発生するファイルか？
 2. 開発環境（IDE、OS、エディタ）に起因するファイルか？
 3. 技術スタック（Java、Node.js など）に依存しないファイルか？
 
 ### 例
+
 ```gitignore
 # ✅ 正しい例
 .idea/                    # IntelliJ（全体で使用）
@@ -51,11 +56,13 @@ target/                   # Maven固有 → backend/.gitignore
 ## レベル2: `backend/.gitignore`
 
 ### 対象
+
 バックエンド（Java/Maven/Spring Boot）固有のファイル
 
 ### 管理すべきファイル
+
 - ✅ コンパイル済みファイル（*.class）
-- ✅ パッケージファイル（*.jar, *.war, *.ear）
+- ✅ パッケージファイル（*.jar,*.war, *.ear）
 - ✅ Mavenビルド成果物（target/）
 - ✅ Gradleビルド成果物（build/, .gradle/）
 - ✅ Spring Boot設定ファイル（application-local.yml など）
@@ -63,12 +70,15 @@ target/                   # Maven固有 → backend/.gitignore
 - ✅ JVM クラッシュログ（hs_err_pid*.log）
 
 ### 追加基準
+
 以下の質問に **YES** の場合、`backend/.gitignore` に追加：
+
 1. backend/ ディレクトリ配下でのみ発生するファイルか？
 2. Java、Maven、Gradle、Spring Boot に関連するファイルか？
 3. バックエンドのビルドや実行によって生成されるファイルか？
 
 ### 例
+
 ```gitignore
 # ✅ 正しい例
 target/                   # Mavenビルド成果物
@@ -83,9 +93,11 @@ application-local.yml     # ローカル環境設定
 ## レベル3: `frontend/.gitignore`
 
 ### 対象
+
 フロントエンド（Node.js/Next.js/pnpm）固有のファイル
 
 ### 管理すべきファイル
+
 - ✅ Node.js依存関係（node_modules/, .pnpm-store/）
 - ✅ Next.jsビルド成果物（.next/, out/）
 - ✅ TypeScriptビルド（*.tsbuildinfo）
@@ -95,12 +107,15 @@ application-local.yml     # ローカル環境設定
 - ✅ Vercel設定（.vercel）
 
 ### 追加基準
+
 以下の質問に **YES** の場合、`frontend/.gitignore` に追加：
+
 1. frontend/ ディレクトリ配下でのみ発生するファイルか？
 2. Node.js、pnpm、Next.js、TypeScript に関連するファイルか？
 3. フロントエンドのビルドや実行によって生成されるファイルか？
 
 ### 例
+
 ```gitignore
 # ✅ 正しい例
 node_modules/             # Node.js依存関係
@@ -119,6 +134,7 @@ src/lib/api/generated/    # Orval生成コード
 **場所**: `frontend/.gitignore`
 
 **理由**:
+
 - フロントエンド固有のツール
 - frontend/ ディレクトリ配下のみに影響
 - `pnpm generate:api` で再生成可能
@@ -134,6 +150,7 @@ src/lib/api/generated/
 **場所**: Git管理対象（除外しない）
 
 **理由**:
+
 - `backend/src/main/resources/api/openapi.yaml` はフロントエンドで参照
 - バージョン管理が必要
 - ビルド時に自動生成されるが、内容の変更履歴を追跡する必要がある
@@ -141,6 +158,7 @@ src/lib/api/generated/
 ### ケース3: 環境変数ファイル
 
 **ルート `.gitignore`**:
+
 ```gitignore
 .env
 .env.local
@@ -148,6 +166,7 @@ src/lib/api/generated/
 ```
 
 **各プロジェクトでの対応**:
+
 - `.env.example` や `.env.local.example` は Git 管理対象
 - 実際の `.env.local` は Git 管理対象外
 

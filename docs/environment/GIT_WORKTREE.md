@@ -48,6 +48,7 @@ cd ../sandbox-feature-auth
 ```
 
 The script will:
+
 - Auto-generate a project name from your branch name
 - Suggest an available port offset (100, 200, 300, etc.)
 - Create `.env` and `frontend/.env.local` files
@@ -60,8 +61,9 @@ docker-compose up
 ```
 
 Your new environment will be accessible at:
-- Frontend: http://localhost:3100 (with offset=100)
-- Backend: http://localhost:8180
+
+- Frontend: <http://localhost:3100> (with offset=100)
+- Backend: <http://localhost:8180>
 - And so on...
 
 ### Step 4: When done
@@ -239,11 +241,13 @@ docker-compose -f docker-compose.yml \
 ```
 
 **Benefits**:
+
 - Faster database operations (in-memory)
 - No disk I/O overhead
 - Automatic cleanup
 
 **Caution**:
+
 - All data is lost when container stops
 - Not suitable for development work requiring data persistence
 
@@ -272,6 +276,7 @@ docker-compose -f docker-compose.yml \
 ```
 
 The E2E environment uses:
+
 - `COMPOSE_PROJECT_NAME=sandbox-e2e`
 - `PORT_OFFSET=1` (ports 3001, 8081, 5433, etc.)
 - `DB_PERSISTENCE_MODE=tmpfs` (no persistent data)
@@ -341,6 +346,7 @@ DB_PERSISTENCE_MODE=tmpfs
 ### 6. One Main Environment at Offset 0
 
 Keep your primary development at offset 0:
+
 - Familiar ports (3000, 8080, etc.)
 - Easier to remember
 - Default if you forget to set offset
@@ -364,6 +370,7 @@ docker-compose up
 **Problem**: `Error: bind: address already in use`
 
 **Solution**:
+
 ```bash
 # Check what's using the ports
 ./scripts/check-ports.sh

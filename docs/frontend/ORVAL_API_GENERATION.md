@@ -17,12 +17,14 @@ This document provides detailed guidance for using Orval to generate TypeScript 
 This project uses **Orval** to automatically generate TypeScript API client code and React Query hooks from the backend's OpenAPI specification.
 
 **Benefits**:
+
 - Type-safe API calls with zero manual typing
 - Automatic React Query hooks generation
 - Synced with backend API changes
 - MSW handlers for testing
 
 **Command**:
+
 ```bash
 pnpm generate:api
 ```
@@ -297,12 +299,14 @@ export function MessageForm({ existingMessage }) {
 ### After Backend API Changes
 
 1. **Backend**: Regenerate OpenAPI spec
+
    ```bash
    cd backend
    ./mvnw verify
    ```
 
 2. **Frontend**: Regenerate API client
+
    ```bash
    cd frontend
    pnpm generate:api
@@ -362,6 +366,7 @@ src/lib/api/generated/
 ```
 
 This ensures:
+
 - Fresh generation on each build
 - No merge conflicts in generated code
 - Smaller repository size

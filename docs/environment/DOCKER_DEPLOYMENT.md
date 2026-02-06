@@ -16,10 +16,12 @@ This document provides detailed guidance for Docker-based development and deploy
 ## Overview
 
 This project uses a two-tier Docker Compose configuration:
+
 - `docker-compose.yml` - Base configuration (production setup)
 - `docker-compose.override.yml` - Development overrides (automatically applied)
 
-Docker Compose automatically merges these files when you run `docker-compose up`, giving you a development environment with hot reload. To test the production setup, explicitly specify only the base file.
+Docker Compose automatically merges these files when you run `docker-compose up`, giving you a development
+environment with hot reload. To test the production setup, explicitly specify only the base file.
 
 ## Development Mode
 
@@ -52,11 +54,13 @@ Docker Compose automatically merges these files when you run `docker-compose up`
 ### Pros and Cons
 
 **Pros**:
+
 - Fast feedback loop with hot reload
 - Easy debugging
 - No rebuild needed for code changes
 
 **Cons**:
+
 - Not representative of production environment
 - Larger image size
 - Development dependencies included
@@ -92,12 +96,14 @@ Docker Compose automatically merges these files when you run `docker-compose up`
 ### Pros and Cons
 
 **Pros**:
+
 - Tests actual production configuration
 - Smaller image size
 - Security best practices (non-root user)
 - Representative of production behavior
 
 **Cons**:
+
 - Requires rebuild for any code changes
 - No hot reload
 - Slower iteration cycle
@@ -106,10 +112,12 @@ Docker Compose automatically merges these files when you run `docker-compose up`
 
 ### Why Nginx Reverse Proxy?
 
-**Problem**: The frontend's `NEXT_PUBLIC_API_URL` is bundled into browser JavaScript during build time. Using Docker internal hostnames like `http://backend:8080` doesn't work because external browsers cannot resolve them.
+**Problem**: The frontend's `NEXT_PUBLIC_API_URL` is bundled into browser JavaScript during build time. Using Docker
+internal hostnames like `http://backend:8080` doesn't work because external browsers cannot resolve them.
 
 **Solution**: Nginx reverse proxy provides:
-1. Single access point for users (http://localhost)
+
+1. Single access point for users (<http://localhost>)
 2. Frontend and backend on same domain (no CORS issues)
 3. Relative URLs work (`/api` resolves to same domain)
 4. Production-ready architecture
@@ -223,7 +231,8 @@ docker-compose down
 
 ### Using .env.local (Recommended)
 
-Development mode automatically mounts `frontend/.env.local` if it exists, allowing you to customize environment variables without modifying docker-compose files.
+Development mode automatically mounts `frontend/.env.local` if it exists, allowing you to customize environment
+variables without modifying docker-compose files.
 
 ```bash
 # 1. Copy example file
@@ -272,6 +281,7 @@ docker-compose build frontend && docker-compose up
 **Symptom**: Code changes don't reflect in the browser
 
 **Solution**:
+
 1. Make sure you're running in development mode: `docker-compose up`
 2. Check that source code volumes are mounted correctly
 3. For frontend, verify `WATCHPACK_POLLING: "true"` is set
@@ -282,12 +292,14 @@ docker-compose build frontend && docker-compose up
 **Symptom**: Frontend cannot reach backend API
 
 **In Development Mode**:
+
 - Frontend should use `http://localhost:8080`
 - Verify `NEXT_PUBLIC_API_URL: http://localhost:8080` in docker-compose.override.yml
-- Check backend is accessible at http://localhost:8080/api/messages
+- Check backend is accessible at <http://localhost:8080/api/messages>
 
 **In Production Mode**:
-- Access via nginx at http://localhost (port 80)
+
+- Access via nginx at <http://localhost> (port 80)
 - Frontend uses relative URLs (`/api`)
 - Don't access frontend directly at :3000 (port not exposed)
 - Verify nginx.conf routing is correct
@@ -297,6 +309,7 @@ docker-compose build frontend && docker-compose up
 **Symptom**: EACCES or permission denied errors
 
 **Solution**:
+
 - Development mode runs as root, should not have permission issues
 - Production mode runs as non-root user (nextjs)
 - If files are created in development mode and then switched to production, ownership might be wrong
@@ -307,6 +320,7 @@ docker-compose build frontend && docker-compose up
 **Symptom**: Cannot start containers, port 3000/8080/80 already in use
 
 **Solution**:
+
 ```bash
 # Find process using the port
 lsof -i :8080
@@ -324,6 +338,7 @@ docker-compose down
 **Symptom**: Old data or cache persists after rebuilding
 
 **Solution**:
+
 ```bash
 # Remove containers and volumes
 docker-compose down -v

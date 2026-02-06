@@ -34,10 +34,12 @@ gh issue view [Issue番号] --json title,labels,state,body
 ```
 
 **確認項目**:
+
 - Issue に `spec-approved` ラベルがあるか
 - Issue がオープン状態か
 
 **エラー時**: 上記条件を満たさない場合はエラーメッセージを表示：
+
 ```
 ❌ Issue #88 に spec-approved ラベルが付与されていません
 
@@ -50,6 +52,7 @@ gh issue view [Issue番号] --json title,labels,state,body
 #### 2.1 Issue本文から仕様PRとファイルパスを抽出
 
 Issue本文（または最新のコメント）から以下を取得：
+
 - 仕様PR番号
 - OpenAPI仕様ファイルのパス
 - 受け入れ条件ファイルのパス
@@ -73,11 +76,13 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/
 ```
 
 **例**:
+
 ```bash
 mkdir -p .epic/20260207-88-auth/
 ```
 
 **title の決定**:
+
 - Issue タイトルから英数字とハイフンのみ抽出
 - 小文字化（例: "認証・認可機能" → "auth"）
 
@@ -86,6 +91,7 @@ mkdir -p .epic/20260207-88-auth/
 **目的**: 何を実装するかを明確にする
 
 **内容**:
+
 ```markdown
 # [Epicタイトル] 要求仕様
 
@@ -155,6 +161,7 @@ Issue: #[N]
 ```
 
 **ファイル出力**:
+
 ```bash
 # 生成したMarkdownを保存
 cat > .epic/[YYYYMMDD]-[issue-N]-[title]/requirements.md << 'EOF'
@@ -167,6 +174,7 @@ EOF
 **目的**: どう実装するかを明確にする
 
 **内容**:
+
 ```markdown
 # [Epicタイトル] 技術設計
 
@@ -270,6 +278,7 @@ Issue: #[N]
 ```
 
 **ファイル出力**:
+
 ```bash
 cat > .epic/[YYYYMMDD]-[issue-N]-[title]/design.md << 'EOF'
 [生成した内容]
@@ -279,11 +288,13 @@ EOF
 ### 6. Story分割
 
 **原則**:
+
 - 各Storyは独立して実装・テスト可能
 - 1 Story = 2-4時間程度
 - 依存関係を明確にする
 
 **分割例（認証・認可機能）**:
+
 1. Story 1: ユーザー管理基盤（User エンティティ、リポジトリ、DB）
 2. Story 2: JWT認証基盤（トークン生成・検証）
 3. Story 3: 認証エンドポイント（ログイン・リフレッシュ・ログアウト）
@@ -295,11 +306,13 @@ EOF
 ### 7. 各Story の tasklist.md 生成
 
 **ディレクトリ作成**:
+
 ```bash
 mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 ```
 
 **tasklist.md の内容**:
+
 ```markdown
 # Story [N]: [Story名]
 
@@ -343,6 +356,7 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 ```
 
 **タスク粒度**:
+
 - 1タスク = 1時間以内
 - 具体的で検証可能
 - 依存関係を考慮
@@ -352,6 +366,7 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 **目的**: Epic全体の管理（エントリーポイント）
 
 **内容**:
+
 ```markdown
 # [Epicタイトル] 実装計画
 
@@ -388,7 +403,9 @@ Issue: #[N]
 ## 依存関係
 
 ```
+
 [依存関係図]
+
 ```
 
 **推奨実装順序**:
@@ -435,14 +452,17 @@ master
 各 Story の詳細なタスクリストは、対応するディレクトリの `tasklist.md` を参照。
 
 ### Story 1: [Story名]
+
 - [ ] Task 1.1: [タスク名]
 - [ ] Task 1.2: [タスク名]
 ...
 
 ### Story 2: [Story名]
+
 - [ ] Task 2.1: [タスク名]
 - [ ] Task 2.2: [タスク名]
 ...
+
 ```
 
 **ファイル出力**:
@@ -497,13 +517,17 @@ Epic ディレクトリ: .epic/20260207-88-auth/
    ```
 
 2. **実装開始**（ステップ9）
+
    ```bash
    /implement-epic 88
    ```
+
    または個別Storyの実装：
+
    ```bash
    /implement-story 88 1
    ```
+
 ```
 
 ---
@@ -523,6 +547,7 @@ Epic ディレクトリ: .epic/20260207-88-auth/
 ```
 
 **Task粒度の適切性**:
+
 ```markdown
 ✓ 各Taskは1時間以内で完了可能か
 ✓ Taskの完了条件が明確か
@@ -531,6 +556,7 @@ Epic ディレクトリ: .epic/20260207-88-auth/
 ```
 
 **依存関係の整合性**:
+
 ```markdown
 ✓ 依存関係が循環していないか
 ✓ 依存するStoryが先に実装可能か
@@ -538,6 +564,7 @@ Epic ディレクトリ: .epic/20260207-88-auth/
 ```
 
 **見積もり時間の妥当性**:
+
 ```markdown
 ✓ 各Taskの見積もりが現実的か
 ✓ Story全体の見積もりが妥当か
@@ -545,6 +572,7 @@ Epic ディレクトリ: .epic/20260207-88-auth/
 ```
 
 **抜け漏れチェック**:
+
 ```markdown
 ✓ 仕様のすべてのエンドポイントがカバーされているか
 ✓ データベースマイグレーションが含まれているか
@@ -572,6 +600,7 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story*/tasklist.md
 ```
 
 **チェック項目**:
+
 - 仕様（OpenAPI、受け入れ条件）との整合性
 - 各Storyの独立性と依存関係
 - Task粒度と見積もり時間
@@ -626,10 +655,12 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story*/tasklist.md
 レビュー結果に基づき、必要に応じて計画を修正：
 
 **自動修正可能な場合**:
+
 - 明らかな問題（Task粒度が大きすぎる、依存関係の矛盾など）
 - 自動的に修正して再生成
 
 **ユーザー確認が必要な場合**:
+
 - 技術選定に関わる判断
 - スコープの変更
 - AskUserQuestion で確認してから修正
@@ -639,6 +670,7 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story*/tasklist.md
 ## エラーハンドリング
 
 ### spec-approved ラベルがない
+
 ```
 ❌ Issue #88 に spec-approved ラベルが付与されていません
 
@@ -647,6 +679,7 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story*/tasklist.md
 ```
 
 ### ディレクトリがすでに存在
+
 ```
 ❌ ディレクトリ .epic/20260207-88-auth は既に存在します
 
@@ -654,6 +687,7 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story*/tasklist.md
 ```
 
 ### 仕様ファイルが見つからない
+
 ```
 ❌ OpenAPI仕様ファイルが見つかりません
 

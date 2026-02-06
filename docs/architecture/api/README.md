@@ -146,6 +146,7 @@ GET /api/messages?page=0&size=20
 ```
 
 **クエリパラメータ:**
+
 - `page`: ページ番号（0始まり）、デフォルト: 0
 - `size`: 1ページあたりの件数、デフォルト: 20、最大: 100
 
@@ -233,6 +234,7 @@ Content-Type: `application/problem+json`
 ```
 
 エラー例:
+
 ```json
 {
   "type": "https://api.example.com/errors/validation-error",
@@ -283,6 +285,7 @@ Breaking Changes が必要になった場合、以下のいずれかを採用：
 ```
 
 **利点:**
+
 - 明示的
 - キャッシュしやすい
 - テストしやすい
@@ -295,6 +298,7 @@ Accept: application/vnd.sandbox.v2+json
 ```
 
 **利点:**
+
 - URL が変わらない
 - より RESTful
 
@@ -343,6 +347,7 @@ MyBatis PreparedStatement を使用：
 ```
 
 ❌ 文字列連結は使用しない:
+
 ```java
 "SELECT * FROM messages WHERE id = " + id  // 危険！
 ```
@@ -462,5 +467,6 @@ Scenario: 有効なデータでメッセージを作成する
 ---
 
 **メンテナンス情報**:
+
 - 最終更新: 2026-01-29
 - 更新タイミング: 新しい API パターン追加時、設計方針変更時

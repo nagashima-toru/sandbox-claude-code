@@ -93,11 +93,13 @@ SDDワークフローを効率化するため、各ステップに対応する�
 | 13 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
 
 **コマンドの特徴**:
+
 - `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（仕様PR作成）を一括実行
 - `/plan-epic`: ステップ7で計画を作成後、自動的にセルフレビューを実行
 - ステップ8（計画レビュー）は人が行うが、ステップ7の自動レビューで品質を担保
 
 **使用例**:
+
 ```bash
 # 1. Epic Issue作成
 /create-epic-issue 認証・認可機能
@@ -155,8 +157,10 @@ See [docs/development/GIT_WORKFLOW.md](docs/development/GIT_WORKFLOW.md) for det
 ## Code Formatting
 
 Code is automatically formatted after editing:
+
 - **Backend**: Spotless with Google Java Format
 - **Frontend**: Prettier + ESLint
+- **Documentation**: markdownlint-cli2
 
 See [backend/CLAUDE.md](backend/CLAUDE.md) and [frontend/CLAUDE.md](frontend/CLAUDE.md) for manual formatting commands.
 
@@ -233,6 +237,7 @@ This section defines the working agreement between developers and Claude Code fo
 | [Git Worktree](docs/environment/GIT_WORKTREE.md) | Multi-environment development | All developers |
 | [.gitignore Rules](docs/environment/GITIGNORE_RULES.md) | .gitignore management | All developers |
 | [Local CI Verification](docs/quality/LOCAL_CI_VERIFICATION.md) | CI checks before push | All developers |
+| [Markdown Linting](docs/quality/MARKDOWN_LINTING.md) | Markdown validation | All developers |
 | [Security](docs/quality/SECURITY.md) | Security checks & Dependabot | All developers |
 | [Storybook](docs/frontend/STORYBOOK.md) | Component development | Frontend |
 | [Orval API Generation](docs/frontend/ORVAL_API_GENERATION.md) | API client generation | Frontend |
@@ -254,5 +259,5 @@ This section defines the working agreement between developers and Claude Code fo
 
 ## Repository
 
-- **Remote**: https://github.com/nagashima-toru/sandbox-claude-code.git
+- **Remote**: <https://github.com/nagashima-toru/sandbox-claude-code.git>
 - **Main branch**: master

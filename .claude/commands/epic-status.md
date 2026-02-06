@@ -27,10 +27,12 @@ Epic の進捗状況を確認し、次に実装すべきStoryを提案します�
 #### 引数あり: 指定されたEpicの状態を表示
 
 Issue番号（または識別子）が引数で渡された場合：
+
 1. `.epic/` ディレクトリから該当するEpicを検索
 2. 見つかったEpicの状態を表示
 
 **検索パターン**:
+
 - `88` → `*-issue-88-*/`
 - `issue-88` → `*-issue-88-*/`
 - `88-auth` → `*-88-auth/`
@@ -38,6 +40,7 @@ Issue番号（または識別子）が引数で渡された場合：
 #### 引数なし: Epic選択UI
 
 引数が渡されない場合：
+
 1. `.epic/` ディレクトリ内の全Epicをスキャン
 2. 各Epicの `overview.md` から以下を取得：
    - Issue番号
@@ -45,6 +48,7 @@ Issue番号（または識別子）が引数で渡された場合：
    - Story進捗（完了/全体）
    - 最終更新日時
 3. AskUserQuestion で選択肢を表示：
+
    ```
    確認するEpicを選択してください
 
@@ -62,6 +66,7 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/overview.md
 ```
 
 **抽出する情報**:
+
 - Epic概要（目的、完了条件）
 - Story構成（Story一覧、見積もり）
 - 依存関係
@@ -70,11 +75,13 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/overview.md
 #### 2.2 各Story の tasklist.md を読み込む
 
 未完了のStoryについて、タスク詳細を読み込む：
+
 ```bash
 cat .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/tasklist.md
 ```
 
 **抽出する情報**:
+
 - Task完了状況（チェックボックス）
 - 見積もり時間
 - 実績時間
@@ -85,16 +92,19 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/tasklist.md
 #### 3.1 全体進捗の計算
 
 **Story進捗率**:
+
 ```
 完了Story数 / 全Story数 × 100
 ```
 
 **Task進捗率**:
+
 ```
 完了Task数 / 全Task数 × 100
 ```
 
 **時間進捗**:
+
 ```
 実績時間 / 見積もり時間 × 100
 ```
@@ -102,6 +112,7 @@ cat .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/tasklist.md
 #### 3.2 Story別進捗の集計
 
 各Storyについて：
+
 - タイトルと状態（✅完了 / 🚧進行中 / ⏱️未着手）
 - Task完了状況（例: 3/5タスク完了）
 - 見積もり時間と実績時間
@@ -120,11 +131,13 @@ gh pr list --head feature/issue-[N]-* --json number,title,state
 ### 5. 次のStoryを提案
 
 **提案ロジック**:
+
 1. 未完了のStoryを依存関係順にソート
 2. 依存するStoryがすべて完了しているStoryを抽出
 3. 最初のStoryを推奨として提案
 
 **依存関係の確認**:
+
 - `overview.md` の依存関係図を解析
 - 依存するStoryが完了していない場合は警告
 
@@ -152,9 +165,11 @@ gh pr list --head feature/issue-[N]-* --json number,title,state
 
 **進捗バー**:
 ```
+
 Story: ████████████████░░ 85.7%
 Task:  █████████████████░ 92.3%
 Time:  █████████████████░ 93.9%
+
 ```
 
 ---
@@ -221,6 +236,7 @@ Time:  █████████████████░ 93.9%
 ```
 
 または Epic全体を完成させる：
+
 ```bash
 /implement-epic 88
 ```
@@ -230,10 +246,12 @@ Time:  █████████████████░ 93.9%
 ## GitHub Issue/PR 状態
 
 **Issue #88**: open
+
 - ラベル: epic, spec-approved
 - 最終更新: 2026-02-04
 
 **関連PR**:
+
 - #104: Story 1（merged）
 - #105: Story 2（merged）
 - #106: Story 3（merged）
@@ -251,11 +269,13 @@ Time:  █████████████████░ 93.9%
 - [ ] Epic PR の準備ができている
 
 **Epic PR 作成**:
+
 ```bash
 gh pr create --base master \
              --head feature/issue-88-auth \
              --template .github/PULL_REQUEST_TEMPLATE/epic.md
 ```
+
 ```
 
 ---
@@ -264,26 +284,32 @@ gh pr create --base master \
 
 ### Epicが存在しない
 ```
+
 ❌ Epic #88 が見つかりません
 
 .epic/ ディレクトリに該当するEpicが存在しません。
 以下のコマンドで実装計画を策定してください：
 /plan-epic 88
+
 ```
 
 ### overview.md が読めない
 ```
+
 ❌ .epic/20260207-88-auth/overview.md が読み込めません
 
 ファイルが破損しているか、権限がない可能性があります
+
 ```
 
 ### .epic/ が空
 ```
+
 ❌ .epic/ ディレクトリが空です
 
 実装計画を策定してから実行してください：
 /plan-epic [Issue番号]
+
 ```
 
 ---

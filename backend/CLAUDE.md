@@ -54,6 +54,7 @@ This project uses **Spotless** with **Google Java Format** for automatic code fo
 ### Automatic Formatting
 
 Claude Code is configured to automatically format code after editing files via hooks in `.claude/settings.local.json`:
+
 - After `Edit` tool: runs `./scripts/format-code.sh`
 - After `Write` tool: runs `./scripts/format-code.sh`
 
@@ -99,6 +100,7 @@ com.sandbox.api
 ```
 
 ## Architecture Rules
+
 - Follow Clean Architecture: domain → application → infrastructure (never reverse)
 - Application layer must NOT depend on infrastructure layer
 - Run `./mvnw verify` after any structural changes to catch ArchitectureTest failures early
@@ -162,6 +164,7 @@ docker context use colima
 ```
 
 Create `~/.testcontainers.properties`:
+
 ```properties
 docker.host=unix://${HOME}/.colima/default/docker.sock
 ```

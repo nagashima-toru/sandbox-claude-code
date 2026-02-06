@@ -28,6 +28,7 @@ git push
 ### What Gets Checked?
 
 #### Backend
+
 - ✅ Build and tests (Maven verify)
 - ✅ Code coverage (≥80% lines, ≥75% branches)
 - ✅ SpotBugs static analysis
@@ -35,7 +36,9 @@ git push
 - ✅ OWASP dependency-check (optional)
 
 #### Frontend
+
 - ✅ ESLint and Prettier
+- ✅ Markdown linting
 - ✅ TypeScript type checking
 - ✅ Vitest tests with coverage (≥80% statements/functions/lines, ≥70% branches)
 - ✅ Production build
@@ -50,11 +53,13 @@ git push
 **Purpose:** Runs all CI checks in the correct order with clear output.
 
 **Usage:**
+
 ```bash
 ./scripts/ci-check-local.sh [OPTIONS]
 ```
 
 **Options:**
+
 - `--backend-only` - Run only backend checks
 - `--frontend-only` - Run only frontend checks
 - `--e2e` - Include E2E tests (slow, ~3-5 minutes)
@@ -64,6 +69,7 @@ git push
 - `--help` - Show help message
 
 **Examples:**
+
 ```bash
 # Standard check (2-3 minutes)
 ./scripts/ci-check-local.sh
@@ -85,6 +91,7 @@ git push
 ```
 
 **Exit Codes:**
+
 - `0` - All checks passed
 - `1-5` - Backend checks failed
 - `11-40` - Frontend checks failed
@@ -97,16 +104,19 @@ git push
 **Purpose:** Replicates `.github/workflows/backend-ci.yml` exactly.
 
 **Usage:**
+
 ```bash
 ./scripts/backend/ci-verify.sh [OPTIONS]
 ```
 
 **Options:**
+
 - `--dependency-check` - Run OWASP dependency-check
 - `--verbose` - Show detailed Maven output
 - `--help` - Show help message
 
 **What it checks:**
+
 1. Java 21 version
 2. PostgreSQL availability (auto-starts if needed)
 3. Maven build and verify (`./mvnw clean verify`)
@@ -116,6 +126,7 @@ git push
 7. OWASP dependency-check (optional, parses JSON report)
 
 **Exit Codes:**
+
 - `0` - All checks passed
 - `1` - Build/test failure
 - `2` - Coverage below threshold
@@ -131,11 +142,13 @@ git push
 **Purpose:** Replicates `.github/workflows/frontend-ci.yml` exactly.
 
 **Usage:**
+
 ```bash
 ./scripts/frontend/ci-verify.sh [OPTIONS]
 ```
 
 **Options:**
+
 - `--e2e` - Run E2E tests with Playwright
 - `--parallel` - Run lint and type-check in parallel
 - `--skip-install` - Skip dependency installation (faster iteration)
@@ -143,22 +156,26 @@ git push
 - `--help` - Show help message
 
 **What it checks:**
+
 1. Node.js 20 and pnpm availability
 2. Dependency installation (`pnpm install --frozen-lockfile`)
 3. API client generation (`pnpm generate:api`)
 4. ESLint (`pnpm lint`)
 5. Prettier (`pnpm format:check`)
-6. TypeScript type checking (`pnpm type-check`)
-7. Vitest tests with coverage (`pnpm test:coverage`)
-8. Coverage validation (parses JSON report)
-9. Production build (`pnpm build`)
-10. E2E tests (optional, uses Docker Compose for backend)
+6. Markdown linting (`pnpm lint:md`)
+7. TypeScript type checking (`pnpm type-check`)
+8. Vitest tests with coverage (`pnpm test:coverage`)
+9. Coverage validation (parses JSON report)
+10. Production build (`pnpm build`)
+11. E2E tests (optional, uses Docker Compose for backend)
 
 **Exit Codes:**
+
 - `0` - All checks passed
 - `11` - ESLint failure
 - `12` - Prettier failure
 - `13` - TypeScript error
+- `14` - Markdown linting failure
 - `21` - Coverage below threshold
 - `30` - Build failure
 - `40` - E2E test failure
@@ -171,12 +188,14 @@ git push
 **Purpose:** Quick smoke tests before push (<30 seconds).
 
 **What it does:**
+
 - Detects changed files (backend/frontend)
 - Backend: Runs `./mvnw compile test`
 - Frontend: Runs `pnpm lint && pnpm type-check`
 - Suggests running full verification
 
 **To skip:**
+
 ```bash
 git push --no-verify
 ```
@@ -188,6 +207,7 @@ git push --no-verify
 **When:** Every commit
 
 **What:** Staged files only
+
 - Prettier formatting
 - ESLint on changed files
 - TypeScript on changed files
@@ -201,6 +221,7 @@ git push --no-verify
 **When:** Before every push
 
 **What:** Quick smoke tests
+
 - Backend: `./mvnw compile test`
 - Frontend: `pnpm lint && pnpm type-check`
 
@@ -213,6 +234,7 @@ git push --no-verify
 **When:** Before creating a PR or after fixing CI failures
 
 **What:** Complete CI simulation
+
 - All checks from Level 1 and 2
 - Full test suite with coverage
 - Quality tools (SpotBugs, Checkstyle)
@@ -220,6 +242,7 @@ git push --no-verify
 - Optional: E2E tests, dependency-check
 
 **Trigger:** Manual
+
 ```bash
 ./scripts/ci-check-local.sh
 ```
@@ -317,6 +340,7 @@ cd frontend && ../scripts/frontend/ci-verify.sh --skip-install
 **Problem:** Backend checks fail with database connection errors.
 
 **Solution 1:** Auto-start via docker-compose
+
 ```bash
 # The script will try this automatically, but you can do it manually:
 docker-compose up -d postgres
@@ -326,6 +350,7 @@ docker-compose ps
 ```
 
 **Solution 2:** Use existing PostgreSQL
+
 ```bash
 # Ensure PostgreSQL is running with correct credentials
 PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "SELECT 1"
@@ -341,6 +366,7 @@ PGPASSWORD=sandbox psql -h localhost -U sandbox -d postgres -c "GRANT ALL PRIVIL
 **Problem:** `Java 21 required, but Java XX detected`
 
 **Solution:** Use SDKMAN or switch Java version
+
 ```bash
 # Using SDKMAN
 sdk install java 21-tem
@@ -355,6 +381,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 **Problem:** `Node.js 20 recommended, but Node XX detected`
 
 **Solution:** Use nvm to switch Node version
+
 ```bash
 # Install nvm if not already installed
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -372,6 +399,7 @@ nvm alias default 20
 **Problem:** `Coverage below threshold` error
 
 **Backend:**
+
 ```bash
 # View detailed coverage report
 open backend/target/site/jacoco/index.html
@@ -385,6 +413,7 @@ grep -A 5 "INSUFFICIENTCOVERAGE" backend/target/site/jacoco/jacoco.xml
 ```
 
 **Frontend:**
+
 ```bash
 # View detailed coverage report
 open frontend/coverage/index.html
@@ -404,6 +433,7 @@ cat frontend/coverage/coverage-summary.json | jq '.total'
 **Problem:** SpotBugs reports violations
 
 **Solution:**
+
 ```bash
 # View detailed report
 open backend/target/spotbugs.html
@@ -420,6 +450,7 @@ vi backend/spotbugs-exclude.xml
 **Problem:** Checkstyle reports violations
 
 **Solution:**
+
 ```bash
 # View detailed report
 cat backend/target/checkstyle-result.xml
@@ -439,6 +470,7 @@ cat backend/target/checkstyle-result.xml
 **Problem:** `Prettier check failed`
 
 **Solution:**
+
 ```bash
 # Auto-fix all formatting issues
 cd frontend
@@ -457,6 +489,7 @@ git commit -m "Fix formatting"
 **Problem:** ESLint reports errors
 
 **Solution:**
+
 ```bash
 # View detailed errors
 cd frontend
@@ -473,6 +506,7 @@ pnpm lint:fix
 **Problem:** Type-check fails
 
 **Solution:**
+
 ```bash
 # View detailed errors
 cd frontend
@@ -489,6 +523,7 @@ pnpm type-check
 **Problem:** Production build fails
 
 **Frontend:**
+
 ```bash
 # View full build output
 cd frontend
@@ -502,6 +537,7 @@ pnpm build --verbose
 ```
 
 **Backend:**
+
 ```bash
 # View full Maven output
 cd backend
@@ -518,6 +554,7 @@ cd backend
 **Problem:** E2E tests fail
 
 **Solution:**
+
 ```bash
 # Run with UI to see what's happening
 cd frontend
@@ -544,6 +581,7 @@ docker-compose -f ../docker-compose.yml \
 **Problem:** E2E tests fail with Docker errors
 
 **Solution:**
+
 ```bash
 # Check Docker is running
 docker ps
@@ -564,6 +602,7 @@ docker-compose build --no-cache
 **Problem:** Scripts take too long to run
 
 **Solutions:**
+
 ```bash
 # Use parallel execution
 ./scripts/ci-check-local.sh --parallel
@@ -598,11 +637,13 @@ cd frontend
 #### 1. PostgreSQL Setup
 
 **CI:**
+
 - Uses GitHub Actions service
 - Fresh database on every run
 - Credentials: testdb/testuser/testpass
 
 **Local:**
+
 - Uses docker-compose or local PostgreSQL
 - Database persists between runs
 - Credentials configurable
@@ -611,16 +652,19 @@ cd frontend
 #### 2. Caching
 
 **CI:**
+
 - Maven: `~/.m2/repository` cached
 - pnpm: Cached by package manager
 - Fresh on new runners
 
 **Local:**
+
 - Maven: Cached locally
 - pnpm: Cached locally
 - May accumulate stale cache
 
 **To clear local cache:**
+
 ```bash
 # Maven
 rm -rf ~/.m2/repository
@@ -632,13 +676,16 @@ pnpm store prune
 #### 3. File Permissions
 
 **CI:**
+
 - All files have consistent permissions
 
 **Local:**
+
 - File permissions may vary
 - Scripts must be executable
 
 **To fix:**
+
 ```bash
 chmod +x scripts/**/*.sh
 chmod +x .husky/*
@@ -647,24 +694,29 @@ chmod +x .husky/*
 #### 4. Environment Variables
 
 **CI:**
+
 - Set in workflow files
 - Secrets managed by GitHub
 
 **Local:**
+
 - Set in shell or .env files
 - No secrets needed for basic checks
 
 #### 5. Build Artifacts
 
 **CI:**
+
 - Uploaded to GitHub Actions artifacts
 - Automatically cleaned up
 
 **Local:**
+
 - Remain in target/.next directories
 - Must clean manually
 
 **To clean:**
+
 ```bash
 # Backend
 cd backend && ./mvnw clean
@@ -725,11 +777,13 @@ pnpm test src/components/MyChangedComponent.test.tsx
 Before running full scripts:
 
 **IntelliJ IDEA:**
+
 - Run tests: Ctrl+Shift+F10
 - Run SpotBugs: Analyze → Inspect Code
 - Format code: Cmd+Opt+L
 
 **VSCode:**
+
 - Run tests: Test Explorer
 - ESLint: Problems panel (auto-fixes available)
 - Prettier: Format on Save
@@ -799,6 +853,7 @@ pnpm test --watch
 IntelliJ IDEA automatically uses Git hooks in `.husky/`.
 
 To disable temporarily:
+
 - Uncheck `Settings → Version Control → Commit → Run Git hooks`
 
 ### Visual Studio Code
@@ -864,6 +919,7 @@ Create `.vscode/keybindings.json`:
 VSCode automatically uses Git hooks in `.husky/`.
 
 To disable temporarily:
+
 - Add to `.git/hooks/` files: `exit 0` at the top
 
 ### Command Line Aliases
@@ -880,6 +936,7 @@ alias ci-full='./scripts/ci-check-local.sh --e2e --dependency-check'
 ```
 
 Then use:
+
 ```bash
 ci-check         # Standard check
 ci-backend       # Backend only
@@ -998,6 +1055,7 @@ The scripts should evolve with the project:
 **If `./scripts/ci-check-local.sh` passes locally, CI should pass.**
 
 If this rule is ever violated:
+
 1. Investigate the difference
 2. Update the scripts to match CI exactly
 3. Document the issue

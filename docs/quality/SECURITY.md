@@ -54,6 +54,7 @@ pnpm audit
 ```
 
 **評価基準**:
+
 - **Critical/High**: CI が失敗 ❌
 - **Moderate/Low**: 警告のみ（CI は成功）⚠️
 
@@ -66,6 +67,7 @@ pnpm licenses list
 ```
 
 **チェック内容**:
+
 - 禁止ライセンス（GPL系など）の検出
 - 全パッケージのライセンス一覧生成
 
@@ -78,6 +80,7 @@ npx depcheck
 ```
 
 **チェック内容**:
+
 - 使用されていない dependencies の検出
 - 使用されていない devDependencies の検出
 
@@ -138,11 +141,13 @@ GitHub の **Security** タブ → **Code scanning** から確認できます。
 #### 自動マージ戦略
 
 **推奨設定**:
+
 1. **Patch更新**: 自動マージ候補（例: `1.0.0` → `1.0.1`）
 2. **Minor更新**: 自動マージ候補（例: `1.0.0` → `1.1.0`）
 3. **Major更新**: 手動レビュー必須（例: `1.0.0` → `2.0.0`）
 
 **条件**:
+
 - ✅ すべてのCIチェックが通過
 - ✅ セキュリティスキャンで問題なし
 - ✅ テストがすべて成功
@@ -156,6 +161,7 @@ gh api repos/{owner}/{repo}/automated-security-fixes -X PUT
 ```
 
 または、GitHub UI で:
+
 1. Settings → Security → Dependabot → Enable Dependabot security updates
 
 ## セキュリティアラートへの対応
@@ -249,6 +255,7 @@ pnpm audit
 ```
 
 **詳細レポート**:
+
 ```bash
 pnpm audit --json > audit-report.json
 ```
@@ -330,6 +337,7 @@ codeql database analyze codeql-db --format=sarif-latest --output=results.sarif
 **問題**: 脆弱性が見つかったがパッチが利用できない
 
 **解決策**:
+
 1. `pnpm audit --fix` で自動修正を試す
 2. 手動でパッケージを更新
 3. 代替パッケージの検討
@@ -351,6 +359,7 @@ codeql database analyze codeql-db --format=sarif-latest --output=results.sarif
 **問題**: ビルドエラーで CodeQL が実行できない
 
 **解決策**:
+
 1. ローカルでビルドが成功することを確認
 2. 依存関係を最新に更新
 3. CodeQL ワークフローのビルドステップを確認
@@ -360,6 +369,7 @@ codeql database analyze codeql-db --format=sarif-latest --output=results.sarif
 **問題**: PRが大量に作成される
 
 **解決策**:
+
 1. `open-pull-requests-limit` を調整
 2. 更新頻度を変更（weekly → monthly）
 3. グループ化設定を検討

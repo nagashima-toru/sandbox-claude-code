@@ -38,10 +38,12 @@ gh issue view [Issue番号] --json state
 ```
 
 **確認項目**:
+
 - PRが `merged` 状態であるか
 - Issue が `open` 状態であるか
 
 **エラー時**: 上記条件を満たさない場合はエラーメッセージを表示：
+
 ```
 ❌ PR #102 はまだマージされていません
 
@@ -59,10 +61,12 @@ gh pr view [PR番号] --json files
 #### 2.2 仕様ファイルを特定
 
 変更ファイルリストから以下を抽出：
+
 - OpenAPI仕様ファイル（`specs/openapi/*.yaml`）
 - 受け入れ条件ファイル（`specs/acceptance/**/*.feature`）
 
 **例**:
+
 ```
 OpenAPI仕様:
 - specs/openapi/openapi.yaml
@@ -77,6 +81,7 @@ OpenAPI仕様:
 #### 2.3 エンドポイント情報を抽出（オプション）
 
 OpenAPI仕様ファイルを読み込み、追加されたエンドポイントを抽出：
+
 ```bash
 cat specs/openapi/openapi.yaml
 ```
@@ -84,6 +89,7 @@ cat specs/openapi/openapi.yaml
 ### 3. Issueにコメントを追加
 
 **コメント内容**:
+
 ```markdown
 ## ✅ 仕様承認完了
 
@@ -111,16 +117,21 @@ cat specs/openapi/openapi.yaml
   ```bash
   /plan-epic [Issue番号]
   ```
+
 - [ ] Epic ベースブランチ作成
+
   ```bash
   git checkout master && git pull origin master
   git checkout -b feature/issue-[N]-[name]
   git push origin feature/issue-[N]-[name]
   ```
+
 - [ ] Story 実装開始
+
   ```bash
   /implement-epic [Issue番号]
   ```
+
 ```
 
 **コマンド実行**:
@@ -135,6 +146,7 @@ gh issue edit [Issue番号] --add-label "spec-approved"
 ```
 
 **確認**:
+
 ```bash
 gh issue view [Issue番号] --json labels
 ```
@@ -170,21 +182,26 @@ Issue更新結果とNext Stepsをユーザーに表示：
    ```bash
    /plan-epic 88
    ```
-   - .epic/ ディレクトリ作成
-   - requirements.md, design.md, overview.md 生成
-   - Story分割とタスク定義
+
+- .epic/ ディレクトリ作成
+- requirements.md, design.md, overview.md 生成
+- Story分割とタスク定義
 
 2. **計画レビュー**（ステップ8）
+
    ```bash
    /review-plan 88
    ```
+
    - Story分割の妥当性を確認
    - 見積もりと依存関係をチェック
 
 3. **実装開始**（ステップ9）
+
    ```bash
    /implement-epic 88
    ```
+
 ```
 
 ---
@@ -193,43 +210,54 @@ Issue更新結果とNext Stepsをユーザーに表示：
 
 ### PRがマージされていない
 ```
+
 ❌ PR #102 はまだマージされていません
 
 現在の状態: open
 
 仕様PRのレビューを完了し、マージしてから再度実行してください
+
 ```
 
 ### Issueが存在しない
 ```
+
 ❌ Issue #88 が見つかりません
 
 Issue番号を確認してください
+
 ```
 
 ### Issueがクローズ済み
 ```
+
 ❌ Issue #88 は既にクローズされています
 
 オープン状態のIssueに対してのみ実行できます
+
 ```
 
 ### PRが存在しない
 ```
+
 ❌ PR #102 が見つかりません
 
 PR番号を確認してください
+
 ```
 
 ### 仕様ファイルが見つからない
 ```
+
 ⚠️ 警告: PR #102 から仕様ファイルが見つかりませんでした
 
 以下のファイルが含まれているか確認してください：
+
 - specs/openapi/*.yaml
 - specs/acceptance/**/*.feature
 
 仕様ファイルが含まれていない場合は、PRを修正してください
+
 ```
 
 ---

@@ -4,7 +4,8 @@ This document describes the Continuous Delivery (CD) pipeline for this project.
 
 ## Overview
 
-The CD pipeline automatically builds Docker images and pushes them to GitHub Container Registry (GHCR) when changes are merged to the main branch. The pipeline is designed to support both staging and production deployments.
+The CD pipeline automatically builds Docker images and pushes them to GitHub Container Registry (GHCR) when changes
+are merged to the main branch. The pipeline is designed to support both staging and production deployments.
 
 ## Architecture
 
@@ -167,21 +168,21 @@ Choose a cloud platform for automated deployment:
   3. Set environment variables
   4. Auto-deploy on push
 
-**Documentation**: https://render.com/docs
+**Documentation**: <https://render.com/docs>
 
 #### Railway
 
 - **Pros**: Simple, great free tier, good DX
 - **Setup**: Similar to Render
 
-**Documentation**: https://docs.railway.app
+**Documentation**: <https://docs.railway.app>
 
 #### Fly.io
 
 - **Pros**: Global edge deployment, generous free tier
 - **Setup**: Use `fly.toml` configuration
 
-**Documentation**: https://fly.io/docs
+**Documentation**: <https://fly.io/docs>
 
 #### AWS ECS (Advanced)
 
@@ -192,7 +193,7 @@ Choose a cloud platform for automated deployment:
   3. Create services with load balancers
   4. Configure auto-scaling
 
-**Documentation**: https://docs.aws.amazon.com/ecs
+**Documentation**: <https://docs.aws.amazon.com/ecs>
 
 #### Google Cloud Run (Advanced)
 
@@ -202,7 +203,7 @@ Choose a cloud platform for automated deployment:
   2. Deploy to Cloud Run from GHCR
   3. Configure environment variables
 
-**Documentation**: https://cloud.google.com/run/docs
+**Documentation**: <https://cloud.google.com/run/docs>
 
 ### Option 3: Kubernetes Deployment
 
@@ -302,10 +303,12 @@ If deployment fails:
 
 1. **Identify**: Previous working version tag
 2. **Redeploy**: Use specific image tag
+
    ```bash
    docker pull ghcr.io/[org]/[repo]/backend:v1.2.2
    docker compose up -d
    ```
+
 3. **Verify**: Health checks and functionality
 4. **Fix**: Address issues in code, then redeploy
 
@@ -368,6 +371,7 @@ Add notifications for deployment events:
 **Issue**: Docker build fails
 
 **Solutions**:
+
 - Check Dockerfile syntax
 - Verify base image availability
 - Ensure all dependencies are installed
@@ -376,6 +380,7 @@ Add notifications for deployment events:
 **Issue**: Maven build fails (backend)
 
 **Solutions**:
+
 - Verify Java version (21 required)
 - Check pom.xml for errors
 - Ensure tests pass locally
@@ -383,6 +388,7 @@ Add notifications for deployment events:
 **Issue**: Next.js build fails (frontend)
 
 **Solutions**:
+
 - Verify Node.js version (20 required)
 - Check for TypeScript errors
 - Ensure API client generation works
@@ -393,15 +399,17 @@ Add notifications for deployment events:
 **Issue**: Cannot push to GHCR
 
 **Solutions**:
+
 - Check `GITHUB_TOKEN` permissions (write:packages required)
 - Verify workflow permissions in settings
-- Check GHCR status: https://www.githubstatus.com
+- Check GHCR status: <https://www.githubstatus.com>
 
 ### Deployment Failures
 
 **Issue**: Container fails to start
 
 **Solutions**:
+
 - Check health check configuration
 - Verify environment variables
 - Check container logs
@@ -410,6 +418,7 @@ Add notifications for deployment events:
 **Issue**: Application returns errors
 
 **Solutions**:
+
 - Verify environment variables match deployment environment
 - Check database connection strings
 - Review application logs

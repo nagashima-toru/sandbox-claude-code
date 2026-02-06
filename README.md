@@ -45,6 +45,7 @@ See [frontend/README.md](frontend/README.md) for setup instructions.
 See [docs/README.md](docs/README.md) for complete documentation index organized by category.
 
 Key documents:
+
 - [CLAUDE.md](CLAUDE.md) - Project-wide development guidance
 - [Epic Documents](docs/development/EPIC_DOCUMENTS.md) - Epic-based development workflow
 - [Git Workflow](docs/development/GIT_WORKFLOW.md) - Branch strategy and PR workflow
@@ -86,14 +87,15 @@ Frontend connects to backend via `/api` (relative URL through nginx).
 
 | Mode | Access Point | Frontend API URL | Reason |
 |------|--------------|------------------|---------|
-| Development | http://localhost:3000 | `http://localhost:8080` | Direct backend access for debugging |
-| Production | http://localhost | `/api` | Nginx reverse proxy for production-ready setup |
+| Development | <http://localhost:3000> | `http://localhost:8080` | Direct backend access for debugging |
+| Production | <http://localhost> | `/api` | Nginx reverse proxy for production-ready setup |
 
 **Why Nginx Reverse Proxy in Production?**
 
-The frontend's `NEXT_PUBLIC_API_URL` is bundled into browser JavaScript. Using Docker internal hostnames like `http://backend:8080` fails because external browsers cannot resolve them. Nginx solves this by:
+The frontend's `NEXT_PUBLIC_API_URL` is bundled into browser JavaScript. Using Docker internal hostnames like
+`http://backend:8080` fails because external browsers cannot resolve them. Nginx solves this by:
 
-1. Providing a single access point (http://localhost)
+1. Providing a single access point (<http://localhost>)
 2. Both frontend and backend accessible through same domain (no CORS)
 3. Relative URLs work (`/api` resolves correctly)
 4. Production-ready and scalable
@@ -107,7 +109,7 @@ This project is configured for IntelliJ IDEA with Java 25 and Node.js 20+.
 
 ## Repository
 
-- **Remote**: https://github.com/nagashima-toru/sandbox-claude-code.git
+- **Remote**: <https://github.com/nagashima-toru/sandbox-claude-code.git>
 - **Main branch**: master
 
 ## License

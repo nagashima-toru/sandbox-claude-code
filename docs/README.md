@@ -5,6 +5,7 @@ This directory contains all project documentation organized by category.
 ## 📚 Quick Navigation
 
 ### Development Process
+
 Documentation for Epic-based development workflow and specifications.
 
 - [Epic Documents](development/EPIC_DOCUMENTS.md) - Epic planning and management
@@ -12,6 +13,7 @@ Documentation for Epic-based development workflow and specifications.
 - [Git Workflow](development/GIT_WORKFLOW.md) - Branch strategy and PR workflow
 
 ### Environment Setup
+
 Guides for setting up development environments.
 
 - [Docker Deployment](environment/DOCKER_DEPLOYMENT.md) - Docker dev/prod modes
@@ -19,12 +21,15 @@ Guides for setting up development environments.
 - [.gitignore Rules](environment/GITIGNORE_RULES.md) - .gitignore management
 
 ### Quality & Testing
+
 Documentation for code quality, testing, and security.
 
 - [Local CI Verification](quality/LOCAL_CI_VERIFICATION.md) - CI checks before push
+- [Markdown Linting](quality/MARKDOWN_LINTING.md) - Markdown validation
 - [Security](quality/SECURITY.md) - Security guidelines and Dependabot
 
 ### Frontend
+
 Frontend-specific documentation.
 
 - [Storybook](frontend/STORYBOOK.md) - Component development with Storybook
@@ -32,12 +37,14 @@ Frontend-specific documentation.
 - [Frontend Performance](frontend/FRONTEND_PERFORMANCE_MONITORING.md) - Bundle size monitoring
 
 ### Deployment & Operations
+
 Guides for deployment and production operations.
 
 - [Deployment](deployment/DEPLOYMENT.md) - CD pipeline and deployment
 - [Dependabot Docs Update](deployment/DEPENDABOT_DOCS_UPDATE.md) - Dependency update workflows
 
 ### Architecture & Design
+
 System architecture and design documentation.
 
 - [Architecture Overview](architecture/README.md) - System architecture overview
@@ -48,6 +55,7 @@ System architecture and design documentation.
 - [ADR Index](adr/) - Architectural Decision Records
 
 ### ADR (Architectural Decision Records)
+
 - [ADR-0001: OpenAPI-First](adr/0001-use-openapi-first.md) - OpenAPI-First approach
 
 ---
@@ -55,19 +63,23 @@ System architecture and design documentation.
 ## 📖 Documentation by Audience
 
 ### For All Developers
+
 - Epic Documents, Spec PR Guide, Git Workflow
 - Docker Deployment, Local CI Verification, Security
 - .gitignore Rules, Dependabot Docs Update
 
 ### For Frontend Developers
+
 - Storybook, Orval API Generation, Frontend Performance
 - API Design Guidelines, Error Handling
 
 ### For Backend Developers
+
 - API Design Guidelines, Error Handling
 - [Backend Test Strategy](../backend/docs/TEST_STRATEGY.md)
 
 ### For Architects & Tech Leads
+
 - Architecture Overview, C4 Diagrams
 - API Design Guidelines, ADRs
 - Deployment

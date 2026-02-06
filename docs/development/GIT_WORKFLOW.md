@@ -16,6 +16,7 @@ master (main branch)
 ```
 
 **例（認証・認可機能）:**
+
 ```
 master
   └── feature/issue-88-auth
@@ -65,6 +66,7 @@ gh pr create --base feature/issue-88-auth \
 ```
 
 **PR 本文の必須項目:**
+
 - `Story: #[Issue番号]` （例: `Story: #88`）
 - 変更内容の記載
 - 完了したタスクのチェックリスト
@@ -83,6 +85,7 @@ gh pr create --base master \
 ```
 
 **PR 本文の必須項目:**
+
 - `Closes #[Issue番号]` （例: `Closes #88`）
 - 全 Story の完了確認
 - テスト実施結果
@@ -154,6 +157,7 @@ feature/issue-[IssueNumber]-[epic-name]-story[N]
 ```
 
 **例:**
+
 - `feature/issue-88-auth` (epic ベース)
 - `feature/issue-88-auth-story1` (Story 1)
 - `feature/issue-88-auth-story2` (Story 2)

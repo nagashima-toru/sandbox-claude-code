@@ -42,6 +42,7 @@ Content-Type: `application/problem+json`
 **type**: `https://api.example.com/errors/validation-error`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/validation-error",
@@ -66,6 +67,7 @@ Content-Type: `application/problem+json`
 ```
 
 **Java 実装**:
+
 ```java
 @ExceptionHandler(MethodArgumentNotValidException.class)
 public ResponseEntity<ErrorResponse> handleValidationErrors(
@@ -103,6 +105,7 @@ public ResponseEntity<ErrorResponse> handleValidationErrors(
 **type**: `https://api.example.com/errors/invalid-parameter`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/invalid-parameter",
@@ -121,6 +124,7 @@ public ResponseEntity<ErrorResponse> handleValidationErrors(
 **type**: `https://api.example.com/errors/unauthorized`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/unauthorized",
@@ -139,6 +143,7 @@ public ResponseEntity<ErrorResponse> handleValidationErrors(
 **type**: `https://api.example.com/errors/invalid-token`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/invalid-token",
@@ -157,6 +162,7 @@ public ResponseEntity<ErrorResponse> handleValidationErrors(
 **type**: `https://api.example.com/errors/not-found`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/not-found",
@@ -169,6 +175,7 @@ public ResponseEntity<ErrorResponse> handleValidationErrors(
 ```
 
 **Java 実装**:
+
 ```java
 @ExceptionHandler(MessageNotFoundException.class)
 public ResponseEntity<ErrorResponse> handleMessageNotFound(
@@ -197,6 +204,7 @@ public ResponseEntity<ErrorResponse> handleMessageNotFound(
 **type**: `https://api.example.com/errors/duplicate-code`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/duplicate-code",
@@ -209,6 +217,7 @@ public ResponseEntity<ErrorResponse> handleMessageNotFound(
 ```
 
 **Java 実装**:
+
 ```java
 @ExceptionHandler(DuplicateMessageCodeException.class)
 public ResponseEntity<ErrorResponse> handleDuplicateCode(
@@ -237,6 +246,7 @@ public ResponseEntity<ErrorResponse> handleDuplicateCode(
 **type**: `https://api.example.com/errors/internal-error`
 
 **例**:
+
 ```json
 {
   "type": "https://api.example.com/errors/internal-error",
@@ -249,6 +259,7 @@ public ResponseEntity<ErrorResponse> handleDuplicateCode(
 ```
 
 **Java 実装**:
+
 ```java
 @ExceptionHandler(Exception.class)
 public ResponseEntity<ErrorResponse> handleGeneralException(
@@ -302,6 +313,7 @@ private String code;
 ```
 
 エラー:
+
 ```json
 {
   "field": "code",
@@ -318,6 +330,7 @@ private String code;
 ```
 
 エラー:
+
 ```json
 {
   "field": "code",
@@ -335,6 +348,7 @@ private String code;
 ```
 
 エラー:
+
 ```json
 {
   "field": "code",
@@ -497,6 +511,7 @@ const CreateMessageForm = () => {
 ### 機密情報の漏洩防止
 
 ❌ **悪い例**: 内部実装詳細を公開
+
 ```json
 {
   "detail": "SQLException: Duplicate entry 'MSG_001' for key 'messages.code'"
@@ -504,6 +519,7 @@ const CreateMessageForm = () => {
 ```
 
 ✅ **良い例**: 抽象化されたメッセージ
+
 ```json
 {
   "detail": "A message with the code 'MSG_001' already exists."
@@ -597,5 +613,6 @@ void createMessage_withDuplicateCode_shouldReturn409() {
 ---
 
 **メンテナンス情報**:
+
 - 最終更新: 2026-01-29
 - 更新タイミング: 新しいエラータイプ追加時、エラーハンドリング戦略変更時

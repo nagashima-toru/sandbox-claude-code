@@ -113,11 +113,13 @@ URL: https://github.com/nagashima-toru/sandbox-claude-code/issues/88
 ```
 
 このコマンドは以下を自動的に実行します：
+
 - **Step 2**: 要求仕様の理解（Issue内容の分析）
 - **Step 3**: 現在の実装調査（既存コード・API・DB調査）
 - **Step 4**: 仕様PR作成（OpenAPI + 受け入れ条件）
 
 要求理解と実装調査を踏まえた上で、適切な仕様を作成します。
+
 ```
 
 ---
@@ -132,6 +134,7 @@ gh auth login
 ```
 
 ### Issue 作成失敗
+
 - ネットワーク接続を確認
 - GitHub のアクセス権限を確認
 - リポジトリが正しいか確認

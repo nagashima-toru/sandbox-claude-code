@@ -49,6 +49,7 @@ pnpm build:analyze
 ```
 
 This command:
+
 1. Builds the Next.js application with bundle analyzer enabled
 2. Generates HTML reports in `frontend/.next/analyze/`
 3. Opens interactive visualizations showing:
@@ -78,6 +79,7 @@ Each PR receives an automated comment with:
 ### GitHub Actions Workflow
 
 The workflow (`frontend-performance.yml`) runs on:
+
 - Pull requests that modify frontend code
 - Pull requests that modify the workflow itself
 
@@ -104,6 +106,7 @@ pnpm build:analyze
 ```
 
 Look for:
+
 - Dependencies larger than 100KB
 - Unused portions of large libraries
 - Duplicate dependencies
@@ -128,8 +131,10 @@ const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
 ### 4. Tree Shaking
 
 Ensure tree shaking works by:
+
 - Using ES modules (import/export)
 - Importing only what you need:
+
   ```typescript
   // Good
   import { Button } from '@/components/ui/button';
@@ -172,12 +177,14 @@ To modify thresholds, edit `.github/workflows/frontend-performance.yml`:
 If bundle analysis doesn't run:
 
 1. Check that the workflow triggers on your PR:
+
    ```yaml
    paths:
      - 'frontend/**'
    ```
 
 2. Verify `@next/bundle-analyzer` is installed:
+
    ```bash
    cd frontend
    pnpm list @next/bundle-analyzer
@@ -221,6 +228,7 @@ Add Lighthouse CI for comprehensive performance metrics:
 ```
 
 This would measure:
+
 - Performance score
 - Accessibility score
 - Best practices score
