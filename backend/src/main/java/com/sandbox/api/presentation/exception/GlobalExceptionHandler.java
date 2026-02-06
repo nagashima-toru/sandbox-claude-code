@@ -120,7 +120,9 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleBadCredentials(
       BadCredentialsException ex, HttpServletRequest request) {
     LOGGER.warn(
-        "Authentication failed for request to URI: {}", sanitizeForLog(request.getRequestURI()));
+        "Authentication failed for request to URI: {} - {}",
+        sanitizeForLog(request.getRequestURI()),
+        ex.getMessage());
 
     ErrorResponse error =
         ErrorResponse.builder()
@@ -145,7 +147,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
   public ResponseEntity<ErrorResponse> handleAccessDenied(
       org.springframework.security.access.AccessDeniedException ex, HttpServletRequest request) {
-    LOGGER.warn("Access denied for request to URI: {}", sanitizeForLog(request.getRequestURI()));
+    LOGGER.warn(
+        "Access denied for request to URI: {} - {}",
+        sanitizeForLog(request.getRequestURI()),
+        ex.getMessage());
 
     ErrorResponse error =
         ErrorResponse.builder()

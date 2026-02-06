@@ -24,6 +24,7 @@ public class RefreshTokenStore implements TokenStore {
    * @param token the refresh token
    * @param userId the user ID
    */
+  @Override
   public void store(String token, Long userId) {
     tokenToUserIdMap.put(token, userId);
     log.debug("Stored refresh token for user ID: {}", userId);
@@ -35,6 +36,7 @@ public class RefreshTokenStore implements TokenStore {
    * @param token the refresh token to validate
    * @return true if the token exists, false otherwise
    */
+  @Override
   public boolean isValid(String token) {
     return tokenToUserIdMap.containsKey(token);
   }
@@ -45,6 +47,7 @@ public class RefreshTokenStore implements TokenStore {
    * @param token the refresh token
    * @return the user ID if found, null otherwise
    */
+  @Override
   public Long getUserId(String token) {
     return tokenToUserIdMap.get(token);
   }
@@ -54,6 +57,7 @@ public class RefreshTokenStore implements TokenStore {
    *
    * @param token the refresh token to remove
    */
+  @Override
   public void remove(String token) {
     Long userId = tokenToUserIdMap.remove(token);
     if (userId != null) {
@@ -66,6 +70,7 @@ public class RefreshTokenStore implements TokenStore {
    *
    * @param userId the user ID
    */
+  @Override
   public void removeAllForUser(Long userId) {
     tokenToUserIdMap.entrySet().removeIf(entry -> entry.getValue().equals(userId));
     log.debug("Removed all refresh tokens for user ID: {}", userId);

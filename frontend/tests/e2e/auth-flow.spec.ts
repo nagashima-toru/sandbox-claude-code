@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login, setupAuthenticatedSession } from './helpers';
+import { setupAuthenticatedSession } from './helpers';
 
 test.describe('Authentication Flow', () => {
   test('should login with valid credentials', async ({ page }) => {
