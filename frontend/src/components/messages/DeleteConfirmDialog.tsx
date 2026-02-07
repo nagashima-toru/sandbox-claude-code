@@ -38,7 +38,7 @@ export default function DeleteConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" data-testid="delete-confirm-dialog">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
@@ -71,10 +71,20 @@ export default function DeleteConfirmDialog({
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel} disabled={isDeleting}>
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            disabled={isDeleting}
+            data-testid="delete-cancel-button"
+          >
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={isDeleting}>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isDeleting}
+            data-testid="delete-confirm-button"
+          >
             {isDeleting ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogFooter>

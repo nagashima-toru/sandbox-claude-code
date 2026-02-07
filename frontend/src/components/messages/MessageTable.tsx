@@ -126,7 +126,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div data-testid="message-table" className="space-y-4">
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
@@ -143,7 +143,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
         <>
           <div className="border rounded-lg overflow-hidden">
             {/* Desktop Table View */}
-            <div className="hidden md:block">
+            <div className="hidden md:block" data-testid="message-table-desktop">
               <Table aria-label="Messages table">
                 <MessageTableHeader
                   sortField={sortField}
@@ -164,7 +164,12 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
             </div>
 
             {/* Mobile Card View */}
-            <div className="md:hidden divide-y" role="list" aria-label="Messages list">
+            <div
+              className="md:hidden divide-y"
+              data-testid="message-table-mobile"
+              role="list"
+              aria-label="Messages list"
+            >
               {paginatedMessages.map((message: MessageResponse) => (
                 <MessageCard
                   key={message.id}

@@ -41,7 +41,7 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
   );
 
   return (
-    <TableHeader>
+    <TableHeader data-testid="message-table-header">
       <TableRow>
         <TableHead className="w-[100px]">
           <button

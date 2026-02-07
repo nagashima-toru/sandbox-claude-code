@@ -15,7 +15,10 @@ const sizeClasses = {
 
 export function Loading({ className, size = 'md', text }: LoadingProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-2', className)}>
+    <div
+      data-testid="loading-spinner"
+      className={cn('flex flex-col items-center justify-center gap-2', className)}
+    >
       <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
       {text && <p className="text-sm text-muted-foreground">{text}</p>}
     </div>
