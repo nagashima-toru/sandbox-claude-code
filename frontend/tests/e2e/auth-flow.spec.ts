@@ -9,15 +9,15 @@ test.describe('Authentication Flow', () => {
 
     // Verify login form is visible
     await expect(page.getByRole('heading', { name: /ログイン/i })).toBeVisible();
-    await expect(page.locator('input[id="username"]')).toBeVisible();
-    await expect(page.locator('input[id="password"]')).toBeVisible();
+    await expect(page.getByTestId('login-username-input')).toBeVisible();
+    await expect(page.getByTestId('login-password-input')).toBeVisible();
 
     // Fill in credentials
-    await page.locator('input[id="username"]').fill('admin');
-    await page.locator('input[id="password"]').fill('admin123');
+    await page.getByTestId('login-username-input').fill('admin');
+    await page.getByTestId('login-password-input').fill('admin123');
 
     // Submit the form
-    await page.getByRole('button', { name: /ログイン/i }).click();
+    await page.getByTestId('login-submit-button').click();
 
     // Wait for redirect to home page
     await page.waitForURL('/', { timeout: 10000 });
@@ -34,11 +34,11 @@ test.describe('Authentication Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Fill in invalid credentials
-    await page.locator('input[id="username"]').fill('invalid_user');
-    await page.locator('input[id="password"]').fill('invalid_pass');
+    await page.getByTestId('login-username-input').fill('invalid_user');
+    await page.getByTestId('login-password-input').fill('invalid_pass');
 
     // Submit the form
-    await page.getByRole('button', { name: /ログイン/i }).click();
+    await page.getByTestId('login-submit-button').click();
 
     // Wait for potential API response
     await page.waitForTimeout(3000);
@@ -47,8 +47,8 @@ test.describe('Authentication Flow', () => {
     expect(page.url()).toContain('/login');
 
     // Verify the form is still visible (not redirected)
-    await expect(page.locator('input[id="username"]')).toBeVisible();
-    await expect(page.locator('input[id="password"]')).toBeVisible();
+    await expect(page.getByTestId('login-username-input')).toBeVisible();
+    await expect(page.getByTestId('login-password-input')).toBeVisible();
 
     // The key validation is that user is NOT redirected to home page
     expect(page.url()).toContain('/login');
@@ -114,7 +114,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForTimeout(2000);
 
     // Make an API call by interacting with the page (e.g., searching)
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await searchInput.fill('test');
     await page.waitForTimeout(600); // Wait for debounce
 
@@ -128,7 +128,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Submit empty form
-    await page.getByRole('button', { name: /ログイン/i }).click();
+    await page.getByTestId('login-submit-button').click();
 
     // Wait for validation errors
     await page.waitForTimeout(500);
@@ -139,7 +139,7 @@ test.describe('Authentication Flow', () => {
     await expect(form).toBeVisible();
 
     // Check if form is still on the page (not submitted)
-    const usernameInput = page.locator('input[id="username"]');
+    const usernameInput = page.getByTestId('login-username-input');
     await expect(usernameInput).toBeVisible();
   });
 });

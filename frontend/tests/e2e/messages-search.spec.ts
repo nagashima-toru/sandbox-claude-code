@@ -33,7 +33,9 @@ test.describe('Messages Search and Filter', () => {
     await page.waitForTimeout(600);
 
     // Should see at least one search test message
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST/i }).first()).toBeVisible({
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST")').first()
+    ).toBeVisible({
       timeout: 10000,
     });
 
@@ -46,9 +48,15 @@ test.describe('Messages Search and Filter', () => {
     await performSearch(page, 'SEARCH_TEST_1');
 
     // Verify only matching messages are visible
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_1/i }).first()).toBeVisible();
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_2/i })).not.toBeVisible();
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_3/i })).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_1")').first()
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_2")').first()
+    ).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_3")').first()
+    ).not.toBeVisible();
   });
 
   test('should search messages by content', async ({ page }) => {
@@ -56,9 +64,15 @@ test.describe('Messages Search and Filter', () => {
     await performSearch(page, 'Apple');
 
     // Verify only matching messages are visible
-    await expect(page.locator('tr', { hasText: /Apple/i }).first()).toBeVisible();
-    await expect(page.locator('tr', { hasText: /Banana/i })).not.toBeVisible();
-    await expect(page.locator('tr', { hasText: /Cherry/i })).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("Apple")').first()
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("Banana")').first()
+    ).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("Cherry")').first()
+    ).not.toBeVisible();
   });
 
   test('should show all messages when search is cleared', async ({ page }) => {
@@ -66,7 +80,9 @@ test.describe('Messages Search and Filter', () => {
     await performSearch(page, 'SEARCH_TEST_1');
 
     // Verify filtered results
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_1/i }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_1")').first()
+    ).toBeVisible();
 
     // Clear the search
     await clearSearch(page);
@@ -74,15 +90,21 @@ test.describe('Messages Search and Filter', () => {
     // Verify all test messages still exist by searching for each one
     // (can't check visibility directly due to pagination)
     await performSearch(page, 'SEARCH_TEST_1');
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_1/i }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_1")').first()
+    ).toBeVisible();
     await clearSearch(page);
 
     await performSearch(page, 'SEARCH_TEST_2');
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_2/i }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_2")').first()
+    ).toBeVisible();
     await clearSearch(page);
 
     await performSearch(page, 'SEARCH_TEST_3');
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_3/i }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_3")').first()
+    ).toBeVisible();
     await clearSearch(page);
   });
 
@@ -91,7 +113,9 @@ test.describe('Messages Search and Filter', () => {
     await performSearch(page, 'NONEXISTENT_MESSAGE_12345');
 
     // Verify no test messages are visible
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST/i })).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST")').first()
+    ).not.toBeVisible();
 
     // Check for "no results" or "not found" message
     const noResultsMessage = page.locator('text=/no results|not found|no messages|empty/i');
@@ -103,7 +127,9 @@ test.describe('Messages Search and Filter', () => {
     await performSearch(page, 'apple');
 
     // Verify the message with "Apple" (capitalized) is still found
-    await expect(page.locator('tr', { hasText: /Apple/i }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("Apple")').first()
+    ).toBeVisible();
   });
 
   test('should debounce search input', async ({ page }) => {
@@ -117,6 +143,8 @@ test.describe('Messages Search and Filter', () => {
     await page.waitForTimeout(600);
 
     // Verify results are now filtered
-    await expect(page.locator('tr', { hasText: /SEARCH_TEST_1/i }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_1")').first()
+    ).toBeVisible();
   });
 });

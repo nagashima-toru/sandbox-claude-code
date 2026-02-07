@@ -133,16 +133,33 @@
 
 4. **PR 作成**（必須: テンプレート使用）
 
+   **自動化環境での推奨方法**（`--template` は対話的なので使用不可）:
+
+   1. テンプレートファイルを読み込む
+   2. テンプレートの内容を Story の情報で埋める
+   3. 一時ファイルに保存して `--body-file` で渡す
+
    ```bash
+   # 実装例（実際には自動化スクリプト内で実行）
+   # 1. テンプレート内容を埋めたファイルを /tmp/pr-description.md に作成
+   # 2. --body-file で PR 作成
    gh pr create --base feature/issue-[N]-[epic-name] \
                 --head feature/issue-[N]-[epic-name]-story[X] \
-                --template .github/PULL_REQUEST_TEMPLATE/story.md
+                --title "Story [X]: [Story名]" \
+                --body-file /tmp/pr-description.md
    ```
 
-   **注意事項：**
-   - `--template` と `--body` は同時に使用不可
-   - `--fill-first` や `--fill` は使用禁止
-   - テンプレートの全項目を埋める
+   **テンプレート (`story.md`) で埋めるべき項目**:
+   - Story 番号と名前
+   - 変更内容（実装した内容を箇条書き）
+   - 完了した受け入れ条件（tasklist.md から）
+   - テスト結果（単体テスト、統合テスト、動作確認）
+   - 備考（補足事項があれば）
+
+   **注意事項**:
+   - テンプレートの構造に従った PR description を作成すること
+   - テンプレートの全項目を適切に埋めること
+   - `--body` で直接長文を渡すのではなく、`--body-file` を使用すること
 
 5. **PR URL の確認**
    - PR が正しく作成されたことを確認
