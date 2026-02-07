@@ -43,11 +43,11 @@ test.describe('Messages CRUD Operations', () => {
     await page.waitForTimeout(1000);
 
     // Search for the message to verify it was created (handles pagination)
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await searchInput.fill(code);
     await page.waitForTimeout(600);
 
-    const row = page.locator(`tr:has-text("${code}")`);
+    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
     await expect(row).toBeVisible({ timeout: 10000 });
   });
 
@@ -65,12 +65,14 @@ test.describe('Messages CRUD Operations', () => {
     await editMessage(page, originalCode, updatedContent);
 
     // Search for the message by code to verify it was updated (handles pagination)
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await searchInput.fill(originalCode);
     await page.waitForTimeout(600);
 
     // Verify the updated content appears in the table
-    const rowWithUpdatedContent = page.locator(`tr:has-text("${updatedContent}")`);
+    const rowWithUpdatedContent = page.locator(
+      `[data-testid^="message-row-"]:has-text("${updatedContent}")`
+    );
     await expect(rowWithUpdatedContent).toBeVisible();
   });
 
@@ -87,12 +89,12 @@ test.describe('Messages CRUD Operations', () => {
     await deleteMessage(page, code);
 
     // Search for the deleted message to verify it's gone (handles pagination)
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await searchInput.fill(code);
     await page.waitForTimeout(600);
 
     // Verify the message is no longer in the table
-    const deletedRow = page.locator(`tr:has-text("${code}")`);
+    const deletedRow = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
     await expect(deletedRow).not.toBeVisible();
   });
 
@@ -104,7 +106,7 @@ test.describe('Messages CRUD Operations', () => {
     await saveModalForm(page);
 
     // Modal should stay open due to validation errors
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
   });
 
