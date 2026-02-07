@@ -28,7 +28,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+    <div
+      data-testid="login-page"
+      className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12"
+    >
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold">ログイン</h1>
@@ -55,6 +58,7 @@ export default function LoginPage() {
               required
               disabled={isSubmitting}
               autoComplete="username"
+              data-testid="login-username-input"
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           </div>
@@ -72,6 +76,7 @@ export default function LoginPage() {
               required
               disabled={isSubmitting}
               autoComplete="current-password"
+              data-testid="login-password-input"
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           </div>
@@ -79,6 +84,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting || isLoading}
+            data-testid="login-submit-button"
             className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'ログイン中...' : 'ログイン'}

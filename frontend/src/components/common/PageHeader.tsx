@@ -17,6 +17,7 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <div
+      data-testid="page-header"
       className={cn(
         'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
         className

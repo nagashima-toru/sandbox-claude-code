@@ -32,7 +32,7 @@ test.describe('Messages Responsive Behavior', () => {
       await createMessage(page, code, content);
 
       // Search for the message to make sure it's visible
-      const searchInput = page.getByPlaceholder(/search/i);
+      const searchInput = page.getByTestId('search-input');
       await searchInput.fill(code);
       await page.waitForTimeout(600);
 
@@ -42,8 +42,8 @@ test.describe('Messages Responsive Behavior', () => {
 
       // Verify the mobile card layout is used (check for mobile-specific structure)
       // Mobile view has divs with p-4 class instead of table
-      const mobileCard = page.locator('.md\\:hidden').locator('div.p-4').first();
-      await expect(mobileCard).toBeVisible();
+      const mobileView = page.getByTestId('message-table-mobile');
+      await expect(mobileView).toBeVisible();
     });
 
     test('should have touch-friendly buttons on mobile', async ({ page }) => {
@@ -57,15 +57,23 @@ test.describe('Messages Responsive Behavior', () => {
       await createMessage(page, code, 'Mobile button test');
 
       // Search for the message
-      const searchInput = page.getByPlaceholder(/search/i);
+      const searchInput = page.getByTestId('search-input');
       await searchInput.fill(code);
       await page.waitForTimeout(600);
 
       // Verify edit and delete buttons are visible in mobile view
-      // Mobile view is in .md:hidden div
-      const mobileView = page.locator('.md\\:hidden');
-      const editButton = mobileView.getByRole('button', { name: /^edit message/i }).first();
-      const deleteButton = mobileView.getByRole('button', { name: /^delete message/i }).first();
+      const mobileView = page.getByTestId('message-table-mobile');
+
+      // Find the message row within mobile view and extract ID from data-testid
+      const row = mobileView.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
+      await expect(row).toBeVisible();
+
+      const rowTestId = await row.getAttribute('data-testid');
+      const messageId = rowTestId?.replace('message-row-', '') || '';
+
+      // Use data-testid for buttons within the row
+      const editButton = row.getByTestId(`edit-message-button-${messageId}`);
+      const deleteButton = row.getByTestId(`delete-message-button-${messageId}`);
 
       await expect(editButton).toBeVisible();
       await expect(deleteButton).toBeVisible();
@@ -84,7 +92,7 @@ test.describe('Messages Responsive Behavior', () => {
       await openCreateModal(page);
 
       // Modal should be visible
-      const modal = page.locator('[role="dialog"]');
+      const modal = page.getByTestId('message-modal');
       await expect(modal).toBeVisible();
 
       // Modal should take significant portion of viewport on mobile
@@ -135,18 +143,18 @@ test.describe('Messages Responsive Behavior', () => {
       await setupAuthenticatedSession(page);
 
       // Create button should be visible and accessible
-      const createButton = page.getByRole('button', { name: /new message/i });
+      const createButton = page.getByTestId('create-message-button');
       await expect(createButton).toBeVisible();
 
       // Search should be visible
-      const searchInput = page.getByPlaceholder(/search/i);
+      const searchInput = page.getByTestId('search-input');
       await expect(searchInput).toBeVisible();
 
       // Open create modal
       await openCreateModal(page);
 
       // Form fields should be visible and usable (scope to modal to avoid conflicts)
-      const modal = page.locator('[role="dialog"]');
+      const modal = page.getByTestId('message-modal');
       const codeInput = modal.getByLabel(/code/i);
       const contentInput = modal.getByLabel(/content/i);
 

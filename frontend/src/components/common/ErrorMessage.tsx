@@ -11,6 +11,7 @@ export function ErrorMessage({ message, className, variant = 'inline' }: ErrorMe
   if (variant === 'card') {
     return (
       <div
+        data-testid="error-message"
         className={cn('rounded-lg border border-destructive/50 bg-destructive/10 p-4', className)}
       >
         <div className="flex items-start gap-3">
@@ -25,7 +26,10 @@ export function ErrorMessage({ message, className, variant = 'inline' }: ErrorMe
   }
 
   return (
-    <div className={cn('flex items-center gap-2 text-sm text-destructive', className)}>
+    <div
+      data-testid="error-message"
+      className={cn('flex items-center gap-2 text-sm text-destructive', className)}
+    >
       <AlertCircle className="h-4 w-4 flex-shrink-0" />
       <span>{message}</span>
     </div>

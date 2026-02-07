@@ -57,7 +57,11 @@ export default function MessageForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form
+        data-testid="message-form"
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-6"
+      >
         {errorMessage && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
             {errorMessage}
@@ -70,7 +74,12 @@ export default function MessageForm({
             <FormItem>
               <FormLabel>Code</FormLabel>
               <FormControl>
-                <Input placeholder="Enter message code" {...field} disabled={isSubmitting} />
+                <Input
+                  placeholder="Enter message code"
+                  {...field}
+                  disabled={isSubmitting}
+                  data-testid="message-code-input"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,6 +98,7 @@ export default function MessageForm({
                   placeholder="Enter message content"
                   {...field}
                   disabled={isSubmitting}
+                  data-testid="message-content-input"
                 />
               </FormControl>
               <FormMessage />
@@ -97,10 +107,16 @@ export default function MessageForm({
         />
 
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            data-testid="message-form-cancel"
+          >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} data-testid="message-form-submit">
             {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         </div>

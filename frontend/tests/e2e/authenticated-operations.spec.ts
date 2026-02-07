@@ -16,12 +16,12 @@ test.describe('Authenticated Operations', () => {
     await createMessage(page, code, content);
 
     // Search for the created message
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await searchInput.fill(code);
     await page.waitForTimeout(600);
 
     // Verify message appears in the table
-    const row = page.locator(`tr:has-text("${code}")`);
+    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
     await expect(row).toBeVisible({ timeout: 10000 });
     await expect(row).toContainText(content);
 
@@ -32,7 +32,9 @@ test.describe('Authenticated Operations', () => {
     // Verify the updated content
     await searchInput.fill(code);
     await page.waitForTimeout(600);
-    const updatedRow = page.locator(`tr:has-text("${updatedContent}")`);
+    const updatedRow = page
+      .locator(`[data-testid^="message-row-"]:has-text("${updatedContent}")`)
+      .first();
     await expect(updatedRow).toBeVisible();
 
     // Delete the message
@@ -51,13 +53,13 @@ test.describe('Authenticated Operations', () => {
     await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
 
     // Verify search functionality works
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await expect(searchInput).toBeVisible();
     await searchInput.fill('test');
     await page.waitForTimeout(600);
 
     // Verify "New Message" button is accessible
-    const newButton = page.getByRole('button', { name: /new message/i });
+    const newButton = page.getByTestId('create-message-button');
     await expect(newButton).toBeVisible();
 
     // Table might not be visible on small screens, so we just verify the page loaded
@@ -74,12 +76,12 @@ test.describe('Authenticated Operations', () => {
     await createMessage(page, code, content);
 
     // Search for the message
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByTestId('search-input');
     await searchInput.fill(code);
     await page.waitForTimeout(600);
 
     // Verify message was created
-    const row = page.locator(`tr:has-text("${code}")`);
+    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
     await expect(row).toBeVisible({ timeout: 10000 });
 
     // Clean up
@@ -100,11 +102,11 @@ test.describe('Authenticated Operations', () => {
       await page.waitForTimeout(1000);
 
       // Verify message was created
-      const searchInput = page.getByPlaceholder(/search/i);
+      const searchInput = page.getByTestId('search-input');
       await searchInput.fill(code);
       await page.waitForTimeout(600);
 
-      const row = page.locator(`tr:has-text("${code}")`);
+      const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
       await expect(row).toBeVisible({ timeout: 10000 });
 
       // Clean up
