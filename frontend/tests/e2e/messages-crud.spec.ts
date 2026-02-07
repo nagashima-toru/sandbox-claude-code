@@ -70,9 +70,9 @@ test.describe('Messages CRUD Operations', () => {
     await page.waitForTimeout(600);
 
     // Verify the updated content appears in the table
-    const rowWithUpdatedContent = page.locator(
-      `[data-testid^="message-row-"]:has-text("${updatedContent}")`
-    );
+    const rowWithUpdatedContent = page
+      .locator(`[data-testid^="message-row-"]:has-text("${updatedContent}")`)
+      .first();
     await expect(rowWithUpdatedContent).toBeVisible();
   });
 

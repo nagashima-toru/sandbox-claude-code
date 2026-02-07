@@ -204,8 +204,8 @@ export async function editMessage(
   const rowTestId = await row.getAttribute('data-testid');
   const messageId = rowTestId?.replace('message-row-', '') || '';
 
-  // Click the edit button for this specific message
-  await page.getByTestId(`edit-message-button-${messageId}`).click();
+  // Click the edit button for this specific message (use first() to handle desktop/mobile views)
+  await page.getByTestId(`edit-message-button-${messageId}`).first().click();
 
   await waitForModal(page);
   await fillFormField(page, 'content', newContent);
@@ -234,8 +234,8 @@ export async function deleteMessage(page: Page, code: string): Promise<void> {
   const rowTestId = await row.getAttribute('data-testid');
   const messageId = rowTestId?.replace('message-row-', '') || '';
 
-  // Click the delete button for this specific message
-  await page.getByTestId(`delete-message-button-${messageId}`).click();
+  // Click the delete button for this specific message (use first() to handle desktop/mobile views)
+  await page.getByTestId(`delete-message-button-${messageId}`).first().click();
 
   // Wait for confirmation dialog
   const confirmDialog = page.getByTestId('delete-confirm-dialog');

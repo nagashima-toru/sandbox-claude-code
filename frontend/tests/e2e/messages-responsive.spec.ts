@@ -64,16 +64,16 @@ test.describe('Messages Responsive Behavior', () => {
       // Verify edit and delete buttons are visible in mobile view
       const mobileView = page.getByTestId('message-table-mobile');
 
-      // Find the message row and extract ID from data-testid
-      const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
+      // Find the message row within mobile view and extract ID from data-testid
+      const row = mobileView.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
       await expect(row).toBeVisible();
 
       const rowTestId = await row.getAttribute('data-testid');
       const messageId = rowTestId?.replace('message-row-', '') || '';
 
-      // Use data-testid for buttons
-      const editButton = page.getByTestId(`edit-message-button-${messageId}`);
-      const deleteButton = page.getByTestId(`delete-message-button-${messageId}`);
+      // Use data-testid for buttons within the row
+      const editButton = row.getByTestId(`edit-message-button-${messageId}`);
+      const deleteButton = row.getByTestId(`delete-message-button-${messageId}`);
 
       await expect(editButton).toBeVisible();
       await expect(deleteButton).toBeVisible();
