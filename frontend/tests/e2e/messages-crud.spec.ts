@@ -47,7 +47,7 @@ test.describe('Messages CRUD Operations', () => {
     await searchInput.fill(code);
     await page.waitForTimeout(600);
 
-    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
+    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
     await expect(row).toBeVisible({ timeout: 10000 });
   });
 
@@ -94,7 +94,7 @@ test.describe('Messages CRUD Operations', () => {
     await page.waitForTimeout(600);
 
     // Verify the message is no longer in the table
-    const deletedRow = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
+    const deletedRow = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
     await expect(deletedRow).not.toBeVisible();
   });
 

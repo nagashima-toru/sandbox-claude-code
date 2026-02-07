@@ -52,10 +52,10 @@ test.describe('Messages Search and Filter', () => {
       page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_1")').first()
     ).toBeVisible();
     await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_2")')
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_2")').first()
     ).not.toBeVisible();
     await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_3")')
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_3")').first()
     ).not.toBeVisible();
   });
 
@@ -68,10 +68,10 @@ test.describe('Messages Search and Filter', () => {
       page.locator('[data-testid^="message-row-"]:has-text("Apple")').first()
     ).toBeVisible();
     await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("Banana")')
+      page.locator('[data-testid^="message-row-"]:has-text("Banana")').first()
     ).not.toBeVisible();
     await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("Cherry")')
+      page.locator('[data-testid^="message-row-"]:has-text("Cherry")').first()
     ).not.toBeVisible();
   });
 
@@ -114,7 +114,7 @@ test.describe('Messages Search and Filter', () => {
 
     // Verify no test messages are visible
     await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST")')
+      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST")').first()
     ).not.toBeVisible();
 
     // Check for "no results" or "not found" message

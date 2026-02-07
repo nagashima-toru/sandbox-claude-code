@@ -21,7 +21,7 @@ test.describe('Authenticated Operations', () => {
     await page.waitForTimeout(600);
 
     // Verify message appears in the table
-    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
+    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
     await expect(row).toBeVisible({ timeout: 10000 });
     await expect(row).toContainText(content);
 
@@ -32,7 +32,9 @@ test.describe('Authenticated Operations', () => {
     // Verify the updated content
     await searchInput.fill(code);
     await page.waitForTimeout(600);
-    const updatedRow = page.locator(`[data-testid^="message-row-"]:has-text("${updatedContent}")`);
+    const updatedRow = page
+      .locator(`[data-testid^="message-row-"]:has-text("${updatedContent}")`)
+      .first();
     await expect(updatedRow).toBeVisible();
 
     // Delete the message
@@ -79,7 +81,7 @@ test.describe('Authenticated Operations', () => {
     await page.waitForTimeout(600);
 
     // Verify message was created
-    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
+    const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
     await expect(row).toBeVisible({ timeout: 10000 });
 
     // Clean up
@@ -104,7 +106,7 @@ test.describe('Authenticated Operations', () => {
       await searchInput.fill(code);
       await page.waitForTimeout(600);
 
-      const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`);
+      const row = page.locator(`[data-testid^="message-row-"]:has-text("${code}")`).first();
       await expect(row).toBeVisible({ timeout: 10000 });
 
       // Clean up
