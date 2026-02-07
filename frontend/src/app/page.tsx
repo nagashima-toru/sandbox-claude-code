@@ -118,7 +118,7 @@ export default function Home() {
   }, [logout, router]);
 
   return (
-    <main className="min-h-screen p-8">
+    <main data-testid="messages-page" className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <PageHeader
           title="Message Management"
@@ -129,6 +129,7 @@ export default function Home() {
                 createMutation.reset(); // Clear previous errors
                 setIsCreateModalOpen(true);
               }}
+              data-testid="create-message-button"
             >
               <Plus className="h-4 w-4 mr-2" />
               New Message
