@@ -36,7 +36,7 @@ export default function MessageModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" data-testid="message-modal">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Create New Message' : 'Edit Message'}</DialogTitle>
           <DialogDescription>

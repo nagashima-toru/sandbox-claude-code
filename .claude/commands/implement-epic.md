@@ -51,17 +51,61 @@
 
 ### Phase 1: Story の開始
 
-1. **Story ディレクトリの確認**
+1. **前提条件の確認**（Story 2 以降は必須）
+
+   **1.1. 前の Story の完了確認**
+
+   ```bash
+   # overview.md で前の Story が ✅ マークされているか確認
+   grep -A 10 "Story [N-1]" .epic/[日付]-[issue番号]-[epic名]/overview.md
+   ```
+
+   - 前の Story が未完了（✅ なし）の場合は実装を中断
+   - AskUserQuestion で「Story [N-1] が未完了ですが、Story [N] を開始しますか？」と確認
+
+   **1.2. 前の Story の PR マージ確認**
+
+   ```bash
+   # 前の Story の PR がマージされているか確認
+   gh pr list --head feature/issue-[N]-[epic-name]-story[N-1] --state merged
+   ```
+
+   - マージされていない場合は警告を表示
+   - AskUserQuestion で「Story [N-1] の PR がマージされていませんが、Story [N] を開始しますか？」と確認
+   - **推奨**: 前の Story のマージを待つ（依存関係の問題を防ぐため）
+
+2. **Epic ベースブランチの最新化**（Story 2 以降、前 Story マージ済みの場合）
+
+   前の Story がマージされている場合、Epic ベースブランチを最新化する：
+
+   ```bash
+   # Epic ベースブランチに切り替え
+   git checkout feature/issue-[N]-[epic-name]
+
+   # リモートの最新を取得
+   git pull origin feature/issue-[N]-[epic-name]
+
+   # 最新化されたことを確認
+   git log --oneline -5
+   ```
+
+   - 前の Story のマージコミットが含まれていることを確認
+   - 含まれていない場合は `git pull` を再実行
+   - コンフリクトがある場合は解決してから次に進む
+
+   **重要**: この手順を省略すると、前の Story の変更が含まれない状態で Story ブランチを作成してしまい、テスト失敗や手戻りの原因となる
+
+3. **Story ディレクトリの確認**
    - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
    - 全タスクの内容と受け入れ条件を理解する
 
-2. **Story ブランチの作成**
+4. **Story ブランチの作成**
 
    ```bash
    git checkout -b feature/issue-[N]-[epic-name]-story[X]
    ```
 
-3. **TaskCreate でタスク管理開始**
+5. **TaskCreate でタスク管理開始**
    - tasklist.md の各タスクを TaskCreate で登録
    - 見積もり時間も記録
 
@@ -79,6 +123,37 @@
    - CLAUDE.md の開発ガイドラインに従う
    - Backend: Clean Architecture、JUnit テスト必須
    - Frontend: Functional components、named exports、テスト・Storybook 必須
+
+   **テストケース変更時の特別ルール**:
+
+   既存のテストケースを変更する場合（アサーション、期待値、テストロジックなど）：
+
+   a. **変更理由の明確化**
+      - なぜテストケースを変更する必要があるのか
+      - 仕様変更か、テストの不具合修正か、リファクタリングか
+
+   b. **ユーザーへの確認**（必須）
+
+      AskUserQuestion で以下を確認：
+
+      ```
+      「既存のテストケース [ファイル名:行番号] を変更する必要があります。
+
+      変更内容:
+      - Before: [現在のテストコード]
+      - After: [変更後のテストコード]
+
+      変更理由: [理由]
+
+      この変更を行ってよろしいですか？」
+      ```
+
+      - テストケースの変更は仕様の変更を意味する可能性がある
+      - 自己判断での変更は避け、必ずユーザーの承認を得る
+
+   c. **新規テスト追加の優先**
+      - 既存テストを変更するより、新規テストを追加する方が安全
+      - 既存テストは残したまま、新しいテストケースを追加できないか検討
 
 3. **ローカルテスト**
    - Backend: `cd backend && ./mvnw test`
@@ -119,19 +194,53 @@
 1. **overview.md の更新**
    - `.epic/[日付]-[issue番号]-[epic名]/overview.md` の該当 Story に ✅ マーク
 
-2. **最終確認**
+2. **Story 全体のテスト実行**（必須）
+
+   Story の全タスク完了後、push 前に必ずテストを実行する：
+
+   ```bash
+   # Backend の場合
+   cd backend && ./mvnw test
+
+   # Frontend の場合
+   cd frontend && pnpm test
+
+   # E2E テストを修正した場合
+   cd frontend && pnpm test:e2e
+   ```
+
+   **重要**: テストコードを修正した場合、必ず以下を実行：
+   - [ ] 修正したテストを実行して成功することを確認
+   - [ ] 全テストを実行してリグレッションがないことを確認
+   - [ ] テスト結果を tasklist.md に記録
+
+   **テスト未実行での push は禁止**:
+   - テストを実行せずに push すると CI で失敗し、手戻りが発生する
+   - 「e2e テストの確認したよな？」と言われないように、必ずローカルで確認する
+
+3. **CI チェックのローカル実行**（推奨）
+
+   push 前に CI チェックをローカルで実行することを推奨：
+
+   ```bash
+   ./scripts/ci-check-local.sh
+   ```
+
+   - 時間がかかる場合はスキップ可能だが、CI 失敗のリスクがある
+
+4. **最終確認**
    - [ ] 全タスクが完了している
    - [ ] 全テストが通過している
    - [ ] セルフレビューが全て記録されている
    - [ ] tasklist.md の進捗が更新されている
 
-3. **ブランチのプッシュ**
+5. **ブランチのプッシュ**
 
    ```bash
    git push origin feature/issue-[N]-[epic-name]-story[X]
    ```
 
-4. **PR 作成**（必須: テンプレート使用）
+6. **PR 作成**（必須: テンプレート使用）
 
    **自動化環境での推奨方法**（`--template` は対話的なので使用不可）:
 
@@ -161,7 +270,7 @@
    - テンプレートの全項目を適切に埋めること
    - `--body` で直接長文を渡すのではなく、`--body-file` を使用すること
 
-5. **PR URL の確認**
+7. **PR URL の確認**
    - PR が正しく作成されたことを確認
    - URL をユーザーに報告
 

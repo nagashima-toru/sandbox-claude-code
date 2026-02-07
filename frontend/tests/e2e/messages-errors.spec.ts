@@ -27,7 +27,7 @@ test.describe('Messages Error Handling', () => {
     await saveModalForm(page);
 
     // Modal should stay open due to validation error
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
   });
 
@@ -42,7 +42,7 @@ test.describe('Messages Error Handling', () => {
     await saveModalForm(page);
 
     // Modal should stay open due to validation error
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
   });
 
@@ -58,7 +58,7 @@ test.describe('Messages Error Handling', () => {
     await saveModalForm(page);
 
     // Modal should stay open due to validation error
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
   });
 
@@ -74,7 +74,7 @@ test.describe('Messages Error Handling', () => {
     await saveModalForm(page);
 
     // Modal should stay open due to validation error
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
   });
 
@@ -109,7 +109,7 @@ test.describe('Messages Error Handling', () => {
     await cancelModalForm(page);
 
     // Modal should close
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).not.toBeVisible();
 
     // Message count should remain the same
@@ -136,7 +136,7 @@ test.describe('Messages Error Handling', () => {
     await page.waitForTimeout(2000);
 
     // Modal should stay open due to network error
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
 
     // Restore online mode
@@ -155,7 +155,7 @@ test.describe('Messages Error Handling', () => {
     await saveModalForm(page);
 
     // Modal should stay open due to validation error
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByTestId('message-modal');
     await expect(modal).toBeVisible();
   });
 });
