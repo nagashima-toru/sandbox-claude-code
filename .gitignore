@@ -57,3 +57,6 @@ logs/
 
 # Epic documents (local development planning)
 .epic/
+
+# Retrospectives (personal reflections)
+.retrospectives/
