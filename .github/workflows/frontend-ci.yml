@@ -238,7 +238,7 @@ jobs:
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Set up JDK 25 for backend build
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'temurin'
