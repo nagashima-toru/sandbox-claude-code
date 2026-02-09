@@ -102,6 +102,27 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /api/users/me:
+    get:
+      tags:
+        - Auth
+      summary: ユーザー情報取得
+      description: |
+        現在ログイン中のユーザー情報を取得します。
+        レスポンスにはユーザー名とロール情報が含まれます。
+
+        **受け入れ条件:** specs/acceptance/auth/get-current-user.feature
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: ユーザー情報取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /api/messages:
     get:
       tags:
@@ -397,6 +418,25 @@ components:
           type: string
           description: リフレッシュトークン
           example: 'eyJhbGciOiJIUzI1NiIs...'
+
+    UserResponse:
+      type: object
+      description: ユーザー情報レスポンス
+      required:
+        - username
+        - role
+      properties:
+        username:
+          type: string
+          description: ユーザー名
+          example: 'admin'
+        role:
+          type: string
+          description: ユーザーロール
+          enum:
+            - ADMIN
+            - VIEWER
+          example: 'ADMIN'
 
     # メッセージ関連スキーマ
     MessageRequest:
