@@ -23,6 +23,17 @@
 - Issue がオープン状態である
 - 仕様PR（OpenAPI + 受け入れ条件）がマージ済みである
 
+### ⚠️ 重要な前提
+
+**仕様PRには実装コードを含まない**: SDD（仕様駆動開発）では、仕様PR（ステップ4）でOpenAPI仕様と受け入れ条件のみを追加し、実装コード（バックエンド・フロントエンド）は含めません。実装はステップ9以降で行います。
+
+そのため、**仕様PRで追加されたAPIエンドポイントは未実装**であることを前提として実装計画を立てる必要があります：
+
+- **バックエンド実装**: 仕様PRで追加されたエンドポイントのController、UseCase、DTOなどを実装
+- **フロントエンド実装**: APIクライアント生成、Hooks、コンポーネント統合などを実装
+
+既存のエンドポイントを使用する場合でも、実装の有無を必ず確認してください。
+
 ---
 
 ## 実行フロー
@@ -66,6 +77,40 @@ cat specs/openapi/openapi.yaml
 # 受け入れ条件
 cat specs/acceptance/[機能名]/*.feature
 ```
+
+#### 2.3 既存実装の確認（重要）
+
+仕様PRで追加されたAPIエンドポイントが既に実装されているか確認します。
+
+**バックエンド実装の確認**:
+
+```bash
+# OpenAPI仕様から追加されたエンドポイントを特定
+# 例: /api/users/me
+
+# Controller検索
+find backend/src -name "*Controller.java" -type f | xargs grep -l "users/me"
+
+# UseCase検索（エンドポイント名から推測）
+find backend/src -name "*UseCase.java" -type f | xargs grep -l "getCurrentUser"
+```
+
+**フロントエンド実装の確認**（オプション）:
+
+```bash
+# API呼び出し検索
+grep -r "getCurrentUser" frontend/src/lib/api/
+
+# Orval生成ファイル確認
+ls -la frontend/src/lib/api/generated/auth/
+```
+
+**判定**:
+
+- ✅ **実装が存在する**: フロントエンド実装のみをStoryに含める
+- ❌ **実装が存在しない**: バックエンド実装とフロントエンド実装の両方をStoryに含める
+
+**注意**: OpenAPI仕様に定義されていても、実装が存在しない場合がほとんどです。必ず確認してください。
 
 ### 3. Epicディレクトリの作成
 
@@ -292,6 +337,15 @@ EOF
 - 各Storyは独立して実装・テスト可能
 - 1 Story = 2-4時間程度
 - 依存関係を明確にする
+
+**⚠️ バックエンド実装の考慮**:
+
+仕様PRで追加されたAPIエンドポイントが未実装の場合（ほとんどの場合）、**Story 1としてバックエンドAPI実装を追加**します：
+
+- **Story 1: バックエンドAPI実装**: Controller、UseCase、DTO、テストなど
+- **Story 2以降**: フロントエンド実装やUI改善
+
+バックエンドAPIが存在しないと、フロントエンドの実装・テストができないため、必ず最初に実装します。
 
 **Story 分割の詳細ガイドライン**:
 
