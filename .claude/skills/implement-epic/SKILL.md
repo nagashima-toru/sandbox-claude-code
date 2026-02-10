@@ -209,6 +209,19 @@ description: Execute Story implementation workflow including task management, te
    - Frontend: `cd frontend && pnpm test`
    - 全テストが通ることを確認
 
+   **統合テスト失敗時のトラブルシューティング**:
+
+   統合テストが失敗した場合、以下をチェック：
+
+   | 症状 | 原因の可能性 | 確認方法 | 解決策 |
+   |------|-------------|---------|--------|
+   | ログイン認証が失敗 | 古いパスワードハッシュが残っている | ログを確認: "Failed login attempt" | `ON CONFLICT DO UPDATE` を使用 |
+   | ランダムに認証失敗 | パスワードハッシュを使い回している | setUp() のコードを確認 | 各ユーザーで個別に `passwordEncoder.encode()` を呼び出す |
+   | 前回のテストデータが残る | トランザクションロールバックが無効 | `@Transactional` の有無を確認 | テストクラスに `@Transactional` を追加 |
+   | ポート競合エラー | `integration-test` ゴールを使用 | コマンド履歴を確認 | `./mvnw verify` を使用 |
+
+   詳細は `backend/CLAUDE.md` の「Integration Test Best Practices」セクションを参照。
+
 4. **セルフレビューの実施と記録**
    - 実装内容を確認
    - 重要な指摘事項を抽出
@@ -277,11 +290,23 @@ description: Execute Story implementation workflow including task management, te
 
    - 時間がかかる場合はスキップ可能だが、CI 失敗のリスクがある
 
-4. **最終確認**
-   - [ ] 全タスクが完了している
+4. **最終確認**（Story 完了チェックリスト）
+
+   **必須項目**:
+   - [ ] 全タスクが完了している（TaskList で確認）
    - [ ] 全テストが通過している
+     - [ ] 単体テスト成功（`./mvnw test` または `pnpm test`）
+     - [ ] 統合テスト成功（該当する場合）
+     - [ ] E2Eテスト成功（該当する場合）
+   - [ ] `./mvnw verify` または `pnpm build` が成功している
    - [ ] セルフレビューが全て記録されている
    - [ ] tasklist.md の進捗が更新されている
+   - [ ] overview.md に ✅ マークを追加している
+
+   **推奨項目**:
+   - [ ] CI チェックをローカルで実行（`./scripts/ci-check-local.sh`）
+   - [ ] コミットメッセージが適切（Co-Authored-By 含む）
+   - [ ] 変更ファイルが適切にステージングされている
 
 5. **ブランチのプッシュ**
 
