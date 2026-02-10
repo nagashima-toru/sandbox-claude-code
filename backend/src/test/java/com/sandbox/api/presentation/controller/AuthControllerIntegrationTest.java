@@ -43,13 +43,20 @@ class AuthControllerIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    // Insert test user
-    String hashedPassword = passwordEncoder.encode("password123");
+    // Insert test users (each with their own password hash)
+    // Use ON CONFLICT UPDATE to ensure password_hash is always fresh for testing
     jdbcTemplate.update(
         "INSERT INTO users (username, password_hash, role, enabled, created_at) "
-            + "VALUES (?, ?, 'ADMIN', true, NOW()) ON CONFLICT DO NOTHING",
+            + "VALUES (?, ?, 'ADMIN', true, NOW()) "
+            + "ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash",
         "testuser",
-        hashedPassword);
+        passwordEncoder.encode("password123"));
+    jdbcTemplate.update(
+        "INSERT INTO users (username, password_hash, role, enabled, created_at) "
+            + "VALUES (?, ?, 'VIEWER', true, NOW()) "
+            + "ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash",
+        "viewer",
+        passwordEncoder.encode("password123"));
   }
 
   @Test
@@ -213,6 +220,84 @@ class AuthControllerIntegrationTest {
             post("/api/auth/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(logoutRequest))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void getCurrentUser_withAdminUser_returns200WithAdminRole() throws Exception {
+    // Login to get access token
+    String loginRequest =
+        """
+        {
+            "username": "testuser",
+            "password": "password123"
+        }
+        """;
+
+    MvcResult loginResult =
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginRequest))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    String loginResponse = loginResult.getResponse().getContentAsString();
+    var loginResponseMap = objectMapper.readValue(loginResponse, java.util.Map.class);
+    String accessToken = (String) loginResponseMap.get("accessToken");
+
+    // Get current user info
+    mockMvc
+        .perform(get("/api/users/me").header("Authorization", "Bearer " + accessToken))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.username", is("testuser")))
+        .andExpect(jsonPath("$.role", is("ADMIN")));
+  }
+
+  @Test
+  void getCurrentUser_withViewerUser_returns200WithViewerRole() throws Exception {
+    // Login to get access token
+    String loginRequest =
+        """
+        {
+            "username": "viewer",
+            "password": "password123"
+        }
+        """;
+
+    MvcResult loginResult =
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginRequest))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    String loginResponse = loginResult.getResponse().getContentAsString();
+    var loginResponseMap = objectMapper.readValue(loginResponse, java.util.Map.class);
+    String accessToken = (String) loginResponseMap.get("accessToken");
+
+    // Get current user info
+    mockMvc
+        .perform(get("/api/users/me").header("Authorization", "Bearer " + accessToken))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.username", is("viewer")))
+        .andExpect(jsonPath("$.role", is("VIEWER")));
+  }
+
+  @Test
+  void getCurrentUser_withoutAuthentication_returns401() throws Exception {
+    mockMvc.perform(get("/api/users/me")).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void getCurrentUser_withInvalidToken_returns401() throws Exception {
+    mockMvc
+        .perform(get("/api/users/me").header("Authorization", "Bearer invalid-token"))
         .andExpect(status().isUnauthorized());
   }
 }

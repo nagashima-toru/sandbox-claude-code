@@ -1,5 +1,6 @@
 package com.sandbox.api.presentation.controller;
 
+import com.sandbox.api.application.usecase.auth.GetCurrentUserUseCase;
 import com.sandbox.api.application.usecase.auth.LoginUseCase;
 import com.sandbox.api.application.usecase.auth.LogoutUseCase;
 import com.sandbox.api.application.usecase.auth.RefreshTokenUseCase;
@@ -15,6 +16,7 @@ public class AuthController implements AuthApi {
   private final LoginUseCase loginUseCase;
   private final RefreshTokenUseCase refreshTokenUseCase;
   private final LogoutUseCase logoutUseCase;
+  private final GetCurrentUserUseCase getCurrentUserUseCase;
 
   /**
    * Constructs a new AuthController with the required use cases.
@@ -22,14 +24,17 @@ public class AuthController implements AuthApi {
    * @param loginUseCase use case for user login
    * @param refreshTokenUseCase use case for refreshing access token
    * @param logoutUseCase use case for user logout
+   * @param getCurrentUserUseCase use case for retrieving current user information
    */
   public AuthController(
       LoginUseCase loginUseCase,
       RefreshTokenUseCase refreshTokenUseCase,
-      LogoutUseCase logoutUseCase) {
+      LogoutUseCase logoutUseCase,
+      GetCurrentUserUseCase getCurrentUserUseCase) {
     this.loginUseCase = loginUseCase;
     this.refreshTokenUseCase = refreshTokenUseCase;
     this.logoutUseCase = logoutUseCase;
+    this.getCurrentUserUseCase = getCurrentUserUseCase;
   }
 
   @Override
@@ -56,5 +61,12 @@ public class AuthController implements AuthApi {
     com.sandbox.api.application.dto.RefreshRequest internal = AuthMapper.toInternal(refreshRequest);
     logoutUseCase.execute(internal.getRefreshToken());
     return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public ResponseEntity<com.sandbox.api.presentation.generated.model.UserResponse>
+      getCurrentUser() {
+    com.sandbox.api.application.dto.UserResponse response = getCurrentUserUseCase.execute();
+    return ResponseEntity.ok(AuthMapper.toGenerated(response));
   }
 }
