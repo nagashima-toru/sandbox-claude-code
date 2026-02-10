@@ -178,7 +178,7 @@
         <dependency>
             <groupId>com.atlassian.oai</groupId>
             <artifactId>swagger-request-validator-spring-webmvc</artifactId>
-            <version>2.43.0</version>
+            <version>2.46.0</version>
             <scope>test</scope>
         </dependency>
 
