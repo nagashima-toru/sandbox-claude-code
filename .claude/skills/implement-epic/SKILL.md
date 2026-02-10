@@ -23,26 +23,70 @@ description: Execute Story implementation workflow including task management, te
    - Issue 番号
    - Epic タイトル
    - 完了/未完了の Story 数
+   - Epic の完了状態（全 Story に ✅ マークがあるか）
 3. AskUserQuestion で選択肢を表示：
 
    ```
    実装する Epic を選択してください
 
    選択肢:
-   - Epic #88: 認証・認可機能 (Story 6/7 完了)
+   - Epic #88: 認証・認可機能 (Story 7/7 完了) ✅ 完了済み
    - Epic #92: 新機能XYZ (Story 0/5 完了)
+   - Epic #112: data-testid 導入 (Story 2/3 完了)
    ```
 
-4. ユーザーが選択した Epic で実装を開始
+   **表示形式**:
+   - 未完了 Epic: `Epic #[N]: [タイトル] (Story [完了数]/[総数] 完了)`
+   - 完了済み Epic: `Epic #[N]: [タイトル] (Story [総数]/[総数] 完了) ✅ 完了済み`
+
+4. ユーザーが選択した Epic で処理を開始
+5. **完了済み Epic を選択した場合**: 「実行前の必須確認」セクションの完了済み Epic 処理フローに従う
 
 ## 実行前の必須確認
 
-1. **Epic 状況の確認**
+1. **Epic 完了状態の確認**（最優先）
+
+   Epic が既に完了している可能性があるため、まず完了状態を確認：
+
+   ```bash
+   # overview.md の全 Story に ✅ マークがあるか確認
+   grep "^### Story" .epic/[日付]-[issue番号]-[epic名]/overview.md
+   ```
+
+   **完了済み Epic の判定基準**:
+   - 全 Story に ✅ マークが付いている
+   - Epic ベースブランチが master にマージ済み（`git log --oneline --grep="#[Issue番号]" master` で確認）
+   - 全 Story の PR がマージ済み
+
+   **完了済み Epic を検出した場合の処理**:
+
+   a. ユーザーに報告：
+   ```
+   Epic #[N] は既に完了しています：
+   - 全 Story ([M]/[M]) 完了
+   - Epic ベースブランチ: master にマージ済み（または存在しない）
+   - 実装済み日時: [日付]
+   ```
+
+   b. 次のアクションを提案（AskUserQuestion）：
+   - **Epic 全体の振り返りを実施** (`/retrospective Epic #[N]`) - 推奨
+   - **Epic 詳細状況を確認** (`/epic-status [N]`)
+   - **別の未完了 Epic を実装**
+   - **何もしない**
+
+   c. ユーザーの選択に応じて処理：
+   - 振り返り選択時: `/retrospective` スキルを実行
+   - 別 Epic 選択時: Epic 選択からやり直し
+   - 何もしない: スキル終了
+
+   **重要**: 完了済み Epic に対して実装を進めない。無駄な作業を避ける。
+
+2. **Epic 状況の確認**（未完了の場合）
    - `.epic/[日付]-[issue番号]-[epic名]/overview.md` を読む
    - 未完了の Story を特定する
    - 次に実装すべき Story を確認する
 
-2. **現在のブランチ確認**
+3. **現在のブランチ確認**
 
    ```bash
    git branch --show-current
