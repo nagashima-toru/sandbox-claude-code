@@ -1,3 +1,8 @@
+---
+name: implement-epic
+description: Execute Story implementation workflow including task management, testing, and PR creation for Epic realization.
+---
+
 # Epic 実装ガイド
 
 ## Epic の選択

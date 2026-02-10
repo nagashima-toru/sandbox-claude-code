@@ -1,3 +1,8 @@
+---
+name: create-spec-pr
+description: Understand requirements, investigate current implementation, and create OpenAPI specification and acceptance criteria.
+---
+
 # 仕様 PR 作成コマンド
 
 ## 概要

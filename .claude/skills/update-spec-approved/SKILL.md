@@ -1,3 +1,8 @@
+---
+name: update-spec-approved
+description: Update Issue with approved specification details and add spec-approved label after merging spec PR.
+---
+
 # Issue更新と承認コマンド
 
 ## 概要

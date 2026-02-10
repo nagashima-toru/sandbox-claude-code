@@ -1,3 +1,8 @@
+---
+name: epic-status
+description: Check Epic progress status and propose next Story to implement based on dependencies.
+---
+
 # Epic状態確認コマンド
 
 ## 概要

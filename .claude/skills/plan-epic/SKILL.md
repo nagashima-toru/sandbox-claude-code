@@ -1,3 +1,8 @@
+---
+name: plan-epic
+description: Generate implementation plan documents in .epic/ directory and automatically review plan quality.
+---
+
 # 実装計画策定コマンド
 
 ## 概要

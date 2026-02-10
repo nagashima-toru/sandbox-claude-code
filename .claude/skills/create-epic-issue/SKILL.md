@@ -1,3 +1,8 @@
+---
+name: create-epic-issue
+description: Create a GitHub Epic Issue and confirm the Issue number for SDD workflow.
+---
+
 # Epic Issue 作成コマンド
 
 ## 概要
