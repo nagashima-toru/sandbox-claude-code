@@ -241,6 +241,125 @@ export const Default: Story = {
 
 See [docs/frontend/STORYBOOK.md](../docs/frontend/STORYBOOK.md) for details.
 
+## React Context Pattern
+
+### Creating a Context
+
+Always include `| undefined` in the Context type to detect usage outside of the Provider at compile time. Create a custom Hook that checks for `undefined` and throws an error.
+
+**Pattern**:
+
+```typescript
+import { createContext, useContext } from 'react';
+
+export interface MyContextValue {
+  user: User | null;
+  isLoading: boolean;
+  setUser: (user: User | null) => void;
+}
+
+export const MyContext = createContext<MyContextValue | undefined>(undefined);
+
+export function useMyContext(): MyContextValue {
+  const context = useContext(MyContext);
+
+  if (context === undefined) {
+    throw new Error('useMyContext must be used within MyProvider');
+  }
+
+  return context;
+}
+
+export function MyProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const value: MyContextValue = {
+    user,
+    isLoading,
+    setUser,
+  };
+
+  return <MyContext.Provider value={value}>{children}</MyContext.Provider>;
+}
+```
+
+### Using Context in Storybook
+
+When creating Stories that use Context, provide both `args` and `render` properties. For custom Provider values, wrap the component in `render`.
+
+**Pattern**:
+
+```typescript
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { MyContext, MyProvider } from './MyContext';
+import { MyComponent } from './MyComponent';
+
+const meta = {
+  title: 'Components/MyComponent',
+  component: MyProvider,
+  tags: ['autodocs'],
+} satisfies Meta<typeof MyProvider>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// Using default Provider
+export const Default: Story = {
+  args: {
+    children: <MyComponent />,
+  },
+};
+
+// Custom Provider value
+export const CustomState: Story = {
+  args: {
+    children: <MyComponent />,
+  },
+  render: (_args) => (
+    <MyContext.Provider
+      value={{
+        user: { id: 1, username: 'admin', role: 'ADMIN' },
+        isLoading: false,
+        setUser: () => {},
+      }}
+    >
+      <MyComponent />
+    </MyContext.Provider>
+  ),
+};
+```
+
+### Testing Context Hooks
+
+Use static `import` instead of dynamic `require()` for Context in tests. Create custom test wrappers with `AuthContext.Provider` to test different states.
+
+**Pattern**:
+
+```typescript
+import { renderHook } from '@testing-library/react';
+import { MyContext, type MyContextValue } from './MyContext';
+import { useMyHook } from './useMyHook';
+
+it('should work with custom context value', () => {
+  const customValue: MyContextValue = {
+    user: { id: 1, username: 'test' },
+    isLoading: false,
+    setUser: () => {},
+  };
+
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <MyContext.Provider value={customValue}>
+      {children}
+    </MyContext.Provider>
+  );
+
+  const { result } = renderHook(() => useMyHook(), { wrapper });
+
+  expect(result.current).toBeDefined();
+});
+```
+
 ## Error Handling
 
 ### Client-side
