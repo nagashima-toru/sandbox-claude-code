@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, type ReactNode } from 'react';
+import { createContext, useEffect, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import type { UserResponse } from '@/lib/api/generated/models';
 import type { UnauthorizedResponse } from '@/lib/api/generated/models';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -48,9 +49,24 @@ export interface AuthProviderProps {
  * AuthProvider component
  *
  * Provides authentication state to child components using /api/users/me endpoint.
+ *
+ * Error handling:
+ * - 401 Unauthorized: Redirect to login page
+ * - Other errors: Default to read-only mode (user = null)
  */
 export function AuthProvider({ children }: AuthProviderProps) {
+  const router = useRouter();
   const { data: user, isLoading, error, refetch } = useCurrentUser();
+
+  // Handle authentication errors
+  useEffect(() => {
+    if (error && 'status' in error && error.status === 401) {
+      // Redirect to login on 401 Unauthorized
+      router.push('/login');
+    }
+    // For other errors, we default to read-only mode (user = null)
+    // which is handled by usePermission Hook
+  }, [error, router]);
 
   const value: AuthContextValue = {
     user: user ?? null,
