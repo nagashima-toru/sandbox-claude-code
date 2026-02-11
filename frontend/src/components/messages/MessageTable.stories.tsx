@@ -23,9 +23,20 @@ const meta = {
           },
         },
       });
+      // Default to ADMIN user for all stories
+      const defaultUser: UserResponse = { username: 'admin', role: ROLES.ADMIN };
       return (
         <QueryClientProvider client={queryClient}>
-          <Story />
+          <AuthContext.Provider
+            value={{
+              user: defaultUser,
+              isLoading: false,
+              error: null,
+              refetch: () => {},
+            }}
+          >
+            <Story />
+          </AuthContext.Provider>
         </QueryClientProvider>
       );
     },
@@ -216,6 +227,7 @@ export const Mobile: Story = {
 
 /**
  * ADMIN role user sees all edit/delete buttons
+ * Uses default ADMIN user from global decorator
  */
 export const AdminRole: Story = {
   args: {
@@ -237,23 +249,6 @@ export const AdminRole: Story = {
       ],
     },
   },
-  decorators: [
-    (Story) => {
-      const adminUser: UserResponse = { username: 'admin', role: ROLES.ADMIN };
-      return (
-        <AuthContext.Provider
-          value={{
-            user: adminUser,
-            isLoading: false,
-            error: null,
-            refetch: () => {},
-          }}
-        >
-          <Story />
-        </AuthContext.Provider>
-      );
-    },
-  ],
 };
 
 /**
