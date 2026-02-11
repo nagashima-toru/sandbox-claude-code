@@ -4,7 +4,7 @@ import { createContext, useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import type { UserResponse } from '@/lib/api/generated/models';
 import type { UnauthorizedResponse } from '@/lib/api/generated/models';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useGetCurrentUser } from '@/lib/api/generated/auth/auth';
 
 /**
  * Authentication context value
@@ -57,7 +57,28 @@ export interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: user, isLoading, error, refetch } = useCurrentUser();
+
+  // Don't fetch user data on login page to avoid infinite redirect loop
+  const isLoginPage = pathname === '/login';
+  const {
+    data: user,
+    isLoading,
+    error,
+    refetch,
+  } = useGetCurrentUser<UserResponse, UnauthorizedResponse>({
+    query: {
+      // Cache for 5 minutes (staleTime)
+      staleTime: 5 * 60 * 1000,
+      // Keep in cache for 10 minutes (gcTime, formerly cacheTime)
+      gcTime: 10 * 60 * 1000,
+      // Retry on failure
+      retry: 1,
+      // Refetch on window focus
+      refetchOnWindowFocus: true,
+      // Don't fetch on login page to prevent infinite redirect loop
+      enabled: !isLoginPage,
+    },
+  });
 
   // Handle authentication errors
   useEffect(() => {
