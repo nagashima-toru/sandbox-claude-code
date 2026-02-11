@@ -42,7 +42,7 @@ fi
 # バックエンドをポート8081で起動
 cd "$BACKEND_DIR"
 echo "📦 Starting Spring Boot on port 8081..."
-SERVER_PORT=8081 ./mvnw spring-boot:run -DskipTests > "$PROJECT_ROOT/backend-e2e.log" 2>&1 &
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--server.port=8081" -DskipTests > "$PROJECT_ROOT/backend-e2e.log" 2>&1 &
 BACKEND_PID=$!
 
 # PIDを保存
