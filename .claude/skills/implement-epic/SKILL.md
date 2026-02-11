@@ -169,6 +169,43 @@ description: Execute Story implementation workflow including task management, te
    ```
 
 2. **実装**
+
+   **作業ディレクトリの管理**（重要）:
+
+   - **常にプロジェクトルートディレクトリで作業を開始する**
+   - frontend または backend での作業が必要な場合のみ `cd` で移動
+   - 作業完了後は必ず `cd ..` でルートに戻る
+   - git コマンドは基本的にルートディレクトリから実行
+
+   ```bash
+   # ❌ 悪い例: frontend ディレクトリで git commit
+   cd frontend
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例: ルートディレクトリから実行
+   cd frontend && pnpm format && cd ..
+   git add frontend/src/...
+   ```
+
+   **実装前の事前確認**:
+
+   - 新しいタイプのコンポーネント（Context, Provider, カスタム Hook など）を実装する前に、既存の類似実装パターンを確認
+   - テストを書く前に、同じタイプのテストファイルを Read して、プロジェクトのテストパターンに従う
+   - Storybook ストーリーを作成する前に、既存のストーリーファイルを Read して、型定義や構造を確認
+
+   **例**: Context を実装する場合
+   ```bash
+   # 1. 既存の Context パターンを確認
+   Read frontend/src/contexts/AuthContext.tsx
+
+   # 2. 既存のテストパターンを確認
+   Read frontend/tests/unit/hooks/useAuthContext.test.tsx
+
+   # 3. パターンに従って実装
+   ```
+
+   **基本ガイドライン**:
+
    - CLAUDE.md の開発ガイドラインに従う
    - Backend: Clean Architecture、JUnit テスト必須
    - Frontend: Functional components、named exports、テスト・Storybook 必須
@@ -228,17 +265,34 @@ description: Execute Story implementation workflow including task management, te
    - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/self-review-task[N].[M].md` に記録
    - 必要に応じて修正を実施
 
-5. **tasklist.md の更新**
+5. **Storybook の型チェック**（Frontend のみ、Storybook ストーリーを作成した場合）
+
+   Storybook ストーリーを作成した場合、コミット前に必ず型チェックを実行：
+
+   ```bash
+   cd frontend && pnpm type-check && cd ..
+   ```
+
+   - Storybook の Story 型（`args`, `render` など）は TypeScript で厳密にチェックされる
+   - 型エラーがある場合は pre-commit hook で失敗するため、事前確認が重要
+   - 型エラーを早期発見することで、手戻りを防ぐ
+
+   **よくある型エラー**:
+   - `args` プロパティが必要なのに `render` だけを指定している
+   - Context の型が `| undefined` を含んでいない
+   - Story の `render` 関数の引数型が合っていない
+
+6. **tasklist.md の更新**
    - 完了条件のチェックボックスを更新
    - 実績時間とメモを記録
 
-6. **タスク完了**
+7. **タスク完了**
 
    ```
    TaskUpdate taskId=[id] status=completed
    ```
 
-7. **コミット**
+8. **コミット**
 
    ```bash
    git add [変更ファイル]
