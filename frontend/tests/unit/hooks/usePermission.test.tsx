@@ -1,15 +1,49 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { usePermission } from '@/hooks/usePermission';
 import { AuthProvider, AuthContext } from '@/contexts/AuthContext';
 import { ROLES } from '@/lib/constants/roles';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { UserResponse } from '@/lib/api/generated/models';
 import type { ReactNode } from 'react';
 
+// Mock useRouter
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+}));
+
+// Mock useCurrentUser
+vi.mock('@/hooks/useCurrentUser', () => ({
+  useCurrentUser: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+  })),
+}));
+
 describe('usePermission', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+  });
+
   it('認証されていない場合、全権限がfalseでisReadOnlyがtrueになる', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AuthProvider>{children}</AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => usePermission(), { wrapper });
