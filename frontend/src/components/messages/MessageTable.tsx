@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Info } from 'lucide-react';
 import { useGetAllMessages } from '@/lib/api/generated/message/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { Loading } from '@/components/common/Loading';
@@ -11,6 +12,7 @@ import { Pagination } from './Pagination';
 import { MessageTableHeader, SortField, SortDirection } from './MessageTableHeader';
 import { MessageTableRow, MessageCard } from './MessageTableRow';
 import { useDebounce } from '@/hooks/useDebounce';
+import { usePermission } from '@/hooks/usePermission';
 
 interface MessageTableProps {
   onEdit?: (message: MessageResponse) => void;
@@ -30,6 +32,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   const { data, isLoading, error } = useGetAllMessages();
   const messages = useMemo(() => data?.content ?? [], [data?.content]);
+  const { isReadOnly } = usePermission();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [sortField, setSortField] = useState<SortField>('id');
@@ -127,6 +130,17 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
 
   return (
     <div data-testid="message-table" className="space-y-4">
+      {isReadOnly && (
+        <div
+          className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+          role="status"
+          data-testid="readonly-info-message"
+        >
+          <Info className="h-4 w-4 flex-shrink-0" />
+          <span>You are in read-only mode. Contact an administrator to make changes.</span>
+        </div>
+      )}
+
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
