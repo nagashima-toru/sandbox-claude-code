@@ -1,16 +1,9 @@
 'use client';
 
-import { createContext, useState, type ReactNode } from 'react';
-import type { Role } from '@/lib/constants/roles';
-
-/**
- * User information
- */
-export interface User {
-  id: number;
-  username: string;
-  role: Role;
-}
+import { createContext, type ReactNode } from 'react';
+import type { UserResponse } from '@/lib/api/generated/models';
+import type { UnauthorizedResponse } from '@/lib/api/generated/models';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 /**
  * Authentication context value
@@ -19,7 +12,7 @@ export interface AuthContextValue {
   /**
    * Current authenticated user
    */
-  user: User | null;
+  user: UserResponse | null;
 
   /**
    * Whether user information is being loaded
@@ -27,9 +20,14 @@ export interface AuthContextValue {
   isLoading: boolean;
 
   /**
-   * Update user information
+   * Error that occurred during user information fetch
    */
-  setUser: (user: User | null) => void;
+  error: UnauthorizedResponse | null;
+
+  /**
+   * Refetch user information
+   */
+  refetch: () => void;
 }
 
 /**
@@ -49,17 +47,16 @@ export interface AuthProviderProps {
 /**
  * AuthProvider component
  *
- * Provides authentication state to child components.
- * API integration will be added in Story 3.
+ * Provides authentication state to child components using /api/users/me endpoint.
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: user, isLoading, error, refetch } = useCurrentUser();
 
   const value: AuthContextValue = {
-    user,
+    user: user ?? null,
     isLoading,
-    setUser,
+    error: error ?? null,
+    refetch,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

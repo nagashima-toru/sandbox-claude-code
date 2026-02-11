@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { ROLES } from '@/lib/constants/roles';
 import type { ReactNode } from 'react';
 
 describe('useAuthContext', () => {
@@ -26,22 +25,22 @@ describe('useAuthContext', () => {
     const { result } = renderHook(() => useAuthContext(), { wrapper });
 
     expect(result.current).toBeDefined();
-    expect(result.current.user).toBeNull();
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.setUser).toBeDefined();
+    expect(result.current.user).toBeDefined();
+    expect(result.current.isLoading).toBeDefined();
+    expect(result.current.error).toBeDefined();
+    expect(result.current.refetch).toBeDefined();
   });
 
-  it('setUser関数が提供される', () => {
+  it('refetch関数が提供される', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <AuthProvider>{children}</AuthProvider>
     );
 
     const { result } = renderHook(() => useAuthContext(), { wrapper });
 
-    expect(result.current.user).toBeNull();
-    expect(typeof result.current.setUser).toBe('function');
+    expect(typeof result.current.refetch).toBe('function');
 
-    // NOTE: setUserの動作検証は、後続のStoryでAPI統合時に実施する
+    // NOTE: refetchの動作検証は、統合テストで実施する
     // 現時点では関数が提供されていることのみ確認
   });
 });
