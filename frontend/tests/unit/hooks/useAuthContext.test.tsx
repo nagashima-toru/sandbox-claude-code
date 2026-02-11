@@ -15,9 +15,9 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
-// Mock useCurrentUser
-vi.mock('@/hooks/useCurrentUser', () => ({
-  useCurrentUser: vi.fn(() => ({
+// Mock useGetCurrentUser from generated API
+vi.mock('@/lib/api/generated/auth/auth', () => ({
+  useGetCurrentUser: vi.fn(() => ({
     data: null,
     isLoading: false,
     error: null,
