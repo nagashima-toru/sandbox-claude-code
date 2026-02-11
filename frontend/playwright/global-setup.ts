@@ -6,7 +6,7 @@ async function globalSetup(_config: FullConfig) {
 
   try {
     // Start backend services
-    execSync('bash ./scripts/start-backend-e2e.sh', {
+    execSync('bash ../scripts/start-backend-e2e.sh', {
       stdio: 'inherit',
       cwd: process.cwd(),
     });

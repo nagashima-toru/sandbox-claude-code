@@ -5,7 +5,7 @@ async function globalTeardown(_config: FullConfig) {
   console.log('🛑 Global teardown: Stopping backend services...');
 
   try {
-    execSync('bash ./scripts/stop-backend-e2e.sh', {
+    execSync('bash ../scripts/stop-backend-e2e.sh', {
       stdio: 'inherit',
       cwd: process.cwd(),
     });
