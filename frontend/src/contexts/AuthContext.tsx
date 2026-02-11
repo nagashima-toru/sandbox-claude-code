@@ -1,16 +1,10 @@
 'use client';
 
-import { createContext, useState, type ReactNode } from 'react';
-import type { Role } from '@/lib/constants/roles';
-
-/**
- * User information
- */
-export interface User {
-  id: number;
-  username: string;
-  role: Role;
-}
+import { createContext, useEffect, type ReactNode } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import type { UserResponse } from '@/lib/api/generated/models';
+import type { UnauthorizedResponse } from '@/lib/api/generated/models';
+import { useGetCurrentUser } from '@/lib/api/generated/auth/auth';
 
 /**
  * Authentication context value
@@ -19,7 +13,7 @@ export interface AuthContextValue {
   /**
    * Current authenticated user
    */
-  user: User | null;
+  user: UserResponse | null;
 
   /**
    * Whether user information is being loaded
@@ -27,9 +21,14 @@ export interface AuthContextValue {
   isLoading: boolean;
 
   /**
-   * Update user information
+   * Error that occurred during user information fetch
    */
-  setUser: (user: User | null) => void;
+  error: UnauthorizedResponse | null;
+
+  /**
+   * Refetch user information
+   */
+  refetch: () => void;
 }
 
 /**
@@ -49,17 +48,55 @@ export interface AuthProviderProps {
 /**
  * AuthProvider component
  *
- * Provides authentication state to child components.
- * API integration will be added in Story 3.
+ * Provides authentication state to child components using /api/users/me endpoint.
+ *
+ * Error handling:
+ * - 401 Unauthorized: Redirect to login page
+ * - Other errors: Default to read-only mode (user = null)
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Don't fetch user data on login page to avoid infinite redirect loop
+  const isLoginPage = pathname === '/login';
+  const {
+    data: user,
+    isLoading,
+    error,
+    refetch,
+  } = useGetCurrentUser<UserResponse, UnauthorizedResponse>({
+    query: {
+      // Cache for 5 minutes (staleTime)
+      staleTime: 5 * 60 * 1000,
+      // Keep in cache for 10 minutes (gcTime, formerly cacheTime)
+      gcTime: 10 * 60 * 1000,
+      // Retry on failure
+      retry: 1,
+      // Refetch on window focus
+      refetchOnWindowFocus: true,
+      // Don't fetch on login page to prevent infinite redirect loop
+      enabled: !isLoginPage,
+    },
+  });
+
+  // Handle authentication errors
+  useEffect(() => {
+    if (error && 'status' in error && error.status === 401) {
+      // Redirect to login on 401 Unauthorized, but only if not already on login page
+      if (pathname !== '/login') {
+        router.push('/login');
+      }
+    }
+    // For other errors, we default to read-only mode (user = null)
+    // which is handled by usePermission Hook
+  }, [error, router, pathname]);
 
   const value: AuthContextValue = {
-    user,
+    user: user ?? null,
     isLoading,
-    setUser,
+    error: error ?? null,
+    refetch,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

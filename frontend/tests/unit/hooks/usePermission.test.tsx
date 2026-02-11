@@ -1,14 +1,50 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { usePermission } from '@/hooks/usePermission';
-import { AuthProvider, AuthContext, type User } from '@/contexts/AuthContext';
+import { AuthProvider, AuthContext } from '@/contexts/AuthContext';
 import { ROLES } from '@/lib/constants/roles';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { UserResponse } from '@/lib/api/generated/models';
 import type { ReactNode } from 'react';
 
+// Mock useRouter and usePathname
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => '/',
+}));
+
+// Mock useGetCurrentUser from generated API
+vi.mock('@/lib/api/generated/auth/auth', () => ({
+  useGetCurrentUser: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+  })),
+}));
+
 describe('usePermission', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+  });
+
   it('認証されていない場合、全権限がfalseでisReadOnlyがtrueになる', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AuthProvider>{children}</AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => usePermission(), { wrapper });
@@ -20,14 +56,15 @@ describe('usePermission', () => {
   });
 
   it('ADMINロールの場合、全権限がtrueになる（カスタムプロバイダー使用）', () => {
-    const adminUser: User = { id: 1, username: 'admin', role: ROLES.ADMIN };
+    const adminUser: UserResponse = { username: 'admin', role: ROLES.ADMIN };
 
     const TestWrapper = ({ children }: { children: ReactNode }) => (
       <AuthContext.Provider
         value={{
           user: adminUser,
           isLoading: false,
-          setUser: () => {},
+          error: null,
+          refetch: () => {},
         }}
       >
         {children}
@@ -43,14 +80,15 @@ describe('usePermission', () => {
   });
 
   it('VIEWERロールの場合、全権限がfalseでisReadOnlyがtrueになる', () => {
-    const viewerUser: User = { id: 2, username: 'viewer', role: ROLES.VIEWER };
+    const viewerUser: UserResponse = { username: 'viewer', role: ROLES.VIEWER };
 
     const TestWrapper = ({ children }: { children: ReactNode }) => (
       <AuthContext.Provider
         value={{
           user: viewerUser,
           isLoading: false,
-          setUser: () => {},
+          error: null,
+          refetch: () => {},
         }}
       >
         {children}

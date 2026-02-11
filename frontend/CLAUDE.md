@@ -412,6 +412,62 @@ it('should work with custom context value', () => {
 - Framework entry: `src/app/layout.tsx`, `src/app/page.tsx`
 - Configuration: `src/lib/api/client.ts`
 
+### Test Best Practices
+
+- **実装と同時にテストを修正**: 既存コードに影響を与える変更（Context の型変更、新しい Hook の追加など）を行う際は、実装と同時に影響を受けるテストも修正する
+- **Next.js Hooks のモック**: `useRouter`, `useSearchParams` などの Next.js Hooks を使用するコンポーネントをテストする場合は、`next/navigation` のモックを準備する
+  ```typescript
+  // Test file
+  vi.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
+    }),
+  }));
+  ```
+- **QueryClientProvider のラップ**: React Query を使用する Hook をテストする場合は、テスト用の wrapper を作成する
+  ```typescript
+  function createWrapper() {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    return ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  }
+  ```
+
+## Working Directory Management
+
+**重要**: 常にプロジェクトルート (`/Users/.../sandbox-claude-code`) で作業を開始する
+
+### ルール
+
+1. **基本は常にルートディレクトリ**: git コマンド、スクリプト実行は基本的にルートから実行
+2. **frontend での作業時**:
+
+   ```bash
+   # ❌ 悪い例
+   cd frontend
+   pnpm install
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例
+   cd frontend && pnpm install && cd ..
+   git add frontend/src/...
+   ```
+
+3. **pwd で現在位置を常に確認**: コマンド実行前に `pwd` で位置を確認する習慣をつける
+4. **作業完了後は必ずルートに戻る**: `cd ..` でルートディレクトリに戻る
+
+### よくある問題
+
+- `git add` や `git commit` でファイルが見つからない → 現在のディレクトリを確認
+- パスの指定が相対パスか絶対パスか不明 → `pwd` で確認してから実行
+
 ## Code Style Guidelines
 
 - **Components**: Functional with TypeScript

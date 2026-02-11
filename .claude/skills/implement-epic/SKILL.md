@@ -96,6 +96,24 @@ description: Execute Story implementation workflow including task management, te
    - 現在 Epic ベースブランチ（例: `feature/issue-88-auth`）にいることを確認
    - Working tree が clean であることを確認
 
+4. **作業ディレクトリ確認**（重要）
+
+   ```bash
+   pwd
+   ```
+
+   - **必ずプロジェクトルート** (`/Users/.../sandbox-claude-code`) にいることを確認
+   - ルート以外にいる場合は `cd` でルートに戻る
+   - **理由**: git コマンド、スクリプト実行は基本的にルートから実行する必要がある
+
+   **よくある問題**:
+   - `cd frontend` で移動したまま git コマンドを実行 → パスエラー
+   - `frontend/frontend` のようなネストしたディレクトリを認識してしまう
+
+   **ベストプラクティス**:
+   - frontend での作業時: `cd frontend && pnpm [command] && cd ..`
+   - 常に `pwd` で位置を確認してから git コマンドを実行
+
 ## 実装フロー
 
 ### Phase 1: Story の開始
@@ -347,6 +365,7 @@ description: Execute Story implementation workflow including task management, te
 4. **最終確認**（Story 完了チェックリスト）
 
    **必須項目**:
+   - [ ] **作業ディレクトリがプロジェクトルートであることを確認**（`pwd`）
    - [ ] 全タスクが完了している（TaskList で確認）
    - [ ] 全テストが通過している
      - [ ] 単体テスト成功（`./mvnw test` または `pnpm test`）
@@ -356,6 +375,7 @@ description: Execute Story implementation workflow including task management, te
    - [ ] セルフレビューが全て記録されている
    - [ ] tasklist.md の進捗が更新されている
    - [ ] overview.md に ✅ マークを追加している
+   - [ ] **既存のテストが全て通過することを確認**（影響を受けるテストを修正した場合）
 
    **推奨項目**:
    - [ ] CI チェックをローカルで実行（`./scripts/ci-check-local.sh`）

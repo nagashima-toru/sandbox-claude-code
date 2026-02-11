@@ -131,9 +131,10 @@ export const AdminUser: Story = {
   render: (_args) => (
     <AuthContext.Provider
       value={{
-        user: { id: 1, username: 'admin', role: ROLES.ADMIN },
+        user: { username: 'admin', role: ROLES.ADMIN },
         isLoading: false,
-        setUser: () => {},
+        error: null,
+        refetch: () => {},
       }}
     >
       <AuthDemo />
@@ -151,9 +152,10 @@ export const ViewerUser: Story = {
   render: (_args) => (
     <AuthContext.Provider
       value={{
-        user: { id: 2, username: 'viewer', role: ROLES.VIEWER },
+        user: { username: 'viewer', role: ROLES.VIEWER },
         isLoading: false,
-        setUser: () => {},
+        error: null,
+        refetch: () => {},
       }}
     >
       <AuthDemo />
@@ -173,7 +175,8 @@ export const Loading: Story = {
       value={{
         user: null,
         isLoading: true,
-        setUser: () => {},
+        error: null,
+        refetch: () => {},
       }}
     >
       <AuthDemo />
@@ -200,9 +203,10 @@ export const RoleComparison: Story = {
         <h3 className="text-sm font-semibold mb-2 text-muted-foreground">VIEWER Role</h3>
         <AuthContext.Provider
           value={{
-            user: { id: 2, username: 'viewer', role: ROLES.VIEWER },
+            user: { username: 'viewer', role: ROLES.VIEWER },
             isLoading: false,
-            setUser: () => {},
+            error: null,
+            refetch: () => {},
           }}
         >
           <AuthDemo />
@@ -212,9 +216,10 @@ export const RoleComparison: Story = {
         <h3 className="text-sm font-semibold mb-2 text-muted-foreground">ADMIN Role</h3>
         <AuthContext.Provider
           value={{
-            user: { id: 1, username: 'admin', role: ROLES.ADMIN },
+            user: { username: 'admin', role: ROLES.ADMIN },
             isLoading: false,
-            setUser: () => {},
+            error: null,
+            refetch: () => {},
           }}
         >
           <AuthDemo />

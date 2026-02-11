@@ -21,13 +21,16 @@ import type {
 } from 'msw';
 
 import type {
-  LoginResponse
+  LoginResponse,
+  UserResponse
 } from '.././models';
 
 
 export const getLoginResponseMock = (overrideResponse: Partial< LoginResponse > = {}): LoginResponse => ({accessToken: faker.string.alpha({length: {min: 10, max: 20}}), refreshToken: faker.string.alpha({length: {min: 10, max: 20}}), tokenType: faker.string.alpha({length: {min: 10, max: 20}}), expiresIn: faker.number.int({min: undefined, max: undefined}), ...overrideResponse})
 
 export const getRefreshTokenResponseMock = (overrideResponse: Partial< LoginResponse > = {}): LoginResponse => ({accessToken: faker.string.alpha({length: {min: 10, max: 20}}), refreshToken: faker.string.alpha({length: {min: 10, max: 20}}), tokenType: faker.string.alpha({length: {min: 10, max: 20}}), expiresIn: faker.number.int({min: undefined, max: undefined}), ...overrideResponse})
+
+export const getGetCurrentUserResponseMock = (overrideResponse: Partial< UserResponse > = {}): UserResponse => ({username: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(['ADMIN','VIEWER'] as const), ...overrideResponse})
 
 
 export const getLoginMockHandler = (overrideResponse?: LoginResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<LoginResponse> | LoginResponse), options?: RequestHandlerOptions) => {
@@ -63,8 +66,21 @@ export const getLogoutMockHandler = (overrideResponse?: void | ((info: Parameter
       })
   }, options)
 }
+
+export const getGetCurrentUserMockHandler = (overrideResponse?: UserResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserResponse> | UserResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/api/users/me', async (info) => {
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetCurrentUserResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  }, options)
+}
 export const getAuthMock = () => [
   getLoginMockHandler(),
   getRefreshTokenMockHandler(),
-  getLogoutMockHandler()
+  getLogoutMockHandler(),
+  getGetCurrentUserMockHandler()
 ]

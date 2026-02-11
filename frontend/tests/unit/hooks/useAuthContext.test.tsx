@@ -1,11 +1,43 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { ROLES } from '@/lib/constants/roles';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
+// Mock useRouter and usePathname
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => '/',
+}));
+
+// Mock useGetCurrentUser from generated API
+vi.mock('@/lib/api/generated/auth/auth', () => ({
+  useGetCurrentUser: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+  })),
+}));
+
 describe('useAuthContext', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+  });
+
   it('AuthProvider外で使用した場合、エラーをスローする', () => {
     // Suppress console.error for this test
     const originalError = console.error;
@@ -20,28 +52,32 @@ describe('useAuthContext', () => {
 
   it('AuthProvider内で使用した場合、Contextの値を取得できる', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AuthProvider>{children}</AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useAuthContext(), { wrapper });
 
     expect(result.current).toBeDefined();
-    expect(result.current.user).toBeNull();
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.setUser).toBeDefined();
+    expect(result.current.user).toBeDefined();
+    expect(result.current.isLoading).toBeDefined();
+    expect(result.current.error).toBeDefined();
+    expect(result.current.refetch).toBeDefined();
   });
 
-  it('setUser関数が提供される', () => {
+  it('refetch関数が提供される', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AuthProvider>{children}</AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useAuthContext(), { wrapper });
 
-    expect(result.current.user).toBeNull();
-    expect(typeof result.current.setUser).toBe('function');
+    expect(typeof result.current.refetch).toBe('function');
 
-    // NOTE: setUserの動作検証は、後続のStoryでAPI統合時に実施する
+    // NOTE: refetchの動作検証は、統合テストで実施する
     // 現時点では関数が提供されていることのみ確認
   });
 });

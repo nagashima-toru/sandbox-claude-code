@@ -5,13 +5,18 @@ async function globalSetup(_config: FullConfig) {
   console.log('🚀 Global setup: Starting backend services...');
 
   try {
-    // Start backend services
-    execSync('bash ./scripts/start-backend-e2e.sh', {
-      stdio: 'inherit',
-      cwd: process.cwd(),
-    });
-
-    console.log('✅ Backend services started successfully');
+    // Skip backend startup in CI (GitHub Actions starts it with Docker Compose)
+    if (process.env.CI !== 'true') {
+      execSync('bash ../scripts/start-backend-e2e.sh', {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+      });
+      console.log('✅ Backend services started successfully');
+    } else {
+      console.log(
+        'ℹ️  CI environment detected, skipping backend startup (already managed by workflow)'
+      );
+    }
 
     // Verify backend API is accessible
     const browser = await chromium.launch();
