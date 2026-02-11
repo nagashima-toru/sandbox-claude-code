@@ -24,4 +24,6 @@ export * from './notFoundResponse';
 export * from './problemDetail';
 export * from './refreshRequest';
 export * from './unauthorizedResponse';
+export * from './userResponse';
+export * from './userResponseRole';
 export * from './validationError';
