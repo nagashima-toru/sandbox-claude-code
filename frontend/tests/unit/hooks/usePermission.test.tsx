@@ -7,13 +7,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { UserResponse } from '@/lib/api/generated/models';
 import type { ReactNode } from 'react';
 
-// Mock useRouter
+// Mock useRouter and usePathname
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
     prefetch: vi.fn(),
   }),
+  usePathname: () => '/',
 }));
 
 // Mock useCurrentUser
