@@ -145,4 +145,40 @@ describe('MessageModal', () => {
     const formIsSubmitting = screen.getByTestId('form-is-submitting');
     expect(formIsSubmitting).toHaveTextContent('false');
   });
+
+  describe('権限制御', () => {
+    it('ADMIN ロールの場合、create モードでモーダルが表示される', () => {
+      const Wrapper = createWrapper({ username: 'admin', role: ROLES.ADMIN });
+      render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
+
+      expect(screen.getByTestId('message-modal')).toBeInTheDocument();
+      expect(screen.getByText('Create New Message')).toBeInTheDocument();
+    });
+
+    it('VIEWER ロールの場合、create モードでモーダルが表示されない', () => {
+      const Wrapper = createWrapper({ username: 'viewer', role: ROLES.VIEWER });
+      render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
+
+      expect(screen.queryByTestId('message-modal')).not.toBeInTheDocument();
+      expect(screen.queryByText('Create New Message')).not.toBeInTheDocument();
+    });
+
+    it('VIEWER ロールの場合でも、edit モードではモーダルが表示される', () => {
+      const Wrapper = createWrapper({ username: 'viewer', role: ROLES.VIEWER });
+      const initialData: MessageResponse = {
+        id: 1,
+        code: 'TEST',
+        content: 'Test content',
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
+      };
+
+      render(<MessageModal {...defaultProps} mode="edit" initialData={initialData} />, {
+        wrapper: Wrapper,
+      });
+
+      expect(screen.getByTestId('message-modal')).toBeInTheDocument();
+      expect(screen.getByText('Edit Message')).toBeInTheDocument();
+    });
+  });
 });
