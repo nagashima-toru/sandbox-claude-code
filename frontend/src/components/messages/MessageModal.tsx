@@ -10,6 +10,7 @@ import {
 import MessageForm from './MessageForm';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
+import { usePermission } from '@/hooks/usePermission';
 
 interface MessageModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface MessageModalProps {
   isSubmitting?: boolean;
   mode: 'create' | 'edit';
   error?: unknown;
+  isReadOnly?: boolean;
 }
 
 export default function MessageModal({
@@ -29,10 +31,18 @@ export default function MessageModal({
   isSubmitting = false,
   mode,
   error,
+  isReadOnly = false,
 }: MessageModalProps) {
+  const { canCreate } = usePermission();
+
   const handleCancel = () => {
     onOpenChange(false);
   };
+
+  // VIEWER ロールの場合、作成モードでモーダルを表示しない
+  if (mode === 'create' && !canCreate) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
