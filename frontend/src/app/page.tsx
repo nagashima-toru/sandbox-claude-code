@@ -12,6 +12,7 @@ import { useMessageMutations } from '@/hooks/useMessageMutations';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { useAuth } from '@/hooks/useAuth';
+import { usePermission } from '@/hooks/usePermission';
 import { useRouter } from 'next/navigation';
 import { ROLES } from '@/lib/constants/roles';
 
@@ -23,6 +24,7 @@ import { ROLES } from '@/lib/constants/roles';
 export default function Home() {
   const router = useRouter();
   const { logout } = useAuth();
+  const { canCreate } = usePermission();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -119,6 +121,15 @@ export default function Home() {
     }
   }, [logout, router]);
 
+  const handleCreateClick = useCallback(() => {
+    // Guard: VIEWER ロールでは何もしない
+    if (!canCreate) {
+      return;
+    }
+    createMutation.reset(); // Clear previous errors
+    setIsCreateModalOpen(true);
+  }, [canCreate, createMutation]);
+
   return (
     <main data-testid="messages-page" className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -127,13 +138,7 @@ export default function Home() {
           description="Manage all your messages in one place"
           action={
             <RoleBasedComponent allowedRoles={[ROLES.ADMIN]}>
-              <Button
-                onClick={() => {
-                  createMutation.reset(); // Clear previous errors
-                  setIsCreateModalOpen(true);
-                }}
-                data-testid="create-message-button"
-              >
+              <Button onClick={handleCreateClick} data-testid="create-message-button">
                 <Plus className="h-4 w-4 mr-2" />
                 New Message
               </Button>
