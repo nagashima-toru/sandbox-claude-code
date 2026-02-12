@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import MessageTable from './MessageTable';
-import { MessageResponse } from '@/lib/api/generated/models';
+import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
 import { getGetAllMessagesMockHandler } from '@/lib/api/generated/message/message.msw';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse, delay } from 'msw';
+import { AuthContext } from '@/contexts/AuthContext';
+import { ROLES } from '@/lib/constants/roles';
 
 const meta = {
   title: 'Messages/MessageTable',
@@ -21,9 +23,20 @@ const meta = {
           },
         },
       });
+      // Default to ADMIN user for all stories
+      const defaultUser: UserResponse = { username: 'admin', role: ROLES.ADMIN };
       return (
         <QueryClientProvider client={queryClient}>
-          <Story />
+          <AuthContext.Provider
+            value={{
+              user: defaultUser,
+              isLoading: false,
+              error: null,
+              refetch: () => {},
+            }}
+          >
+            <Story />
+          </AuthContext.Provider>
         </QueryClientProvider>
       );
     },
@@ -210,4 +223,73 @@ export const Mobile: Story = {
       ],
     },
   },
+};
+
+/**
+ * ADMIN role user sees all edit/delete buttons
+ * Uses default ADMIN user from global decorator
+ */
+export const AdminRole: Story = {
+  args: {
+    onEdit: (message) => console.log('Edit:', message),
+    onDelete: (message) => console.log('Delete:', message),
+  },
+  parameters: {
+    msw: {
+      handlers: [
+        getGetAllMessagesMockHandler(() => ({
+          content: mockMessages,
+          page: {
+            size: 20,
+            number: 0,
+            totalElements: mockMessages.length,
+            totalPages: 1,
+          },
+        })),
+      ],
+    },
+  },
+};
+
+/**
+ * VIEWER role user sees read-only mode with info message
+ * Edit and delete buttons are hidden
+ */
+export const ViewerRole: Story = {
+  args: {
+    onEdit: (message) => console.log('Edit:', message),
+    onDelete: (message) => console.log('Delete:', message),
+  },
+  parameters: {
+    msw: {
+      handlers: [
+        getGetAllMessagesMockHandler(() => ({
+          content: mockMessages,
+          page: {
+            size: 20,
+            number: 0,
+            totalElements: mockMessages.length,
+            totalPages: 1,
+          },
+        })),
+      ],
+    },
+  },
+  decorators: [
+    (Story) => {
+      const viewerUser: UserResponse = { username: 'viewer', role: ROLES.VIEWER };
+      return (
+        <AuthContext.Provider
+          value={{
+            user: viewerUser,
+            isLoading: false,
+            error: null,
+            refetch: () => {},
+          }}
+        >
+          <Story />
+        </AuthContext.Provider>
+      );
+    },
+  ],
 };

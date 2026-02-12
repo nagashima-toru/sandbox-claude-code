@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
+import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
 import { Button } from '@/components/ui/button';
 import { Plus, LogOut } from 'lucide-react';
 import { useMessageMutations } from '@/hooks/useMessageMutations';
@@ -12,6 +13,7 @@ import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { ROLES } from '@/lib/constants/roles';
 
 /**
  * Home page component for message management.
@@ -124,16 +126,18 @@ export default function Home() {
           title="Message Management"
           description="Manage all your messages in one place"
           action={
-            <Button
-              onClick={() => {
-                createMutation.reset(); // Clear previous errors
-                setIsCreateModalOpen(true);
-              }}
-              data-testid="create-message-button"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              New Message
-            </Button>
+            <RoleBasedComponent allowedRoles={[ROLES.ADMIN]}>
+              <Button
+                onClick={() => {
+                  createMutation.reset(); // Clear previous errors
+                  setIsCreateModalOpen(true);
+                }}
+                data-testid="create-message-button"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Message
+              </Button>
+            </RoleBasedComponent>
           }
           rightContent={
             <Button variant="outline" onClick={handleLogout}>
