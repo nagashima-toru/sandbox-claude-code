@@ -26,6 +26,7 @@ Story 実装完了後、適切なテンプレートを使用して PR を作成�
 ```
 
 引数がない場合はユーザーに確認:
+
 - Issue 番号は？
 - Story 番号は？
 
@@ -38,6 +39,7 @@ git branch -r | grep "origin/feature/issue-[N]-" | grep -v story
 パターン: `feature/issue-[N]-[epic-name]`
 
 例:
+
 - Issue #133 → `feature/issue-133-permission-ui`
 - Issue #88 → `feature/issue-88-auth`
 
