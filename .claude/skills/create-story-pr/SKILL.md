@@ -1,3 +1,8 @@
+---
+name: create-story-pr
+description: Create Story PR with proper template to avoid Implementation Check failures.
+---
+
 # Create Story PR Skill
 
 Story 実装完了後、適切なテンプレートを使用して PR を作成します。
