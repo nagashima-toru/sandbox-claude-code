@@ -271,6 +271,99 @@ Use test credentials for different roles:
 
 **Security Note**: Permission checks in the UI are for display control only. All security enforcement is handled by the backend API.
 
+### E2E Testing Patterns
+
+#### API Direct Call Testing
+
+Use Playwright's `request` fixture to test API responses directly without browser interaction:
+
+```typescript
+test('should return 403 for unauthorized access', async ({ page, request }) => {
+  // Get auth token from page
+  await login(page, 'viewer', 'password123');
+  const token = await page.evaluate(() => localStorage.getItem('accessToken'));
+
+  // Direct API call
+  const response = await request.post('http://localhost:8080/api/messages', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    data: { code: 'TEST', content: 'Test' },
+  });
+
+  // Verify response
+  expect(response.status()).toBe(403);
+
+  // Verify RFC 7807 error format
+  const errorBody = await response.json();
+  expect(errorBody).toHaveProperty('type');
+  expect(errorBody).toHaveProperty('title');
+  expect(errorBody).toHaveProperty('status', 403);
+});
+```
+
+#### Multi-User Testing
+
+Use `page.context().newPage()` to test interactions between different users:
+
+```typescript
+test('VIEWER can view ADMIN created data', async ({ page }) => {
+  // Create data as ADMIN
+  const adminPage = await page.context().newPage();
+  await login(adminPage, 'testuser', 'password123');
+  await waitForFrontend(adminPage);
+  await createMessage(adminPage, 'TEST_CODE', 'Test content');
+  await adminPage.close();
+
+  // View as VIEWER
+  await login(page, 'viewer', 'password123');
+  await waitForFrontend(page);
+
+  const searchInput = page.getByTestId('search-input');
+  await searchInput.fill('TEST_CODE');
+  await page.waitForTimeout(600);
+
+  const row = page.locator(`[data-testid^="message-row-"]:has-text("TEST_CODE")`);
+  await expect(row).toBeVisible();
+});
+```
+
+#### Test Helpers
+
+Create reusable helper functions in `tests/e2e/helpers.ts`:
+
+```typescript
+// Login helper
+export async function login(page: Page, username: string, password: string) {
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+  await page.getByTestId('login-username-input').fill(username);
+  await page.getByTestId('login-password-input').fill(password);
+  await page.getByTestId('login-submit-button').click();
+  await page.waitForURL('/', { timeout: 10000 });
+}
+
+// Wait for frontend to be ready
+export async function waitForFrontend(page: Page) {
+  await page.waitForLoadState('networkidle');
+  const searchInput = page.getByTestId('search-input');
+  await expect(searchInput).toBeVisible({ timeout: 15000 });
+}
+```
+
+#### Running E2E Tests Locally
+
+```bash
+# Using the convenience script
+./scripts/e2e-test-local.sh
+
+# Or manually
+docker compose up postgres -d
+cd backend && ./mvnw spring-boot:run &
+cd frontend && pnpm test:e2e
+```
+
 ### Validation (React Hook Form + Zod)
 
 ```typescript
