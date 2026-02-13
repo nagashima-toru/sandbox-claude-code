@@ -15,7 +15,7 @@ test.describe('Permission UI - Error Handling', () => {
 
   test.beforeEach(async ({ page }) => {
     // Login as VIEWER user and capture the auth token
-    await login(page, 'viewer', 'password123');
+    await login(page, 'viewer', 'viewer123');
     await waitForFrontend(page);
 
     // Get the auth token from localStorage

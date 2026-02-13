@@ -267,7 +267,7 @@ Forms automatically switch to readonly mode for VIEWER role:
 Use test credentials for different roles:
 
 - ADMIN: `testuser` / `password123`
-- VIEWER: `viewer` / `password123`
+- VIEWER: `viewer` / `viewer123`
 
 **Security Note**: Permission checks in the UI are for display control only. All security enforcement is handled by the backend API.
 
@@ -280,7 +280,7 @@ Use Playwright's `request` fixture to test API responses directly without browse
 ```typescript
 test('should return 403 for unauthorized access', async ({ page, request }) => {
   // Get auth token from page
-  await login(page, 'viewer', 'password123');
+  await login(page, 'viewer', 'viewer123');
   const token = await page.evaluate(() => localStorage.getItem('accessToken'));
 
   // Direct API call
@@ -317,7 +317,7 @@ test('VIEWER can view ADMIN created data', async ({ page }) => {
   await adminPage.close();
 
   // View as VIEWER
-  await login(page, 'viewer', 'password123');
+  await login(page, 'viewer', 'viewer123');
   await waitForFrontend(page);
 
   const searchInput = page.getByTestId('search-input');

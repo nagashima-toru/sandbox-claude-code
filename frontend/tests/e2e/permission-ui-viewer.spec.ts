@@ -14,7 +14,7 @@ import { login, waitForFrontend, createMessage } from './helpers';
 test.describe('Permission UI - VIEWER Role', () => {
   test.beforeEach(async ({ page }) => {
     // Login as VIEWER user
-    await login(page, 'viewer', 'password123');
+    await login(page, 'viewer', 'viewer123');
     await waitForFrontend(page);
   });
 
