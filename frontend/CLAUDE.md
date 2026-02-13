@@ -182,6 +182,95 @@ frontend/
 - Pagination (10, 25, 50, 100 items)
 - CRUD operations via modals
 
+### Permission Control
+
+This application implements role-based permission control for UI elements:
+
+**Supported Roles**:
+
+- `ADMIN`: Full access (create, edit, delete)
+- `VIEWER`: Read-only access
+
+**Implementation**:
+
+```typescript
+// Get current user information
+import { useAuth } from '@/contexts/AuthContext';
+
+function MyComponent() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  // user.role is 'ADMIN' or 'VIEWER'
+  const canEdit = user?.role === 'ADMIN';
+
+  return (
+    <>
+      {canEdit && <Button>Edit</Button>}
+    </>
+  );
+}
+```
+
+**Permission Hooks**:
+
+```typescript
+import { usePermission } from '@/hooks/usePermission';
+
+function MyComponent() {
+  const { canCreate, canUpdate, canDelete, isReadOnly } = usePermission();
+
+  return (
+    <>
+      {canCreate && <Button>Create</Button>}
+      {canUpdate && <Button>Update</Button>}
+      {canDelete && <Button>Delete</Button>}
+      {isReadOnly && <InfoMessage>閲覧のみ可能です</InfoMessage>}
+    </>
+  );
+}
+```
+
+**Role-Based Component**:
+
+```typescript
+import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
+
+function MyComponent() {
+  return (
+    <>
+      <RoleBasedComponent allowedRoles={['ADMIN']}>
+        <Button>Admin Only</Button>
+      </RoleBasedComponent>
+
+      <RoleBasedComponent allowedRoles={['ADMIN', 'VIEWER']}>
+        <p>Visible to all</p>
+      </RoleBasedComponent>
+    </>
+  );
+}
+```
+
+**Readonly Form Mode**:
+
+Forms automatically switch to readonly mode for VIEWER role:
+
+- All input fields are disabled
+- Submit and delete buttons are hidden
+- Only "Close" button is shown
+
+**Testing Permission UI**:
+
+Use test credentials for different roles:
+
+- ADMIN: `testuser` / `password123`
+- VIEWER: `viewer` / `password123`
+
+**Security Note**: Permission checks in the UI are for display control only. All security enforcement is handled by the backend API.
+
 ### Validation (React Hook Form + Zod)
 
 ```typescript
