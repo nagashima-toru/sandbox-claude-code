@@ -6,6 +6,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
 import { ROLES } from '@/lib/constants/roles';
+import { usePermission } from '@/hooks/usePermission';
 
 interface MessageTableRowProps {
   message: MessageResponse;
@@ -14,8 +15,25 @@ interface MessageTableRowProps {
 }
 
 export function MessageTableRow({ message, onEdit, onDelete }: MessageTableRowProps) {
+  const { canEdit } = usePermission();
+
+  const handleRowClick = (e: React.MouseEvent) => {
+    // VIEWER ロールの場合のみ、行クリックで読み取り専用モーダルを開く
+    // ボタンのクリックイベントは除外（event.target がボタンまたはその子要素の場合）
+    if (!canEdit && onEdit) {
+      const target = e.target as HTMLElement;
+      if (!target.closest('button')) {
+        onEdit(message);
+      }
+    }
+  };
+
   return (
-    <TableRow data-testid={`message-row-${message.id}`}>
+    <TableRow
+      data-testid={`message-row-${message.id}`}
+      className={!canEdit ? 'cursor-pointer hover:bg-muted/50' : ''}
+      onClick={handleRowClick}
+    >
       <TableCell className="font-medium">{message.id}</TableCell>
       <TableCell>
         <code className="bg-muted px-2 py-1 rounded text-sm">{message.code}</code>
@@ -58,8 +76,25 @@ interface MessageCardProps {
 }
 
 export function MessageCard({ message, onEdit, onDelete }: MessageCardProps) {
+  const { canEdit } = usePermission();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // VIEWER ロールの場合のみ、カードクリックで読み取り専用モーダルを開く
+    // ボタンのクリックイベントは除外
+    if (!canEdit && onEdit) {
+      const target = e.target as HTMLElement;
+      if (!target.closest('button')) {
+        onEdit(message);
+      }
+    }
+  };
+
   return (
-    <div data-testid={`message-row-${message.id}`} className="p-4 space-y-3">
+    <div
+      data-testid={`message-row-${message.id}`}
+      className={`p-4 space-y-3 ${!canEdit ? 'cursor-pointer hover:bg-muted/50' : ''}`}
+      onClick={handleCardClick}
+    >
       <div className="flex items-start justify-between">
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">

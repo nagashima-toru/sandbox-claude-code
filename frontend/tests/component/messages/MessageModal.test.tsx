@@ -13,17 +13,20 @@ vi.mock('@/components/messages/MessageForm', () => ({
     isSubmitting,
     onCancel,
     error,
+    disabled,
   }: {
     onSubmit: (data: { code: string; content: string }) => void;
     initialData?: MessageResponse;
     isSubmitting: boolean;
     onCancel: () => void;
     error?: unknown;
+    disabled?: boolean;
   }) => (
     <div data-testid="message-form">
       <div data-testid="form-initial-data">{JSON.stringify(initialData)}</div>
       <div data-testid="form-is-submitting">{String(isSubmitting)}</div>
       <div data-testid="form-error">{error ? 'has-error' : 'no-error'}</div>
+      <div data-testid="form-disabled">{String(disabled || false)}</div>
       <button onClick={() => onSubmit({ code: 'TEST', content: 'Test' })}>Submit</button>
       <button onClick={onCancel}>Cancel</button>
     </div>
@@ -179,6 +182,57 @@ describe('MessageModal', () => {
 
       expect(screen.getByTestId('message-modal')).toBeInTheDocument();
       expect(screen.getByText('Edit Message')).toBeInTheDocument();
+    });
+  });
+
+  describe('読み取り専用モード', () => {
+    it('isReadOnly が true の場合、タイトルが "View Message" になる', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
+        wrapper: Wrapper,
+      });
+
+      expect(screen.getByText('View Message')).toBeInTheDocument();
+      expect(screen.queryByText('Edit Message')).not.toBeInTheDocument();
+    });
+
+    it('isReadOnly が true の場合、説明が "Message details (read-only)" になる', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
+        wrapper: Wrapper,
+      });
+
+      expect(screen.getByText('Message details (read-only)')).toBeInTheDocument();
+      expect(screen.queryByText('Update the message details below.')).not.toBeInTheDocument();
+    });
+
+    it('isReadOnly が true の場合、MessageForm に disabled={true} が渡される', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
+        wrapper: Wrapper,
+      });
+
+      const formDisabled = screen.getByTestId('form-disabled');
+      expect(formDisabled).toHaveTextContent('true');
+    });
+
+    it('isReadOnly が false の場合、MessageForm に disabled={false} が渡される', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={false} />, {
+        wrapper: Wrapper,
+      });
+
+      const formDisabled = screen.getByTestId('form-disabled');
+      expect(formDisabled).toHaveTextContent('false');
+    });
+
+    it('isReadOnly がデフォルトで false', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" />, { wrapper: Wrapper });
+
+      expect(screen.getByText('Edit Message')).toBeInTheDocument();
+      const formDisabled = screen.getByTestId('form-disabled');
+      expect(formDisabled).toHaveTextContent('false');
     });
   });
 });

@@ -24,7 +24,7 @@ import { ROLES } from '@/lib/constants/roles';
 export default function Home() {
   const router = useRouter();
   const { logout } = useAuth();
-  const { canCreate } = usePermission();
+  const { canCreate, isReadOnly } = usePermission();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -170,6 +170,7 @@ export default function Home() {
           isSubmitting={updateMutation.isPending}
           mode="edit"
           error={updateMutation.error}
+          isReadOnly={isReadOnly}
         />
 
         <DeleteConfirmDialog

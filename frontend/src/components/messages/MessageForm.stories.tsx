@@ -78,3 +78,13 @@ export const ValidationError: Story = {
     }
   },
 };
+
+export const ReadOnly: Story = {
+  args: {
+    onSubmit: (data) => console.log('Submit:', data),
+    onCancel: () => console.log('Cancel'),
+    initialData: mockInitialData,
+    isSubmitting: false,
+    disabled: true,
+  },
+};

@@ -22,6 +22,7 @@ interface MessageFormProps {
   isSubmitting?: boolean;
   onCancel: () => void;
   error?: unknown;
+  disabled?: boolean;
 }
 
 /**
@@ -33,6 +34,7 @@ interface MessageFormProps {
  * @param isSubmitting - Loading state during form submission
  * @param onCancel - Callback function called when cancel button is clicked
  * @param error - API error object to display error messages from server
+ * @param disabled - If true, all form fields will be disabled (read-only mode)
  */
 export default function MessageForm({
   onSubmit,
@@ -40,6 +42,7 @@ export default function MessageForm({
   isSubmitting = false,
   onCancel,
   error,
+  disabled = false,
 }: MessageFormProps) {
   const form = useForm<MessageFormData>({
     resolver: zodResolver(messageSchema),
@@ -77,7 +80,8 @@ export default function MessageForm({
                 <Input
                   placeholder="Enter message code"
                   {...field}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || disabled}
+                  aria-readonly={disabled}
                   data-testid="message-code-input"
                 />
               </FormControl>
@@ -97,7 +101,8 @@ export default function MessageForm({
                   className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   placeholder="Enter message content"
                   {...field}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || disabled}
+                  aria-readonly={disabled}
                   data-testid="message-content-input"
                 />
               </FormControl>
@@ -114,11 +119,13 @@ export default function MessageForm({
             disabled={isSubmitting}
             data-testid="message-form-cancel"
           >
-            Cancel
+            {disabled ? 'Close' : 'Cancel'}
           </Button>
-          <Button type="submit" disabled={isSubmitting} data-testid="message-form-submit">
-            {isSubmitting ? 'Saving...' : 'Save'}
-          </Button>
+          {!disabled && (
+            <Button type="submit" disabled={isSubmitting} data-testid="message-form-submit">
+              {isSubmitting ? 'Saving...' : 'Save'}
+            </Button>
+          )}
         </div>
       </form>
     </Form>

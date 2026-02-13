@@ -201,3 +201,41 @@ export const EditModeViewer: Story = {
     );
   },
 };
+
+/**
+ * VIEWER role sees edit modal in read-only mode
+ */
+export const ReadOnlyMode: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => {},
+    onSubmit: (data) => console.log('Submit:', data),
+    mode: 'edit',
+    initialData: mockMessage,
+    isSubmitting: false,
+    isReadOnly: true,
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(args.open);
+    return (
+      <AuthContext.Provider
+        value={{
+          user: { username: 'viewer', role: ROLES.VIEWER },
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        <MessageModal
+          {...args}
+          open={open}
+          onOpenChange={setOpen}
+          onSubmit={(data) => {
+            console.log('Submit:', data);
+            setOpen(false);
+          }}
+        />
+      </AuthContext.Provider>
+    );
+  },
+};
