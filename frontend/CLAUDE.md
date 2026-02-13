@@ -505,6 +505,7 @@ it('should work with custom context value', () => {
 
 - **実装と同時にテストを修正**: 既存コードに影響を与える変更（Context の型変更、新しい Hook の追加など）を行う際は、実装と同時に影響を受けるテストも修正する
 - **Next.js Hooks のモック**: `useRouter`, `useSearchParams` などの Next.js Hooks を使用するコンポーネントをテストする場合は、`next/navigation` のモックを準備する
+
   ```typescript
   // Test file
   vi.mock('next/navigation', () => ({
@@ -515,7 +516,9 @@ it('should work with custom context value', () => {
     }),
   }));
   ```
+
 - **QueryClientProvider のラップ**: React Query を使用する Hook をテストする場合は、テスト用の wrapper を作成する
+
   ```typescript
   function createWrapper() {
     const queryClient = new QueryClient({
@@ -643,6 +646,7 @@ useGetCurrentUser({
    ```
 
 4. **開発時のキャッシュ無効化** (必要に応じて):
+
    ```typescript
    useGetCurrentUser({
      query: {
