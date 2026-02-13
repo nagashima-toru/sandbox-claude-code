@@ -51,4 +51,20 @@ public class AuthMapper {
       com.sandbox.api.presentation.generated.model.RefreshRequest generated) {
     return new com.sandbox.api.application.dto.RefreshRequest(generated.getRefreshToken());
   }
+
+  /**
+   * Converts internal UserResponse to generated UserResponse.
+   *
+   * @param internal internal user response DTO
+   * @return generated user response
+   */
+  public static com.sandbox.api.presentation.generated.model.UserResponse toGenerated(
+      com.sandbox.api.application.dto.UserResponse internal) {
+    var generated = new com.sandbox.api.presentation.generated.model.UserResponse();
+    generated.setUsername(internal.username());
+    generated.setRole(
+        com.sandbox.api.presentation.generated.model.UserResponse.RoleEnum.fromValue(
+            internal.role()));
+    return generated;
+  }
 }

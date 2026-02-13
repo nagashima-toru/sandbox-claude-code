@@ -52,4 +52,19 @@ class AuthMapperTest {
     // Assert
     assertThat(internal.getRefreshToken()).isEqualTo("refresh-token-123");
   }
+
+  @Test
+  void toGenerated_shouldConvertUserResponse() {
+    // Arrange
+    com.sandbox.api.application.dto.UserResponse internal =
+        new com.sandbox.api.application.dto.UserResponse("testuser", "ADMIN");
+
+    // Act
+    var generated = AuthMapper.toGenerated(internal);
+
+    // Assert
+    assertThat(generated.getUsername()).isEqualTo("testuser");
+    assertThat(generated.getRole())
+        .isEqualTo(com.sandbox.api.presentation.generated.model.UserResponse.RoleEnum.ADMIN);
+  }
 }
