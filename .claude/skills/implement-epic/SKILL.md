@@ -392,31 +392,39 @@ description: Execute Story implementation workflow including task management, te
 
    **自動化環境での推奨方法**（`--template` は対話的なので使用不可）:
 
-   1. テンプレートファイルを読み込む
-   2. テンプレートの内容を Story の情報で埋める
-   3. 一時ファイルに保存して `--body-file` で渡す
+   **CRITICAL**: 必ず `--template` オプションを使用すること。テンプレートを使わないと Implementation Check が失敗します。
 
    ```bash
-   # 実装例（実際には自動化スクリプト内で実行）
-   # 1. テンプレート内容を埋めたファイルを /tmp/pr-description.md に作成
-   # 2. --body-file で PR 作成
    gh pr create --base feature/issue-[N]-[epic-name] \
                 --head feature/issue-[N]-[epic-name]-story[X] \
-                --title "Story [X]: [Story名]" \
-                --body-file /tmp/pr-description.md
+                --template .github/PULL_REQUEST_TEMPLATE/story.md
+   ```
+
+   **自動化スクリプトを使用する場合**:
+
+   ```bash
+   ./scripts/create-story-pr.sh [issue-number] [story-number]
+   ```
+
+   または `/create-story-pr` スキル:
+
+   ```bash
+   /create-story-pr [issue-number] [story-number]
    ```
 
    **テンプレート (`story.md`) で埋めるべき項目**:
-   - Story 番号と名前
+   - Story: #[Issue番号]
+   - Story 概要: Story [X]: [Story名]
    - 変更内容（実装した内容を箇条書き）
-   - 完了した受け入れ条件（tasklist.md から）
-   - テスト結果（単体テスト、統合テスト、動作確認）
+   - このPRで検証した受け入れ条件（tasklist.md のタスクリストをコピー）
+   - テスト（単体テスト、統合テスト、ローカルで動作確認のチェックボックス）
    - 備考（補足事項があれば）
 
-   **注意事項**:
-   - テンプレートの構造に従った PR description を作成すること
-   - テンプレートの全項目を適切に埋めること
-   - `--body` で直接長文を渡すのではなく、`--body-file` を使用すること
+   **重要な注意事項**:
+   - `--template` オプションは**必須**（Implementation Check のため）
+   - `--body` や `--body-file` は使用しない
+   - テンプレートは GitHub が自動的に表示するので、PR 作成後にブラウザで編集する
+   - CI チェックが通るまで待ってからレビュー依頼する
 
 7. **PR URL の確認**
    - PR が正しく作成されたことを確認

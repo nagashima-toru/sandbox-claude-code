@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import MessageModal from './MessageModal';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { useState } from 'react';
+import { AuthContext } from '@/contexts/AuthContext';
+import { ROLES } from '@/lib/constants/roles';
 
 const meta = {
   title: 'Messages/MessageModal',
@@ -83,5 +85,119 @@ export const Submitting: Story = {
   render: (args) => {
     const [open, setOpen] = useState(args.open);
     return <MessageModal {...args} open={open} onOpenChange={setOpen} />;
+  },
+};
+
+/**
+ * ADMIN role can see create modal
+ */
+export const CreateModeAdmin: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => {},
+    onSubmit: (data) => console.log('Submit:', data),
+    mode: 'create',
+    isSubmitting: false,
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(args.open);
+    return (
+      <AuthContext.Provider
+        value={{
+          user: { username: 'admin', role: ROLES.ADMIN },
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        <MessageModal
+          {...args}
+          open={open}
+          onOpenChange={setOpen}
+          onSubmit={(data) => {
+            console.log('Submit:', data);
+            setOpen(false);
+          }}
+        />
+      </AuthContext.Provider>
+    );
+  },
+};
+
+/**
+ * VIEWER role cannot see create modal (returns null)
+ */
+export const CreateModeViewer: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => {},
+    onSubmit: (data) => console.log('Submit:', data),
+    mode: 'create',
+    isSubmitting: false,
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(args.open);
+    return (
+      <AuthContext.Provider
+        value={{
+          user: { username: 'viewer', role: ROLES.VIEWER },
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        <div className="p-4 border rounded">
+          <p className="text-sm text-gray-600 mb-4">
+            VIEWER role: Modal should not be displayed (component returns null)
+          </p>
+          <MessageModal
+            {...args}
+            open={open}
+            onOpenChange={setOpen}
+            onSubmit={(data) => {
+              console.log('Submit:', data);
+              setOpen(false);
+            }}
+          />
+        </div>
+      </AuthContext.Provider>
+    );
+  },
+};
+
+/**
+ * VIEWER role can see edit modal
+ */
+export const EditModeViewer: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => {},
+    onSubmit: (data) => console.log('Submit:', data),
+    mode: 'edit',
+    initialData: mockMessage,
+    isSubmitting: false,
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(args.open);
+    return (
+      <AuthContext.Provider
+        value={{
+          user: { username: 'viewer', role: ROLES.VIEWER },
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        <MessageModal
+          {...args}
+          open={open}
+          onOpenChange={setOpen}
+          onSubmit={(data) => {
+            console.log('Submit:', data);
+            setOpen(false);
+          }}
+        />
+      </AuthContext.Provider>
+    );
   },
 };
