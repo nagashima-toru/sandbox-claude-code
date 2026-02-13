@@ -468,6 +468,107 @@ it('should work with custom context value', () => {
 - `git add` や `git commit` でファイルが見つからない → 現在のディレクトリを確認
 - パスの指定が相対パスか絶対パスか不明 → `pwd` で確認してから実行
 
+## PR Creation
+
+**IMPORTANT**: PR 作成時は必ず適切なテンプレートを使用すること。テンプレートを使わないと **Implementation Check が失敗します**。
+
+### Story PR の場合
+
+```bash
+gh pr create --base feature/issue-[N]-[epic-name] \
+             --head feature/issue-[N]-[epic-name]-story[M] \
+             --template .github/PULL_REQUEST_TEMPLATE/story.md
+```
+
+**例**: Epic #133 の Story 5
+
+```bash
+gh pr create --base feature/issue-133-permission-ui \
+             --head feature/issue-133-permission-ui-story5 \
+             --template .github/PULL_REQUEST_TEMPLATE/story.md
+```
+
+### Epic PR の場合
+
+```bash
+gh pr create --base master \
+             --head feature/issue-[N]-[epic-name] \
+             --template .github/PULL_REQUEST_TEMPLATE/epic.md
+```
+
+### Spec PR の場合
+
+```bash
+gh pr create --base master \
+             --head feature/issue-[N]-spec \
+             --template .github/PULL_REQUEST_TEMPLATE/spec.md
+```
+
+### 自動化スクリプト
+
+プロジェクトルートから以下のスクリプトを使用すると、テンプレートを自動選択できます:
+
+```bash
+./scripts/create-story-pr.sh [issue-number] [story-number]
+```
+
+## React Query Troubleshooting
+
+### 症状
+
+- ログイン後、古いユーザー情報が表示される
+- ロールを切り替えても権限が反映されない
+- API を呼び出したはずなのに古いデータが表示される
+
+### 原因
+
+React Query のキャッシュ設定（`staleTime`, `gcTime`）により、古いデータがキャッシュに残っている可能性があります。
+
+AuthContext の設定例:
+
+```typescript
+useGetCurrentUser({
+  query: {
+    staleTime: 5 * 60 * 1000, // 5分間キャッシュ
+    gcTime: 10 * 60 * 1000, // 10分間メモリ保持
+    // ...
+  },
+});
+```
+
+### 解決方法
+
+1. **ハードリフレッシュ**: `Cmd+Shift+R` (Mac) / `Ctrl+Shift+R` (Windows/Linux)
+   - ブラウザキャッシュと React Query キャッシュを両方クリア
+
+2. **ログアウト→ログイン**: 新しいトークンで再認証
+   - localStorage のトークンがクリアされ、新しいユーザー情報を取得
+
+3. **React Query DevTools で確認**: キャッシュの状態を可視化
+
+   ```typescript
+   import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+   // layout.tsx に追加
+   <ReactQueryDevtools initialIsOpen={false} />
+   ```
+
+4. **開発時のキャッシュ無効化** (必要に応じて):
+   ```typescript
+   useGetCurrentUser({
+     query: {
+       staleTime: 0, // 常に最新データを取得
+       gcTime: 0, // キャッシュしない
+     },
+   });
+   ```
+
+### 予防策
+
+- 認証状態が変わる操作（ログイン、ロール変更）の後は、ページリフレッシュを促す UI を表示
+- `refetch()` を明示的に呼び出して最新データを取得
+- 重要な権限チェックはバックエンドで実施（フロントエンドは表示制御のみ）
+
 ## Code Style Guidelines
 
 - **Components**: Functional with TypeScript
