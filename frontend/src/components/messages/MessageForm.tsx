@@ -81,6 +81,7 @@ export default function MessageForm({
                   placeholder="Enter message code"
                   {...field}
                   disabled={isSubmitting || disabled}
+                  aria-disabled={isSubmitting || disabled}
                   aria-readonly={disabled}
                   data-testid="message-code-input"
                 />
@@ -102,6 +103,7 @@ export default function MessageForm({
                   placeholder="Enter message content"
                   {...field}
                   disabled={isSubmitting || disabled}
+                  aria-disabled={isSubmitting || disabled}
                   aria-readonly={disabled}
                   data-testid="message-content-input"
                 />
@@ -122,7 +124,12 @@ export default function MessageForm({
             {disabled ? 'Close' : 'Cancel'}
           </Button>
           {!disabled && (
-            <Button type="submit" disabled={isSubmitting} data-testid="message-form-submit">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              aria-disabled={isSubmitting}
+              data-testid="message-form-submit"
+            >
               {isSubmitting ? 'Saving...' : 'Save'}
             </Button>
           )}
