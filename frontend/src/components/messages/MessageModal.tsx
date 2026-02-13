@@ -44,16 +44,21 @@ export default function MessageModal({
     return null;
   }
 
+  const title =
+    mode === 'create' ? 'Create New Message' : isReadOnly ? 'View Message' : 'Edit Message';
+  const description =
+    mode === 'create'
+      ? 'Fill in the details to create a new message.'
+      : isReadOnly
+        ? 'Message details (read-only)'
+        : 'Update the message details below.';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]" data-testid="message-modal">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Create New Message' : 'Edit Message'}</DialogTitle>
-          <DialogDescription>
-            {mode === 'create'
-              ? 'Fill in the details to create a new message.'
-              : 'Update the message details below.'}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <MessageForm
           onSubmit={onSubmit}
@@ -61,6 +66,7 @@ export default function MessageModal({
           isSubmitting={isSubmitting}
           onCancel={handleCancel}
           error={error}
+          disabled={isReadOnly}
         />
       </DialogContent>
     </Dialog>

@@ -116,18 +116,16 @@ export default function MessageForm({
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isSubmitting || disabled}
+            disabled={isSubmitting}
             data-testid="message-form-cancel"
           >
-            Cancel
+            {disabled ? 'Close' : 'Cancel'}
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || disabled}
-            data-testid="message-form-submit"
-          >
-            {isSubmitting ? 'Saving...' : 'Save'}
-          </Button>
+          {!disabled && (
+            <Button type="submit" disabled={isSubmitting} data-testid="message-form-submit">
+              {isSubmitting ? 'Saving...' : 'Save'}
+            </Button>
+          )}
         </div>
       </form>
     </Form>
