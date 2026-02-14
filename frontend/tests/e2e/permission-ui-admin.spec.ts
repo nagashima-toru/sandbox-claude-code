@@ -21,7 +21,7 @@ import {
 test.describe('Permission UI - ADMIN Role', () => {
   test.beforeEach(async ({ page }) => {
     // Login as ADMIN user
-    await login(page, 'testuser', 'password123');
+    await login(page, 'admin', 'admin123');
     await waitForFrontend(page);
   });
 

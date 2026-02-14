@@ -266,7 +266,7 @@ Forms automatically switch to readonly mode for VIEWER role:
 
 Use test credentials for different roles:
 
-- ADMIN: `testuser` / `password123`
+- ADMIN: `admin` / `admin123`
 - VIEWER: `viewer` / `viewer123`
 
 **Security Note**: Permission checks in the UI are for display control only. All security enforcement is handled by the backend API.
@@ -311,7 +311,7 @@ Use `page.context().newPage()` to test interactions between different users:
 test('VIEWER can view ADMIN created data', async ({ page }) => {
   // Create data as ADMIN
   const adminPage = await page.context().newPage();
-  await login(adminPage, 'testuser', 'password123');
+  await login(adminPage, 'admin', 'admin123');
   await waitForFrontend(adminPage);
   await createMessage(adminPage, 'TEST_CODE', 'Test content');
   await adminPage.close();

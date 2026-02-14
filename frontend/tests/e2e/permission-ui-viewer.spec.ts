@@ -108,7 +108,7 @@ test.describe('Permission UI - VIEWER Role', () => {
 
     // First, create a test message as ADMIN
     const adminPage = await page.context().newPage();
-    await login(adminPage, 'testuser', 'password123');
+    await login(adminPage, 'admin', 'admin123');
     await waitForFrontend(adminPage);
 
     const timestamp = Date.now();

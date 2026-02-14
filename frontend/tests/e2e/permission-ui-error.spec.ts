@@ -63,7 +63,7 @@ test.describe('Permission UI - Error Handling', () => {
   test('should return 403 when VIEWER attempts to update a message', async ({ page, request }) => {
     // First, create a test message as ADMIN
     const adminPage = await page.context().newPage();
-    await login(adminPage, 'testuser', 'password123');
+    await login(adminPage, 'admin', 'admin123');
     await waitForFrontend(adminPage);
 
     const timestamp = Date.now();
@@ -113,7 +113,7 @@ test.describe('Permission UI - Error Handling', () => {
   test('should return 403 when VIEWER attempts to delete a message', async ({ page, request }) => {
     // First, create a test message as ADMIN
     const adminPage = await page.context().newPage();
-    await login(adminPage, 'testuser', 'password123');
+    await login(adminPage, 'admin', 'admin123');
     await waitForFrontend(adminPage);
 
     const timestamp = Date.now();
