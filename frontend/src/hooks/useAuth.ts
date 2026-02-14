@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLogin, useLogout, useRefreshToken } from '@/lib/api/generated/auth/auth';
 import type { LoginRequest, LoginResponse } from '@/lib/api/generated/models';
 
@@ -31,6 +32,7 @@ export const useAuth = (): UseAuthReturn => {
     refreshToken: null,
   });
 
+  const queryClient = useQueryClient();
   const loginMutation = useLogin();
   const logoutMutation = useLogout();
   const refreshMutation = useRefreshToken();
@@ -105,8 +107,10 @@ export const useAuth = (): UseAuthReturn => {
       console.warn('Logout API call failed, but clearing local tokens', error);
     } finally {
       clearTokens();
+      // Clear React Query cache to prevent stale data after logout
+      queryClient.clear();
     }
-  }, [logoutMutation, clearTokens]);
+  }, [logoutMutation, clearTokens, queryClient]);
 
   const refreshAuth = useCallback(async () => {
     const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
