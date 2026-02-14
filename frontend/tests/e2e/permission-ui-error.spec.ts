@@ -20,7 +20,7 @@ test.describe('Permission UI - Error Handling', () => {
 
     // Get the auth token from localStorage
     const token = await page.evaluate(() => {
-      return localStorage.getItem('accessToken');
+      return localStorage.getItem('access_token');
     });
 
     if (!token) {
