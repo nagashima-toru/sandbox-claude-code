@@ -8,8 +8,9 @@ Epic Documents に基づく開発では、以下のブランチ戦略を採用�
 
 ```
 master (main branch)
-  └── feature/issue-[N]-[epic-name]  ← epic のベースブランチ
-       ├── feature/issue-[N]-[epic-name]-story1
+  └── feature/issue-[N]-[epic-name]  ← Epic のベースブランチ
+       ├── feature/issue-[N]-[epic-name]-spec    ← 仕様PR (OpenAPI + 受け入れ条件)
+       ├── feature/issue-[N]-[epic-name]-story1  ← Story 実装
        ├── feature/issue-[N]-[epic-name]-story2
        ├── feature/issue-[N]-[epic-name]-story3
        └── ...
@@ -20,6 +21,7 @@ master (main branch)
 ```
 master
   └── feature/issue-88-auth
+       ├── feature/issue-88-auth-spec    (仕様定義: OpenAPI + 受け入れ条件)
        ├── feature/issue-88-auth-story1  (ユーザー管理基盤)
        ├── feature/issue-88-auth-story2  (JWT認証基盤)
        ├── feature/issue-88-auth-story3  (認証エンドポイント)
@@ -30,15 +32,41 @@ master
 
 ## ワークフロー
 
-### 1. Epic 開始時
+### 0. 仕様 PR 作成（Epic 開始前）
 
 ```bash
-# master から epic のベースブランチを作成
+# Epic ベースブランチを作成
 git checkout master
 git pull
 git checkout -b feature/issue-88-auth
 git push -u origin feature/issue-88-auth
+
+# 仕様ブランチを作成
+git checkout -b feature/issue-88-auth-spec
+
+# OpenAPI仕様と受け入れ条件を追加
+# ...編集作業...
+
+# 仕様PRを Epic ベースブランチに向けて作成
+gh pr create --base feature/issue-88-auth \
+             --head feature/issue-88-auth-spec \
+             --template .github/PULL_REQUEST_TEMPLATE/spec.md \
+             --label spec
+
+# レビュー・承認後、Epic ベースブランチにマージ
+gh pr merge --merge
+
+# Issue に spec-approved ラベル付与
+gh issue edit 88 --add-label spec-approved
 ```
+
+**重要**: 仕様PRは master ではなく **Epic ベースブランチ** にマージします。これにより、master のビルドを保護できます（OpenAPI 仕様は既存 Controller に実装を強制するため）。
+
+---
+
+### 1. Epic 開始時（仕様承認後）
+
+Epic ベースブランチは仕様PR作成時に既に作成済みです。
 
 ---
 
@@ -73,15 +101,15 @@ gh pr create --base feature/issue-88-auth \
 
 ---
 
-### 4. 全 Story 完了後（最終 PR）
+### 4. 全 Story 完了後（Epic PR: Epic branch → master）
 
 ```bash
-# epic ベースブランチ → master へ PR
+# Epic ベースブランチ → master へ PR
 gh pr create --base master \
              --head feature/issue-88-auth \
              --template .github/PULL_REQUEST_TEMPLATE/epic.md
 
-# PR タイトル例: "[Issue #88] 認証・認可機能の実装"
+# PR タイトル例: "[Epic #88] 認証・認可機能の実装"
 ```
 
 **PR 本文の必須項目:**
@@ -89,6 +117,15 @@ gh pr create --base master \
 - `Closes #[Issue番号]` （例: `Closes #88`）
 - 全 Story の完了確認
 - テスト実施結果
+- 仕様 PR への参照
+
+**この Epic PR には以下が含まれます:**
+
+- 仕様 (OpenAPI + 受け入れ条件)
+- 全 Story の実装
+- すべてのテストコード
+
+これにより、master は常にビルド可能な状態を保ちます。
 
 ---
 
