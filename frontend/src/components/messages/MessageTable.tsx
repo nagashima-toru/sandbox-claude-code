@@ -137,7 +137,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
           data-testid="readonly-info-message"
         >
           <Info className="h-4 w-4 flex-shrink-0" />
-          <span>You are in read-only mode. Contact an administrator to make changes.</span>
+          <span>閲覧のみ可能です。変更するには管理者に連絡してください。</span>
         </div>
       )}
 
