@@ -175,25 +175,18 @@ test.describe('Permission UI - VIEWER Role', () => {
       const modal = page.getByTestId('message-modal');
       await expect(modal).toBeVisible({ timeout: 10000 });
 
-      // Try to interact with disabled fields (should not be possible)
+      // Verify fields are disabled (read-only mode)
       const codeInput = page.getByTestId('message-code-input');
       const contentInput = page.getByTestId('message-content-input');
 
-      // Get current values
-      const originalCode = await codeInput.inputValue();
-      const originalContent = await contentInput.inputValue();
+      await expect(codeInput).toBeDisabled();
+      await expect(contentInput).toBeDisabled();
 
-      // Attempt to fill (should not work because fields are disabled)
-      await codeInput.fill('SHOULD_NOT_WORK').catch(() => {
-        /* Expected to fail */
-      });
-      await contentInput.fill('SHOULD_NOT_WORK').catch(() => {
-        /* Expected to fail */
-      });
-
-      // Verify values haven't changed
-      await expect(codeInput).toHaveValue(originalCode);
-      await expect(contentInput).toHaveValue(originalContent);
+      // Verify fields have values (readonly fields should still display data)
+      const codeValue = await codeInput.inputValue();
+      const contentValue = await contentInput.inputValue();
+      expect(codeValue).toBeTruthy();
+      expect(contentValue).toBeTruthy();
 
       // Close the modal
       const cancelButton = page.getByTestId('message-form-cancel');
