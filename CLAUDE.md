@@ -75,6 +75,7 @@ docker compose -f docker-compose.yml up  # Production mode
 13. deploy 前確認
 
 **重要**:
+
 - 仕様が確定してから実装計画を立てる（手戻りを防ぐ）
 - **仕様PRには実装を含まない**: ステップ4の仕様PRではOpenAPI仕様と受け入れ条件のみを追加し、実装コード（バックエンド・フロントエンド）は含めない。実装はステップ9以降で行う。
 - **実装計画策定時の注意**: ステップ7で実装計画を立てる際、仕様PRで追加されたAPIエンドポイントは未実装であることを前提とし、バックエンド実装とフロントエンド実装の両方をStoryに含める必要がある。
@@ -140,23 +141,29 @@ Epic の状態に応じて、適切なスキルを使用してください。
 **推奨フロー**:
 
 1. **Epic 開始前**:
+
    ```bash
    /epic-status 88  # 状況確認
    ```
+
    - 未実装の Story があることを確認
    - 次に実装すべき Story を特定
 
 2. **Epic 実装中**:
+
    ```bash
    /implement-epic 88  # Story 実装
    ```
+
    - 未完了 Story がある場合、自動的に次の Story を実装
    - 完了済み Epic の場合、代替アクション（振り返り等）を提案
 
 3. **Epic 完了後**:
+
    ```bash
    /retrospective Epic #88  # 全体振り返り
    ```
+
    - Epic 全体の学びと改善点を記録
    - 各 Story の振り返りを総括
 
@@ -195,6 +202,50 @@ master
 ```
 
 See [docs/development/GIT_WORKFLOW.md](docs/development/GIT_WORKFLOW.md) for details.
+
+### Story PR Format Requirements
+
+**CRITICAL**: When creating a Story PR (Story branch → Epic base branch), the PR body **MUST** include the Issue number in one of the following formats:
+
+```markdown
+Story: #[Issue番号]
+```
+
+or
+
+```markdown
+Closes #[Issue番号]
+```
+
+**Example (Correct)**:
+
+```markdown
+Story: #133
+
+## Story 概要
+Story 8: E2Eテストと最終確認
+...
+```
+
+**Example (Incorrect)**:
+
+```markdown
+関連 Issue: #133  ❌ Implementation Check will fail
+Issue #133        ❌ Implementation Check will fail
+Ref: #133         ❌ Implementation Check will fail
+```
+
+**Why This Matters**:
+
+- The Implementation Check workflow uses regex to extract the Issue number from the PR body
+- Only `Story: #xxx` or `Closes #xxx` (and variants like `Fixes`, `Resolves`) are recognized
+- If the format is incorrect, the Implementation Check will fail and block the PR
+
+**Important Notes**:
+
+- Editing the PR body after creation does NOT re-trigger existing CI runs
+- To re-trigger CI after fixing the PR body, push an empty commit: `git commit --allow-empty -m "chore: trigger CI" && git push`
+- Always use the `/create-story-pr` skill or `./scripts/create-story-pr.sh` script to ensure correct formatting
 
 ## Code Formatting
 

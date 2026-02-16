@@ -182,6 +182,188 @@ frontend/
 - Pagination (10, 25, 50, 100 items)
 - CRUD operations via modals
 
+### Permission Control
+
+This application implements role-based permission control for UI elements:
+
+**Supported Roles**:
+
+- `ADMIN`: Full access (create, edit, delete)
+- `VIEWER`: Read-only access
+
+**Implementation**:
+
+```typescript
+// Get current user information
+import { useAuth } from '@/contexts/AuthContext';
+
+function MyComponent() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  // user.role is 'ADMIN' or 'VIEWER'
+  const canEdit = user?.role === 'ADMIN';
+
+  return (
+    <>
+      {canEdit && <Button>Edit</Button>}
+    </>
+  );
+}
+```
+
+**Permission Hooks**:
+
+```typescript
+import { usePermission } from '@/hooks/usePermission';
+
+function MyComponent() {
+  const { canCreate, canUpdate, canDelete, isReadOnly } = usePermission();
+
+  return (
+    <>
+      {canCreate && <Button>Create</Button>}
+      {canUpdate && <Button>Update</Button>}
+      {canDelete && <Button>Delete</Button>}
+      {isReadOnly && <InfoMessage>閲覧のみ可能です</InfoMessage>}
+    </>
+  );
+}
+```
+
+**Role-Based Component**:
+
+```typescript
+import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
+
+function MyComponent() {
+  return (
+    <>
+      <RoleBasedComponent allowedRoles={['ADMIN']}>
+        <Button>Admin Only</Button>
+      </RoleBasedComponent>
+
+      <RoleBasedComponent allowedRoles={['ADMIN', 'VIEWER']}>
+        <p>Visible to all</p>
+      </RoleBasedComponent>
+    </>
+  );
+}
+```
+
+**Readonly Form Mode**:
+
+Forms automatically switch to readonly mode for VIEWER role:
+
+- All input fields are disabled
+- Submit and delete buttons are hidden
+- Only "Close" button is shown
+
+**Testing Permission UI**:
+
+Use test credentials for different roles:
+
+- ADMIN: `admin` / `admin123`
+- VIEWER: `viewer` / `viewer123`
+
+**Security Note**: Permission checks in the UI are for display control only. All security enforcement is handled by the backend API.
+
+### E2E Testing Patterns
+
+#### API Direct Call Testing
+
+Use Playwright's `request` fixture to test API responses directly without browser interaction:
+
+```typescript
+test('should return 403 for unauthorized access', async ({ page, request }) => {
+  // Get auth token from page
+  await login(page, 'viewer', 'viewer123');
+  const token = await page.evaluate(() => localStorage.getItem('accessToken'));
+
+  // Direct API call
+  const response = await request.post('http://localhost:8080/api/messages', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    data: { code: 'TEST', content: 'Test' },
+  });
+
+  // Verify response
+  expect(response.status()).toBe(403);
+
+  // Verify RFC 7807 error format
+  const errorBody = await response.json();
+  expect(errorBody).toHaveProperty('type');
+  expect(errorBody).toHaveProperty('title');
+  expect(errorBody).toHaveProperty('status', 403);
+});
+```
+
+#### Multi-User Testing
+
+Use `page.context().newPage()` to test interactions between different users:
+
+```typescript
+test('VIEWER can view ADMIN created data', async ({ page }) => {
+  // Create data as ADMIN
+  const adminPage = await page.context().newPage();
+  await login(adminPage, 'admin', 'admin123');
+  await waitForFrontend(adminPage);
+  await createMessage(adminPage, 'TEST_CODE', 'Test content');
+  await adminPage.close();
+
+  // View as VIEWER
+  await login(page, 'viewer', 'viewer123');
+  await waitForFrontend(page);
+
+  const searchInput = page.getByTestId('search-input');
+  await searchInput.fill('TEST_CODE');
+  await page.waitForTimeout(600);
+
+  const row = page.locator(`[data-testid^="message-row-"]:has-text("TEST_CODE")`);
+  await expect(row).toBeVisible();
+});
+```
+
+#### Test Helpers
+
+Create reusable helper functions in `tests/e2e/helpers.ts`:
+
+```typescript
+// Login helper
+export async function login(page: Page, username: string, password: string) {
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+  await page.getByTestId('login-username-input').fill(username);
+  await page.getByTestId('login-password-input').fill(password);
+  await page.getByTestId('login-submit-button').click();
+  await page.waitForURL('/', { timeout: 10000 });
+}
+
+// Wait for frontend to be ready
+export async function waitForFrontend(page: Page) {
+  await page.waitForLoadState('networkidle');
+  const searchInput = page.getByTestId('search-input');
+  await expect(searchInput).toBeVisible({ timeout: 15000 });
+}
+```
+
+#### Running E2E Tests Locally
+
+```bash
+# Using the convenience script
+./scripts/e2e-test-local.sh
+
+# Or manually
+docker compose up postgres -d
+cd backend && ./mvnw spring-boot:run &
+cd frontend && pnpm test:e2e
+```
+
 ### Validation (React Hook Form + Zod)
 
 ```typescript
@@ -416,6 +598,7 @@ it('should work with custom context value', () => {
 
 - **実装と同時にテストを修正**: 既存コードに影響を与える変更（Context の型変更、新しい Hook の追加など）を行う際は、実装と同時に影響を受けるテストも修正する
 - **Next.js Hooks のモック**: `useRouter`, `useSearchParams` などの Next.js Hooks を使用するコンポーネントをテストする場合は、`next/navigation` のモックを準備する
+
   ```typescript
   // Test file
   vi.mock('next/navigation', () => ({
@@ -426,7 +609,9 @@ it('should work with custom context value', () => {
     }),
   }));
   ```
+
 - **QueryClientProvider のラップ**: React Query を使用する Hook をテストする場合は、テスト用の wrapper を作成する
+
   ```typescript
   function createWrapper() {
     const queryClient = new QueryClient({
@@ -554,6 +739,7 @@ useGetCurrentUser({
    ```
 
 4. **開発時のキャッシュ無効化** (必要に応じて):
+
    ```typescript
    useGetCurrentUser({
      query: {

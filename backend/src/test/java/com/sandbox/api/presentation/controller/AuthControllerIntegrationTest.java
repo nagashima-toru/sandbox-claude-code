@@ -56,7 +56,7 @@ class AuthControllerIntegrationTest {
             + "VALUES (?, ?, 'VIEWER', true, NOW()) "
             + "ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash",
         "viewer",
-        passwordEncoder.encode("password123"));
+        passwordEncoder.encode("viewer123"));
   }
 
   @Test
@@ -263,7 +263,7 @@ class AuthControllerIntegrationTest {
         """
         {
             "username": "viewer",
-            "password": "password123"
+            "password": "viewer123"
         }
         """;
 

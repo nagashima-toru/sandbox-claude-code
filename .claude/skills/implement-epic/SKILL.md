@@ -61,6 +61,7 @@ description: Execute Story implementation workflow including task management, te
    **完了済み Epic を検出した場合の処理**:
 
    a. ユーザーに報告：
+
    ```
    Epic #[N] は既に完了しています：
    - 全 Story ([M]/[M]) 完了
@@ -212,6 +213,7 @@ description: Execute Story implementation workflow including task management, te
    - Storybook ストーリーを作成する前に、既存のストーリーファイルを Read して、型定義や構造を確認
 
    **例**: Context を実装する場合
+
    ```bash
    # 1. 既存の Context パターンを確認
    Read frontend/src/contexts/AuthContext.tsx
