@@ -117,8 +117,9 @@ test.describe('Permission UI - VIEWER Role', () => {
     await createMessage(adminPage, testCode, testContent);
     await adminPage.close();
 
-    // Reload VIEWER page to get the latest data (clear React Query cache)
-    await page.reload();
+    // Re-login as VIEWER because adminPage login overwrote the localStorage token
+    // (both pages share the same browser context and localStorage)
+    await login(page, 'viewer', 'viewer123');
     await waitForFrontend(page);
 
     // Now, as VIEWER, search for this message
