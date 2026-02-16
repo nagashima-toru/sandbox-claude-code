@@ -38,7 +38,7 @@ test.describe('Permission UI - Error Handling', () => {
     };
 
     // Make a direct API call with VIEWER token
-    const response = await request.post('http://localhost:8080/api/messages', {
+    const response = await request.post('http://127.0.0.1:8080/api/messages', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ test.describe('Permission UI - Error Handling', () => {
       content: 'Updated by VIEWER - should fail',
     };
 
-    const response = await request.put(`http://localhost:8080/api/messages/${messageId}`, {
+    const response = await request.put(`http://127.0.0.1:8080/api/messages/${messageId}`, {
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ test.describe('Permission UI - Error Handling', () => {
     await adminPage.close();
 
     // Now, as VIEWER, attempt to delete the message via API
-    const response = await request.delete(`http://localhost:8080/api/messages/${messageId}`, {
+    const response = await request.delete(`http://127.0.0.1:8080/api/messages/${messageId}`, {
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -155,7 +155,7 @@ test.describe('Permission UI - Error Handling', () => {
 
   test('should verify RFC 7807 error format structure', async ({ request }) => {
     // Use create endpoint as an example (any forbidden action works)
-    const response = await request.post('http://localhost:8080/api/messages', {
+    const response = await request.post('http://127.0.0.1:8080/api/messages', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
