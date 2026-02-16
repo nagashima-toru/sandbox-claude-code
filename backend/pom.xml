@@ -23,7 +23,7 @@
         <mockito.version>5.21.0</mockito.version>
         <byte-buddy.version>1.17.5</byte-buddy.version>
         <!-- Spring Cloud version -->
-        <spring-cloud.version>2024.0.1</spring-cloud.version>
+        <spring-cloud.version>2025.1.1</spring-cloud.version>
         <!-- Security vulnerability fixes -->
         <tomcat.version>10.1.52</tomcat.version>
         <postgresql.version>42.7.10</postgresql.version>
