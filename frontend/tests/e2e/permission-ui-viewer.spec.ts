@@ -117,6 +117,10 @@ test.describe('Permission UI - VIEWER Role', () => {
     await createMessage(adminPage, testCode, testContent);
     await adminPage.close();
 
+    // Reload VIEWER page to get the latest data (clear React Query cache)
+    await page.reload();
+    await waitForFrontend(page);
+
     // Now, as VIEWER, search for this message
     const searchInput = page.getByTestId('search-input');
     await searchInput.fill(testCode);
