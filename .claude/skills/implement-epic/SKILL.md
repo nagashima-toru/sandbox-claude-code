@@ -261,10 +261,20 @@ description: Execute Story implementation workflow including task management, te
       - 既存テストを変更するより、新規テストを追加する方が安全
       - 既存テストは残したまま、新しいテストケースを追加できないか検討
 
-3. **ローカルテスト**
-   - Backend: `cd backend && ./mvnw test`
-   - Frontend: `cd frontend && pnpm test`
+3. **ローカルテスト**（テスト実行後は必ずルートに戻る）
+
+   **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
+
+   ```bash
+   # Backend の場合
+   cd backend && ./mvnw test && cd ..
+
+   # Frontend の場合
+   cd frontend && pnpm test && cd ..
+   ```
+
    - 全テストが通ることを確認
+   - テスト実行後、次の git コマンドのために必ずルートディレクトリに戻る
 
    **統合テスト失敗時のトラブルシューティング**:
 
@@ -334,21 +344,27 @@ description: Execute Story implementation workflow including task management, te
 
    Story の全タスク完了後、push 前に必ずテストを実行する：
 
+   **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
+
    ```bash
    # Backend の場合
-   cd backend && ./mvnw test
+   cd backend && ./mvnw test && cd ..
 
    # Frontend の場合
-   cd frontend && pnpm test
+   cd frontend && pnpm test && cd ..
 
    # E2E テストを修正した場合
-   cd frontend && pnpm test:e2e
+   cd frontend && pnpm test:e2e && cd ..
    ```
+
+   - テスト実行後、次の git コマンドのために必ずルートディレクトリに戻る
+   - `pwd` で現在位置を確認してから次の操作に進む
 
    **重要**: テストコードを修正した場合、必ず以下を実行：
    - [ ] 修正したテストを実行して成功することを確認
    - [ ] 全テストを実行してリグレッションがないことを確認
    - [ ] テスト結果を tasklist.md に記録
+   - [ ] **テスト実行後、プロジェクトルートに戻ったことを確認**（`pwd`）
 
    **テスト未実行での push は禁止**:
    - テストを実行せずに push すると CI で失敗し、手戻りが発生する
