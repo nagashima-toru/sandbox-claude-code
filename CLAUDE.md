@@ -288,6 +288,49 @@ See [docs/quality/LOCAL_CI_VERIFICATION.md](docs/quality/LOCAL_CI_VERIFICATION.m
 - Branch: `feature/`, `bugfix/`, `hotfix/`
 - Run CI check before PR: `./scripts/ci-check-local.sh`
 
+### Working Directory
+
+**重要**: 常にプロジェクトルート (`/Users/.../sandbox-claude-code`) で作業を開始する
+
+**ルール**:
+
+1. **基本は常にルートディレクトリ**: git コマンド、スクリプト実行は基本的にルートから実行
+2. **サブディレクトリでの作業時**: 必ず作業後にルートに戻る
+
+   ```bash
+   # ❌ 悪い例
+   cd frontend
+   pnpm test
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例
+   cd frontend && pnpm test && cd ..
+   git add frontend/src/...
+   ```
+
+3. **pwd で現在位置を常に確認**: コマンド実行前に `pwd` で位置を確認する習慣をつける
+4. **作業完了後は必ずルートに戻る**: `cd ..` でルートディレクトリに戻る
+
+### Test Coverage
+
+**目標**: 新規実装時はカバレッジ 90% 以上を目標とする
+
+**カバレッジ確認**:
+
+```bash
+# Frontend
+cd frontend && pnpm test:coverage
+
+# Backend
+cd backend && ./mvnw test jacoco:report
+```
+
+**カバレッジ比較** (before/after):
+
+```bash
+./scripts/coverage-diff.sh frontend/coverage/coverage-before.json frontend/coverage/coverage-summary.json
+```
+
 ## Working Agreement
 
 This section defines the working agreement between developers and Claude Code for this project.

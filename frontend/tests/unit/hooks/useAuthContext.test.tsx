@@ -5,12 +5,17 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
+// Mock router
+const mockPush = vi.fn();
+const mockReplace = vi.fn();
+const mockPrefetch = vi.fn();
+
 // Mock useRouter and usePathname
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    prefetch: vi.fn(),
+    push: mockPush,
+    replace: mockReplace,
+    prefetch: mockPrefetch,
   }),
   usePathname: () => '/',
 }));
@@ -79,5 +84,36 @@ describe('useAuthContext', () => {
 
     // NOTE: refetchの動作検証は、統合テストで実施する
     // 現時点では関数が提供されていることのみ確認
+  });
+
+  it('401エラー時、ログインページにリダイレクトする', async () => {
+    // Reset mocks
+    mockPush.mockClear();
+
+    // Mock useGetCurrentUser to return 401 error
+    const { useGetCurrentUser } = await import('@/lib/api/generated/auth/auth');
+    vi.mocked(useGetCurrentUser).mockReturnValueOnce({
+      data: undefined,
+      isLoading: false,
+      error: { status: 401, type: 'about:blank', title: 'Unauthorized' } as any,
+      refetch: vi.fn(),
+      isSuccess: false,
+      isError: true,
+      status: 'error',
+    } as any);
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
+    );
+
+    renderHook(() => useAuthContext(), { wrapper });
+
+    // Wait for useEffect to run
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Verify router.push was called with '/login'
+    expect(mockPush).toHaveBeenCalledWith('/login');
   });
 });
