@@ -180,6 +180,50 @@ describe('MessageTableRow', () => {
       screen.queryByRole('button', { name: /delete message TEST001/i })
     ).not.toBeInTheDocument();
   });
+
+  it('VIEWER ロールの場合、行クリックで onEdit が呼ばれる', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(
+      <ViewerWrapper>
+        <table>
+          <tbody>
+            <MessageTableRow message={mockMessage} onEdit={onEdit} onDelete={onDelete} />
+          </tbody>
+        </table>
+      </ViewerWrapper>
+    );
+
+    const row = screen.getByTestId(`message-row-${mockMessage.id}`);
+    await user.click(row);
+
+    expect(onEdit).toHaveBeenCalledWith(mockMessage);
+    expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it('ADMIN ロールの場合、行クリックで onEdit が呼ばれない', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(
+      <AdminWrapper>
+        <table>
+          <tbody>
+            <MessageTableRow message={mockMessage} onEdit={onEdit} onDelete={onDelete} />
+          </tbody>
+        </table>
+      </AdminWrapper>
+    );
+
+    const row = screen.getByTestId(`message-row-${mockMessage.id}`);
+    await user.click(row);
+
+    // ADMIN ロールでは行クリックで onEdit は呼ばれない
+    expect(onEdit).not.toHaveBeenCalled();
+  });
 });
 
 describe('MessageCard', () => {
@@ -322,5 +366,41 @@ describe('MessageCard', () => {
     expect(
       screen.queryByRole('button', { name: /delete message MOBILE001/i })
     ).not.toBeInTheDocument();
+  });
+
+  it('VIEWER ロールの場合、カードクリックで onEdit が呼ばれる', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(
+      <ViewerWrapper>
+        <MessageCard message={mockMessage} onEdit={onEdit} onDelete={onDelete} />
+      </ViewerWrapper>
+    );
+
+    const card = screen.getByTestId(`message-row-${mockMessage.id}`);
+    await user.click(card);
+
+    expect(onEdit).toHaveBeenCalledWith(mockMessage);
+    expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it('ADMIN ロールの場合、カードクリックで onEdit が呼ばれない', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(
+      <AdminWrapper>
+        <MessageCard message={mockMessage} onEdit={onEdit} onDelete={onDelete} />
+      </AdminWrapper>
+    );
+
+    const card = screen.getByTestId(`message-row-${mockMessage.id}`);
+    await user.click(card);
+
+    // ADMIN ロールではカードクリックで onEdit は呼ばれない
+    expect(onEdit).not.toHaveBeenCalled();
   });
 });
