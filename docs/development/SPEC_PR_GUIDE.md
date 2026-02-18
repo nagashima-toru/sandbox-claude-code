@@ -24,13 +24,19 @@ Epic Issue 作成
   ↓
 現在の実装調査
   ↓
-👉 仕様 PR 作成（ここ！）
+Epic ベースブランチ作成
   ↓
-レビュー・マージ
+👉 仕様 PR 作成（Epic branch へ）
+  ↓
+レビュー・マージ（Epic branch へ）
   ↓
 spec-approved
   ↓
 実装計画策定
+  ↓
+Story実装（Epic branch へ）
+  ↓
+Epic PR作成（master へ）
 ```
 
 ---
@@ -178,36 +184,156 @@ Feature: ログイン機能
 
 ---
 
+## 3. 空実装の追加（ビルドエラー回避）
+
+**重要**: 仕様PRには OpenAPI 仕様と受け入れ条件だけでなく、**空実装**も含めます。
+
+### なぜ空実装が必要か？
+
+OpenAPI 仕様から生成されるインターフェース（例: `AuthApi.java`）は、既存の Controller に新しいメソッドの実装を強制します。仕様だけを Epic ブランチにマージすると、**Epic ブランチがビルドエラー**になります。
+
+```java
+// ❌ 仕様PRだけマージした場合（ビルドエラー）
+
+// OpenAPI から自動生成される
+public interface AuthApi {
+  ResponseEntity<LoginResponse> login(...);
+  ResponseEntity<UserResponse> getCurrentUser();  // ← 追加
+}
+
+// 既存のController
+@RestController
+public class AuthController implements AuthApi {
+  public ResponseEntity<LoginResponse> login(...) { ... }
+  // getCurrentUser() がない → コンパイルエラー！
+}
+```
+
+### 空実装の例
+
+**Backend (Java/Spring Boot)**:
+
+```java
+// AuthController.java に追加
+@Override
+public ResponseEntity<UserResponse> getCurrentUser() {
+  throw new UnsupportedOperationException(
+    "Not implemented yet - Story 3: 現在のユーザー情報取得"
+  );
+}
+```
+
+**Frontend (TypeScript/Next.js)**:
+
+```typescript
+// 必要に応じて、対応するコンポーネントやページに空実装を追加
+export default function CurrentUserPage() {
+  return (
+    <div>
+      <h1>Not implemented yet - Story 3</h1>
+    </div>
+  );
+}
+```
+
+### 空実装のメリット
+
+| メリット | 説明 |
+|---------|------|
+| ✅ Epic ブランチが常にビルド可能 | CI/CD が正しく機能する |
+| ✅ 何を実装すべきか明確 | Story 実装者が空実装を検索して置き換えるだけ |
+| ✅ 仕様承認プロセスは維持 | PR でレビュー・承認できる |
+| ✅ レビュアーの混乱を防ぐ | ビルドエラーの原因を探す必要がない |
+
+### 空実装を置き換えるタイミング
+
+Story 実装時に、空実装を実際の実装で置き換えます：
+
+```java
+// Story 3 実装時
+@Override
+public ResponseEntity<UserResponse> getCurrentUser() {
+  // 空実装を削除し、実際の実装に置き換え
+  UserResponse response = getCurrentUserUseCase.execute();
+  return ResponseEntity.ok(AuthMapper.toGenerated(response));
+}
+```
+
+---
+
 ## 作成手順
 
-### Step 1: 仕様ブランチを作成
+### Step 1: Epic ベースブランチを作成
 
 ```bash
 git checkout master
 git pull
-git checkout -b spec/issue-88-auth
+git checkout -b feature/issue-88-auth
+git push -u origin feature/issue-88-auth
 ```
 
-### Step 2: OpenAPI 仕様を追加
+### Step 2: 仕様ブランチを作成
+
+```bash
+git checkout feature/issue-88-auth
+git checkout -b feature/issue-88-auth-spec
+```
+
+### Step 3: OpenAPI 仕様を追加
 
 `specs/openapi/openapi.yaml` にエンドポイントを追加
 
-### Step 3: 受け入れ条件を作成
+### Step 4: 受け入れ条件を作成
 
 ```bash
 mkdir -p specs/acceptance/auth
 # .feature ファイルを作成
 ```
 
-### Step 4: PR 作成
+### Step 5: 空実装を追加（重要）
+
+**Backend**:
+
+```java
+// 既存の Controller に空実装を追加
+@Override
+public ResponseEntity<UserResponse> getCurrentUser() {
+  throw new UnsupportedOperationException(
+    "Not implemented yet - Story 3: 現在のユーザー情報取得"
+  );
+}
+```
+
+**Frontend** (必要に応じて):
+
+```typescript
+// 対応するページやコンポーネントに空実装を追加
+export default function CurrentUserPage() {
+  return <div>Not implemented yet - Story 3</div>;
+}
+```
+
+### Step 6: テストとビルド確認
 
 ```bash
-gh pr create --base master \
-             --head spec/issue-88-auth \
+# Backend
+cd backend && ./mvnw verify
+
+# Frontend
+cd frontend && pnpm build
+```
+
+**重要**: 仕様PRをマージする前に、Epic ブランチがビルド可能であることを確認します。
+
+### Step 7: PR 作成（Epic branch へ）
+
+```bash
+gh pr create --base feature/issue-88-auth \
+             --head feature/issue-88-auth-spec \
              --template .github/PULL_REQUEST_TEMPLATE/spec.md \
              --label spec
 
-# PR タイトル例: "[Spec] 認証・認可機能の仕様定義"
+# PR タイトル例: "[Spec] Epic #88 仕様定義"
 ```
 
 **PR 本文の必須項目**:
@@ -215,6 +341,8 @@ gh pr create --base master \
 - `Story: #88`（Issue 番号）
 - 変更内容の概要
 - レビュー観点
+
+**重要**: 仕様PRは **Epic ベースブランチ** (`feature/issue-88-auth`) にマージします。masterのビルドを保護するため、実装完了まで仕様はEpicブランチ内に留めます。
 
 ---
 
@@ -227,11 +355,13 @@ Issue #88 に以下のコメントを追加：
 ```markdown
 ## ✅ 仕様承認完了
 
-仕様 PR #XX がマージされ、仕様が確定しました。
+仕様 PR #XX が Epic ベースブランチにマージされ、仕様が確定しました。
 
 ### 承認された仕様
 
-**仕様 PR**: #XX
+**仕様 PR**: #XX (Epic branch へマージ済み)
+
+**Epic ベースブランチ**: `feature/issue-88-auth`
 
 **OpenAPI 仕様**:
 - [`specs/openapi/openapi.yaml`](リンク)
@@ -248,8 +378,8 @@ Issue #88 に以下のコメントを追加：
 ### Next Steps
 
 - [ ] 実装計画策定（`.epic/20260203-88-auth/` 作成）
-- [ ] Epic ベースブランチ作成
-- [ ] Story 実装開始
+- [ ] Story 実装開始（Epic ブランチから分岐）
+- [ ] 全 Story 完了後、Epic PR で master へマージ
 ```
 
 ### 2. spec-approved ラベル付与
@@ -259,6 +389,29 @@ Issue #88 に `spec-approved` ラベルを手動で付与
 ### 3. 実装計画策定
 
 Issue のコメントを参照しながら `.epic/` を作成
+
+---
+
+## Epic ベースブランチへのマージの利点
+
+**なぜ master ではなく Epic ブランチにマージするのか？**
+
+1. **master のビルド保護**
+   - OpenAPI 仕様から自動生成されるインターフェース (例: `AuthApi.java`) は、既存の Controller に実装を強制する
+   - 仕様だけを master にマージすると、実装がないためビルドエラーになる
+   - Epic ブランチにマージすることで、master は常にビルド可能な状態を保つ
+
+2. **仕様承認プロセスの維持**
+   - GitHub の PR Approve 機能で正式に仕様承認できる
+   - レビュアーは仕様だけに集中してレビュー可能
+
+3. **柔軟な仕様変更**
+   - 実装中に仕様変更が必要になった場合、Epic ブランチ内で調整できる
+   - master への影響なし
+
+4. **一貫性の保証**
+   - Epic 全体（仕様 + 全 Story 実装）をまとめて master にマージ
+   - 仕様と実装の不整合が発生しない
 
 ---
 
@@ -272,6 +425,8 @@ Issue のコメントを参照しながら `.epic/` を作成
 - [ ] エラーレスポンスが RFC 7807 形式で定義されている
 - [ ] 認証が必要なエンドポイントに security が設定されている
 - [ ] Breaking Changes がある場合、明記されている
+- [ ] **空実装が追加されている**（Backend Controller など）
+- [ ] **Epic ブランチでビルドが成功する**（`./mvnw verify` または `pnpm build`）
 
 ---
 

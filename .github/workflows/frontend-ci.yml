@@ -45,7 +45,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -82,7 +82,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -116,7 +116,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -201,7 +201,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -238,7 +238,7 @@ jobs:
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Set up JDK 25 for backend build
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'temurin'
@@ -265,7 +265,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated

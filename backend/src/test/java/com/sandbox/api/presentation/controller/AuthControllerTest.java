@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sandbox.api.application.dto.UserResponse;
+import com.sandbox.api.application.usecase.auth.GetCurrentUserUseCase;
 import com.sandbox.api.application.usecase.auth.LoginUseCase;
 import com.sandbox.api.application.usecase.auth.LogoutUseCase;
 import com.sandbox.api.application.usecase.auth.RefreshTokenUseCase;
@@ -21,6 +23,7 @@ class AuthControllerTest {
   @Mock private LoginUseCase loginUseCase;
   @Mock private RefreshTokenUseCase refreshTokenUseCase;
   @Mock private LogoutUseCase logoutUseCase;
+  @Mock private GetCurrentUserUseCase getCurrentUserUseCase;
 
   @InjectMocks private AuthController authController;
 
@@ -89,5 +92,25 @@ class AuthControllerTest {
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     verify(logoutUseCase).execute("refresh-token-to-invalidate");
+  }
+
+  @Test
+  void getCurrentUser_shouldReturnUserResponse() {
+    // Arrange
+    UserResponse mockResponse = new UserResponse("testuser", "ADMIN");
+    when(getCurrentUserUseCase.execute()).thenReturn(mockResponse);
+
+    // Act
+    ResponseEntity<com.sandbox.api.presentation.generated.model.UserResponse> response =
+        authController.getCurrentUser();
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getUsername()).isEqualTo("testuser");
+    assertThat(response.getBody().getRole())
+        .isEqualTo(com.sandbox.api.presentation.generated.model.UserResponse.RoleEnum.ADMIN);
+
+    verify(getCurrentUserUseCase).execute();
   }
 }
