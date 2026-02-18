@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
 import { AuthContext } from '@/contexts/AuthContext';
 import { ROLES } from '@/lib/constants/roles';
