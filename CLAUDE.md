@@ -63,24 +63,22 @@ docker compose -f docker-compose.yml up  # Production mode
 1. **Epic Issue 作成**（簡易版）
 2. 要求仕様の理解
 3. 現在の実装調査
-4. **Epic ベースブランチ作成**（master から分岐）
-5. **仕様 PR 作成**（base: Epic branch, OpenAPI + 受け入れ条件）
-6. 仕様 PR レビュー・マージ（Epic branch へ）
-7. **Issue に仕様を明記** + spec-approved ラベル付与
-8. **実装計画策定**（.epic/ 作成）
-9. 計画レビュー
-10. 実装/単体テスト実施（Epic branch から Story 分岐）
-11. 実装/単体テスト review 実施 & 指摘修正
-12. Story PR マージ（Epic branch へ）
-13. 全 Story 完了後、Epic PR 作成（base: master）
-14. Epic PR レビュー・マージ
-15. deploy 前確認
+4. **仕様 PR 作成**（OpenAPI + 受け入れ条件）
+5. 仕様 PR レビュー・マージ
+6. **Issue に仕様を明記** + spec-approved ラベル付与
+7. **実装計画策定**（.epic/ 作成）
+8. 計画レビュー
+9. 実装/単体テスト実施
+10. 実装/単体テスト review 実施 & 指摘修正
+11. 結合テスト実施
+12. 結合テスト review 実施 & 指摘修正
+13. deploy 前確認
 
 **重要**:
 
-- **仕様PRは Epic ブランチにマージ**: masterのビルドを保護するため、仕様PRはEpicベースブランチにマージします。OpenAPI仕様は既存Controllerに実装を強制するため、実装と一緒にmasterにマージする必要があります。
-- **仕様PRには空実装を含める**: ステップ5の仕様PRではOpenAPI仕様と受け入れ条件に加え、**空実装**（`throw new UnsupportedOperationException`）も含めます。これによりEpicブランチが常にビルド可能な状態を保ちます。実際の実装はステップ10以降で行います。
-- **Epic全体をまとめてmasterにマージ**: 全Story完了後、Epicブランチ全体をmasterにマージすることで、masterは常にビルド可能な状態を保ちます。
+- 仕様が確定してから実装計画を立てる（手戻りを防ぐ）
+- **仕様PRには実装を含まない**: ステップ4の仕様PRではOpenAPI仕様と受け入れ条件のみを追加し、実装コード（バックエンド・フロントエンド）は含めない。実装はステップ9以降で行う。
+- **実装計画策定時の注意**: ステップ7で実装計画を立てる際、仕様PRで追加されたAPIエンドポイントは未実装であることを前提とし、バックエンド実装とフロントエンド実装の両方をStoryに含める必要がある。
 
 ### カスタムスキルとの対応
 
@@ -89,21 +87,20 @@ SDDワークフローを効率化するため、各ステップに対応する�
 | ステップ | 内容 | スキル | 実行方法 | 備考 |
 |---------|------|---------|---------|------|
 | 1 | Epic Issue 作成 | `/create-epic-issue` | `/create-epic-issue [タイトル]` | GitHub に Epic Issue を作成 |
-| 2-5 | 要求理解+実装調査+仕様PR | `/create-spec-pr` | `/create-spec-pr [Issue番号]` | Epic branch 作成 + OpenAPI 仕様 PR |
-| 6 | 仕様 PR レビュー・マージ | - | 手動 | Epic branch へマージ |
-| 7 | Issue更新 + spec-approved | `/update-spec-approved` | `/update-spec-approved [Issue番号] [PR番号]` | Issue に仕様を明記しラベル付与 |
-| 8 | 実装計画策定 + セルフレビュー | `/plan-epic` | `/plan-epic [Issue番号]` | .epic/ 作成と自動品質チェック |
-| 9 | 計画レビュー | - | 手動 | 人による最終確認 |
-| 10-12 | 実装/テスト | `/implement-epic` | `/implement-epic [Issue番号]` | Story実装と PR 作成（Epic branch へ） |
-| 13-14 | Epic PR 作成・マージ | - | 手動 | Epic 全体を master へマージ |
+| 2-4 | 要求理解+実装調査+仕様PR | `/create-spec-pr` | `/create-spec-pr [Issue番号]` | OpenAPI + 受け入れ条件を作成 |
+| 5 | 仕様 PR レビュー・マージ | - | 手動 | レビュアーによる承認 |
+| 6 | Issue更新 + spec-approved | `/update-spec-approved` | `/update-spec-approved [Issue番号] [PR番号]` | Issue に仕様を明記しラベル付与 |
+| 7 | 実装計画策定 + セルフレビュー | `/plan-epic` | `/plan-epic [Issue番号]` | .epic/ 作成と自動品質チェック |
+| 8 | 計画レビュー | - | 手動 | 人による最終確認 |
+| 9-12 | 実装/テスト | `/implement-epic` | `/implement-epic [Issue番号]` | Story実装と PR 作成 |
 | - | Epic進捗確認 | `/epic-status` | `/epic-status [Issue番号]` | いつでも実行可能 |
-| 15 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
+| 13 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
 
 **スキルの特徴**:
 
-- `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（Epic branch作成）、5（仕様PR作成）を一括実行
-- `/plan-epic`: ステップ8で計画を作成後、自動的にセルフレビューを実行
-- ステップ9（計画レビュー）は人が行うが、ステップ8の自動レビューで品質を担保
+- `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（仕様PR作成）を一括実行
+- `/plan-epic`: ステップ7で計画を作成後、自動的にセルフレビューを実行
+- ステップ8（計画レビュー）は人が行うが、ステップ7の自動レビューで品質を担保
 
 **使用例**:
 
@@ -111,24 +108,21 @@ SDDワークフローを効率化するため、各ステップに対応する�
 # 1. Epic Issue作成
 /create-epic-issue 認証・認可機能
 
-# 2-5. Epic branch作成 + 仕様PR作成（Epic branchへ）
+# 2-4. 仕様PR作成（要求理解・実装調査・PR作成を自動実行）
 /create-spec-pr 88
 
-# 6. 仕様PRレビュー・マージ（手動、Epic branchへ）
+# 5. 仕様PRレビュー・マージ（手動）
 
-# 7. Issue更新
+# 6. Issue更新
 /update-spec-approved 88 102
 
-# 8. 実装計画策定（自動セルフレビュー含む）
+# 7. 実装計画策定（自動セルフレビュー含む）
 /plan-epic 88
 
-# 9. 計画レビュー（手動）
+# 8. 計画レビュー（手動）
 
-# 10-12. Epic実装（各StoryはEpic branchへマージ）
+# 9-12. Epic実装
 /implement-epic 88
-
-# 13-14. Epic PR作成・マージ（手動、masterへ）
-gh pr create --base master --head feature/issue-88-auth
 
 # 進捗確認（いつでも）
 /epic-status 88
@@ -147,23 +141,29 @@ Epic の状態に応じて、適切なスキルを使用してください。
 **推奨フロー**:
 
 1. **Epic 開始前**:
+
    ```bash
    /epic-status 88  # 状況確認
    ```
+
    - 未実装の Story があることを確認
    - 次に実装すべき Story を特定
 
 2. **Epic 実装中**:
+
    ```bash
    /implement-epic 88  # Story 実装
    ```
+
    - 未完了 Story がある場合、自動的に次の Story を実装
    - 完了済み Epic の場合、代替アクション（振り返り等）を提案
 
 3. **Epic 完了後**:
+
    ```bash
    /retrospective Epic #88  # 全体振り返り
    ```
+
    - Epic 全体の学びと改善点を記録
    - 各 Story の振り返りを総括
 
@@ -196,13 +196,56 @@ Epic-based development uses the following branch strategy:
 
 ```
 master
-  └── feature/issue-[N]-[epic-name]  ← Epic base branch
-       ├── feature/issue-[N]-[epic-name]-spec     ← 仕様PR（OpenAPI + 受け入れ条件）
-       ├── feature/issue-[N]-[epic-name]-story1   ← Story実装
+  └── feature/issue-[N]-[epic-name]
+       ├── feature/issue-[N]-[epic-name]-story1
        └── ...
 ```
 
 See [docs/development/GIT_WORKFLOW.md](docs/development/GIT_WORKFLOW.md) for details.
+
+### Story PR Format Requirements
+
+**CRITICAL**: When creating a Story PR (Story branch → Epic base branch), the PR body **MUST** include the Issue number in one of the following formats:
+
+```markdown
+Story: #[Issue番号]
+```
+
+or
+
+```markdown
+Closes #[Issue番号]
+```
+
+**Example (Correct)**:
+
+```markdown
+Story: #133
+
+## Story 概要
+Story 8: E2Eテストと最終確認
+...
+```
+
+**Example (Incorrect)**:
+
+```markdown
+関連 Issue: #133  ❌ Implementation Check will fail
+Issue #133        ❌ Implementation Check will fail
+Ref: #133         ❌ Implementation Check will fail
+```
+
+**Why This Matters**:
+
+- The Implementation Check workflow uses regex to extract the Issue number from the PR body
+- Only `Story: #xxx` or `Closes #xxx` (and variants like `Fixes`, `Resolves`) are recognized
+- If the format is incorrect, the Implementation Check will fail and block the PR
+
+**Important Notes**:
+
+- Editing the PR body after creation does NOT re-trigger existing CI runs
+- To re-trigger CI after fixing the PR body, push an empty commit: `git commit --allow-empty -m "chore: trigger CI" && git push`
+- Always use the `/create-story-pr` skill or `./scripts/create-story-pr.sh` script to ensure correct formatting
 
 ## Code Formatting
 
@@ -244,6 +287,49 @@ See [docs/quality/LOCAL_CI_VERIFICATION.md](docs/quality/LOCAL_CI_VERIFICATION.m
 
 - Branch: `feature/`, `bugfix/`, `hotfix/`
 - Run CI check before PR: `./scripts/ci-check-local.sh`
+
+### Working Directory
+
+**重要**: 常にプロジェクトルート (`/Users/.../sandbox-claude-code`) で作業を開始する
+
+**ルール**:
+
+1. **基本は常にルートディレクトリ**: git コマンド、スクリプト実行は基本的にルートから実行
+2. **サブディレクトリでの作業時**: 必ず作業後にルートに戻る
+
+   ```bash
+   # ❌ 悪い例
+   cd frontend
+   pnpm test
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例
+   cd frontend && pnpm test && cd ..
+   git add frontend/src/...
+   ```
+
+3. **pwd で現在位置を常に確認**: コマンド実行前に `pwd` で位置を確認する習慣をつける
+4. **作業完了後は必ずルートに戻る**: `cd ..` でルートディレクトリに戻る
+
+### Test Coverage
+
+**目標**: 新規実装時はカバレッジ 90% 以上を目標とする
+
+**カバレッジ確認**:
+
+```bash
+# Frontend
+cd frontend && pnpm test:coverage
+
+# Backend
+cd backend && ./mvnw test jacoco:report
+```
+
+**カバレッジ比較** (before/after):
+
+```bash
+./scripts/coverage-diff.sh frontend/coverage/coverage-before.json frontend/coverage/coverage-summary.json
+```
 
 ## Working Agreement
 

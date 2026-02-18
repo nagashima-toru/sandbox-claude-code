@@ -3,15 +3,27 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MessageTable from '@/components/messages/MessageTable';
-import { MessageResponse } from '@/lib/api/generated/models';
+import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
 import * as messageApi from '@/lib/api/generated/message/message';
+import { AuthContext } from '@/contexts/AuthContext';
+import { ROLES } from '@/lib/constants/roles';
 
 // Mock the API module
 vi.mock('@/lib/api/generated/message/message', () => ({
   useGetAllMessages: vi.fn(),
 }));
 
-const createWrapper = () => {
+// Mock next/navigation (required by AuthContext)
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => '/',
+}));
+
+const createWrapper = (user: UserResponse | null = { username: 'admin', role: ROLES.ADMIN }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -20,7 +32,18 @@ const createWrapper = () => {
   });
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthContext.Provider
+        value={{
+          user,
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    </QueryClientProvider>
   );
 
   Wrapper.displayName = 'QueryClientWrapper';
@@ -444,6 +467,42 @@ describe('MessageTable', () => {
         expect(screen.getAllByText('MSG011').length).toBeGreaterThan(0);
         expect(screen.getAllByText('MSG015').length).toBeGreaterThan(0);
       });
+    });
+  });
+
+  describe('権限制御', () => {
+    it('ADMIN ロールの場合、読み取り専用メッセージが表示されない', () => {
+      const adminUser: UserResponse = { username: 'admin', role: ROLES.ADMIN };
+
+      vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
+        data: createMessagePage(mockMessages),
+        isLoading: false,
+        error: null,
+      } as any);
+
+      render(<MessageTable onEdit={mockOnEdit} onDelete={mockOnDelete} />, {
+        wrapper: createWrapper(adminUser),
+      });
+
+      expect(screen.queryByTestId('readonly-info-message')).not.toBeInTheDocument();
+    });
+
+    it('VIEWER ロールの場合、読み取り専用メッセージが表示される', () => {
+      const viewerUser: UserResponse = { username: 'viewer', role: ROLES.VIEWER };
+
+      vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
+        data: createMessagePage(mockMessages),
+        isLoading: false,
+        error: null,
+      } as any);
+
+      render(<MessageTable onEdit={mockOnEdit} onDelete={mockOnDelete} />, {
+        wrapper: createWrapper(viewerUser),
+      });
+
+      const infoMessage = screen.getByTestId('readonly-info-message');
+      expect(infoMessage).toBeInTheDocument();
+      expect(infoMessage).toHaveTextContent(/閲覧のみ可能です/);
     });
   });
 });

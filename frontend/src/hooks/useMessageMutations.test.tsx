@@ -206,6 +206,73 @@ describe('useMessageMutations', () => {
         expect(onCreateError).toHaveBeenCalledWith(testError);
       });
     });
+
+    it('should call onUpdateError when update fails', async () => {
+      const onUpdateError = vi.fn();
+      const testError = new Error('Update failed');
+      let capturedOnError: ((error: unknown) => void) | undefined;
+
+      vi.mocked(messageApi.useCreateMessage).mockReturnValue({
+        mutate: vi.fn(),
+        isPending: false,
+        error: null,
+        reset: vi.fn(),
+      } as never);
+
+      vi.mocked(messageApi.useUpdateMessage).mockImplementation((options) => {
+        capturedOnError = options?.mutation?.onError as ((error: unknown) => void) | undefined;
+        return { mutate: vi.fn(), isPending: false, error: null, reset: vi.fn() } as never;
+      });
+
+      vi.mocked(messageApi.useDeleteMessage).mockReturnValue({
+        mutate: vi.fn(),
+        isPending: false,
+        error: null,
+        reset: vi.fn(),
+      } as never);
+
+      renderHook(() => useMessageMutations({ onUpdateError }), { wrapper });
+
+      // Simulate error
+      capturedOnError?.(testError);
+
+      await waitFor(() => {
+        expect(onUpdateError).toHaveBeenCalledWith(testError);
+      });
+    });
+
+    it('should call onDeleteError when delete fails', async () => {
+      const onDeleteError = vi.fn();
+      const testError = new Error('Delete failed');
+      let capturedOnError: ((error: unknown) => void) | undefined;
+
+      vi.mocked(messageApi.useCreateMessage).mockReturnValue({
+        mutate: vi.fn(),
+        isPending: false,
+        error: null,
+        reset: vi.fn(),
+      } as never);
+      vi.mocked(messageApi.useUpdateMessage).mockReturnValue({
+        mutate: vi.fn(),
+        isPending: false,
+        error: null,
+        reset: vi.fn(),
+      } as never);
+
+      vi.mocked(messageApi.useDeleteMessage).mockImplementation((options) => {
+        capturedOnError = options?.mutation?.onError as ((error: unknown) => void) | undefined;
+        return { mutate: vi.fn(), isPending: false, error: null, reset: vi.fn() } as never;
+      });
+
+      renderHook(() => useMessageMutations({ onDeleteError }), { wrapper });
+
+      // Simulate error
+      capturedOnError?.(testError);
+
+      await waitFor(() => {
+        expect(onDeleteError).toHaveBeenCalledWith(testError);
+      });
+    });
   });
 
   describe('query invalidation', () => {

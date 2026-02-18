@@ -182,6 +182,188 @@ frontend/
 - Pagination (10, 25, 50, 100 items)
 - CRUD operations via modals
 
+### Permission Control
+
+This application implements role-based permission control for UI elements:
+
+**Supported Roles**:
+
+- `ADMIN`: Full access (create, edit, delete)
+- `VIEWER`: Read-only access
+
+**Implementation**:
+
+```typescript
+// Get current user information
+import { useAuth } from '@/contexts/AuthContext';
+
+function MyComponent() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  // user.role is 'ADMIN' or 'VIEWER'
+  const canEdit = user?.role === 'ADMIN';
+
+  return (
+    <>
+      {canEdit && <Button>Edit</Button>}
+    </>
+  );
+}
+```
+
+**Permission Hooks**:
+
+```typescript
+import { usePermission } from '@/hooks/usePermission';
+
+function MyComponent() {
+  const { canCreate, canUpdate, canDelete, isReadOnly } = usePermission();
+
+  return (
+    <>
+      {canCreate && <Button>Create</Button>}
+      {canUpdate && <Button>Update</Button>}
+      {canDelete && <Button>Delete</Button>}
+      {isReadOnly && <InfoMessage>閲覧のみ可能です</InfoMessage>}
+    </>
+  );
+}
+```
+
+**Role-Based Component**:
+
+```typescript
+import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
+
+function MyComponent() {
+  return (
+    <>
+      <RoleBasedComponent allowedRoles={['ADMIN']}>
+        <Button>Admin Only</Button>
+      </RoleBasedComponent>
+
+      <RoleBasedComponent allowedRoles={['ADMIN', 'VIEWER']}>
+        <p>Visible to all</p>
+      </RoleBasedComponent>
+    </>
+  );
+}
+```
+
+**Readonly Form Mode**:
+
+Forms automatically switch to readonly mode for VIEWER role:
+
+- All input fields are disabled
+- Submit and delete buttons are hidden
+- Only "Close" button is shown
+
+**Testing Permission UI**:
+
+Use test credentials for different roles:
+
+- ADMIN: `admin` / `admin123`
+- VIEWER: `viewer` / `viewer123`
+
+**Security Note**: Permission checks in the UI are for display control only. All security enforcement is handled by the backend API.
+
+### E2E Testing Patterns
+
+#### API Direct Call Testing
+
+Use Playwright's `request` fixture to test API responses directly without browser interaction:
+
+```typescript
+test('should return 403 for unauthorized access', async ({ page, request }) => {
+  // Get auth token from page
+  await login(page, 'viewer', 'viewer123');
+  const token = await page.evaluate(() => localStorage.getItem('accessToken'));
+
+  // Direct API call
+  const response = await request.post('http://localhost:8080/api/messages', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    data: { code: 'TEST', content: 'Test' },
+  });
+
+  // Verify response
+  expect(response.status()).toBe(403);
+
+  // Verify RFC 7807 error format
+  const errorBody = await response.json();
+  expect(errorBody).toHaveProperty('type');
+  expect(errorBody).toHaveProperty('title');
+  expect(errorBody).toHaveProperty('status', 403);
+});
+```
+
+#### Multi-User Testing
+
+Use `page.context().newPage()` to test interactions between different users:
+
+```typescript
+test('VIEWER can view ADMIN created data', async ({ page }) => {
+  // Create data as ADMIN
+  const adminPage = await page.context().newPage();
+  await login(adminPage, 'admin', 'admin123');
+  await waitForFrontend(adminPage);
+  await createMessage(adminPage, 'TEST_CODE', 'Test content');
+  await adminPage.close();
+
+  // View as VIEWER
+  await login(page, 'viewer', 'viewer123');
+  await waitForFrontend(page);
+
+  const searchInput = page.getByTestId('search-input');
+  await searchInput.fill('TEST_CODE');
+  await page.waitForTimeout(600);
+
+  const row = page.locator(`[data-testid^="message-row-"]:has-text("TEST_CODE")`);
+  await expect(row).toBeVisible();
+});
+```
+
+#### Test Helpers
+
+Create reusable helper functions in `tests/e2e/helpers.ts`:
+
+```typescript
+// Login helper
+export async function login(page: Page, username: string, password: string) {
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+  await page.getByTestId('login-username-input').fill(username);
+  await page.getByTestId('login-password-input').fill(password);
+  await page.getByTestId('login-submit-button').click();
+  await page.waitForURL('/', { timeout: 10000 });
+}
+
+// Wait for frontend to be ready
+export async function waitForFrontend(page: Page) {
+  await page.waitForLoadState('networkidle');
+  const searchInput = page.getByTestId('search-input');
+  await expect(searchInput).toBeVisible({ timeout: 15000 });
+}
+```
+
+#### Running E2E Tests Locally
+
+```bash
+# Using the convenience script
+./scripts/e2e-test-local.sh
+
+# Or manually
+docker compose up postgres -d
+cd backend && ./mvnw spring-boot:run &
+cd frontend && pnpm test:e2e
+```
+
 ### Validation (React Hook Form + Zod)
 
 ```typescript
@@ -241,6 +423,125 @@ export const Default: Story = {
 
 See [docs/frontend/STORYBOOK.md](../docs/frontend/STORYBOOK.md) for details.
 
+## React Context Pattern
+
+### Creating a Context
+
+Always include `| undefined` in the Context type to detect usage outside of the Provider at compile time. Create a custom Hook that checks for `undefined` and throws an error.
+
+**Pattern**:
+
+```typescript
+import { createContext, useContext } from 'react';
+
+export interface MyContextValue {
+  user: User | null;
+  isLoading: boolean;
+  setUser: (user: User | null) => void;
+}
+
+export const MyContext = createContext<MyContextValue | undefined>(undefined);
+
+export function useMyContext(): MyContextValue {
+  const context = useContext(MyContext);
+
+  if (context === undefined) {
+    throw new Error('useMyContext must be used within MyProvider');
+  }
+
+  return context;
+}
+
+export function MyProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const value: MyContextValue = {
+    user,
+    isLoading,
+    setUser,
+  };
+
+  return <MyContext.Provider value={value}>{children}</MyContext.Provider>;
+}
+```
+
+### Using Context in Storybook
+
+When creating Stories that use Context, provide both `args` and `render` properties. For custom Provider values, wrap the component in `render`.
+
+**Pattern**:
+
+```typescript
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { MyContext, MyProvider } from './MyContext';
+import { MyComponent } from './MyComponent';
+
+const meta = {
+  title: 'Components/MyComponent',
+  component: MyProvider,
+  tags: ['autodocs'],
+} satisfies Meta<typeof MyProvider>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// Using default Provider
+export const Default: Story = {
+  args: {
+    children: <MyComponent />,
+  },
+};
+
+// Custom Provider value
+export const CustomState: Story = {
+  args: {
+    children: <MyComponent />,
+  },
+  render: (_args) => (
+    <MyContext.Provider
+      value={{
+        user: { id: 1, username: 'admin', role: 'ADMIN' },
+        isLoading: false,
+        setUser: () => {},
+      }}
+    >
+      <MyComponent />
+    </MyContext.Provider>
+  ),
+};
+```
+
+### Testing Context Hooks
+
+Use static `import` instead of dynamic `require()` for Context in tests. Create custom test wrappers with `AuthContext.Provider` to test different states.
+
+**Pattern**:
+
+```typescript
+import { renderHook } from '@testing-library/react';
+import { MyContext, type MyContextValue } from './MyContext';
+import { useMyHook } from './useMyHook';
+
+it('should work with custom context value', () => {
+  const customValue: MyContextValue = {
+    user: { id: 1, username: 'test' },
+    isLoading: false,
+    setUser: () => {},
+  };
+
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <MyContext.Provider value={customValue}>
+      {children}
+    </MyContext.Provider>
+  );
+
+  const { result } = renderHook(() => useMyHook(), { wrapper });
+
+  expect(result.current).toBeDefined();
+});
+```
+
 ## Error Handling
 
 ### Client-side
@@ -292,6 +593,167 @@ See [docs/frontend/STORYBOOK.md](../docs/frontend/STORYBOOK.md) for details.
 - Auto-generated: `src/lib/api/generated/**`
 - Framework entry: `src/app/layout.tsx`, `src/app/page.tsx`
 - Configuration: `src/lib/api/client.ts`
+
+### Test Best Practices
+
+- **実装と同時にテストを修正**: 既存コードに影響を与える変更（Context の型変更、新しい Hook の追加など）を行う際は、実装と同時に影響を受けるテストも修正する
+- **Next.js Hooks のモック**: `useRouter`, `useSearchParams` などの Next.js Hooks を使用するコンポーネントをテストする場合は、`next/navigation` のモックを準備する
+
+  ```typescript
+  // Test file
+  vi.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
+    }),
+  }));
+  ```
+
+- **QueryClientProvider のラップ**: React Query を使用する Hook をテストする場合は、テスト用の wrapper を作成する
+
+  ```typescript
+  function createWrapper() {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    return ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  }
+  ```
+
+## Working Directory Management
+
+**重要**: 常にプロジェクトルート (`/Users/.../sandbox-claude-code`) で作業を開始する
+
+### ルール
+
+1. **基本は常にルートディレクトリ**: git コマンド、スクリプト実行は基本的にルートから実行
+2. **frontend での作業時**:
+
+   ```bash
+   # ❌ 悪い例
+   cd frontend
+   pnpm install
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例
+   cd frontend && pnpm install && cd ..
+   git add frontend/src/...
+   ```
+
+3. **pwd で現在位置を常に確認**: コマンド実行前に `pwd` で位置を確認する習慣をつける
+4. **作業完了後は必ずルートに戻る**: `cd ..` でルートディレクトリに戻る
+
+### よくある問題
+
+- `git add` や `git commit` でファイルが見つからない → 現在のディレクトリを確認
+- パスの指定が相対パスか絶対パスか不明 → `pwd` で確認してから実行
+
+## PR Creation
+
+**IMPORTANT**: PR 作成時は必ず適切なテンプレートを使用すること。テンプレートを使わないと **Implementation Check が失敗します**。
+
+### Story PR の場合
+
+```bash
+gh pr create --base feature/issue-[N]-[epic-name] \
+             --head feature/issue-[N]-[epic-name]-story[M] \
+             --template .github/PULL_REQUEST_TEMPLATE/story.md
+```
+
+**例**: Epic #133 の Story 5
+
+```bash
+gh pr create --base feature/issue-133-permission-ui \
+             --head feature/issue-133-permission-ui-story5 \
+             --template .github/PULL_REQUEST_TEMPLATE/story.md
+```
+
+### Epic PR の場合
+
+```bash
+gh pr create --base master \
+             --head feature/issue-[N]-[epic-name] \
+             --template .github/PULL_REQUEST_TEMPLATE/epic.md
+```
+
+### Spec PR の場合
+
+```bash
+gh pr create --base master \
+             --head feature/issue-[N]-spec \
+             --template .github/PULL_REQUEST_TEMPLATE/spec.md
+```
+
+### 自動化スクリプト
+
+プロジェクトルートから以下のスクリプトを使用すると、テンプレートを自動選択できます:
+
+```bash
+./scripts/create-story-pr.sh [issue-number] [story-number]
+```
+
+## React Query Troubleshooting
+
+### 症状
+
+- ログイン後、古いユーザー情報が表示される
+- ロールを切り替えても権限が反映されない
+- API を呼び出したはずなのに古いデータが表示される
+
+### 原因
+
+React Query のキャッシュ設定（`staleTime`, `gcTime`）により、古いデータがキャッシュに残っている可能性があります。
+
+AuthContext の設定例:
+
+```typescript
+useGetCurrentUser({
+  query: {
+    staleTime: 5 * 60 * 1000, // 5分間キャッシュ
+    gcTime: 10 * 60 * 1000, // 10分間メモリ保持
+    // ...
+  },
+});
+```
+
+### 解決方法
+
+1. **ハードリフレッシュ**: `Cmd+Shift+R` (Mac) / `Ctrl+Shift+R` (Windows/Linux)
+   - ブラウザキャッシュと React Query キャッシュを両方クリア
+
+2. **ログアウト→ログイン**: 新しいトークンで再認証
+   - localStorage のトークンがクリアされ、新しいユーザー情報を取得
+
+3. **React Query DevTools で確認**: キャッシュの状態を可視化
+
+   ```typescript
+   import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+   // layout.tsx に追加
+   <ReactQueryDevtools initialIsOpen={false} />
+   ```
+
+4. **開発時のキャッシュ無効化** (必要に応じて):
+
+   ```typescript
+   useGetCurrentUser({
+     query: {
+       staleTime: 0, // 常に最新データを取得
+       gcTime: 0, // キャッシュしない
+     },
+   });
+   ```
+
+### 予防策
+
+- 認証状態が変わる操作（ログイン、ロール変更）の後は、ページリフレッシュを促す UI を表示
+- `refetch()` を明示的に呼び出して最新データを取得
+- 重要な権限チェックはバックエンドで実施（フロントエンドは表示制御のみ）
 
 ## Code Style Guidelines
 

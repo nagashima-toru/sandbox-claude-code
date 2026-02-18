@@ -168,3 +168,52 @@ Create `~/.testcontainers.properties`:
 ```properties
 docker.host=unix://${HOME}/.colima/default/docker.sock
 ```
+
+### Integration Test Best Practices
+
+When writing integration tests, follow these guidelines to avoid common pitfalls:
+
+#### Test Data Setup
+
+- **Use `ON CONFLICT DO UPDATE` for test data**: Instead of `ON CONFLICT DO NOTHING`, use `ON CONFLICT DO UPDATE` to ensure test data is always fresh. This prevents issues where stale data from previous test runs causes authentication or validation failures.
+
+  ```java
+  // ✅ Good: Updates existing data
+  jdbcTemplate.update(
+      "INSERT INTO users (username, password_hash, role, enabled, created_at) "
+          + "VALUES (?, ?, 'ADMIN', true, NOW()) "
+          + "ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash",
+      "testuser",
+      passwordEncoder.encode("password123"));
+
+  // ❌ Bad: Leaves stale data
+  jdbcTemplate.update(
+      "INSERT INTO users (username, password_hash, role, enabled, created_at) "
+          + "VALUES (?, ?, 'ADMIN', true, NOW()) ON CONFLICT DO NOTHING",
+      "testuser",
+      passwordEncoder.encode("password123"));
+  ```
+
+- **Generate password hashes individually**: Don't reuse a single password hash variable for multiple users. Generate a fresh hash for each user to avoid bcrypt caching issues.
+
+  ```java
+  // ✅ Good: Fresh hash for each user
+  jdbcTemplate.update(..., "user1", passwordEncoder.encode("password123"));
+  jdbcTemplate.update(..., "user2", passwordEncoder.encode("password123"));
+
+  // ❌ Bad: Reusing the same hash
+  String hash = passwordEncoder.encode("password123");
+  jdbcTemplate.update(..., "user1", hash);
+  jdbcTemplate.update(..., "user2", hash);  // May fail authentication
+  ```
+
+- **Leverage `@Transactional`**: Mark test classes with `@Transactional` to automatically rollback changes after each test. This keeps your test database clean without manual cleanup.
+
+#### Common Issues and Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Login fails in integration test | Stale password hash from previous run | Use `ON CONFLICT DO UPDATE` |
+| Authentication randomly fails | Reused password hash variable | Generate fresh hash per user |
+| Database pollution between tests | No automatic cleanup | Add `@Transactional` to test class |
+| Port conflict on subsequent runs | Using `integration-test` goal | Use `./mvnw verify` instead |

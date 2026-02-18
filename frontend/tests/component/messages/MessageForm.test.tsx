@@ -292,4 +292,52 @@ describe('MessageForm', () => {
       expect(screen.getByText(/network error/i)).toBeInTheDocument();
     });
   });
+
+  describe('読み取り専用モード', () => {
+    it('disabled が true の場合、全ての入力欄が無効化される', () => {
+      render(<MessageForm {...defaultProps} disabled={true} />);
+
+      expect(screen.getByLabelText(/code/i)).toBeDisabled();
+      expect(screen.getByLabelText(/content/i)).toBeDisabled();
+    });
+
+    it('disabled が true の場合、Saveボタンが非表示になる', () => {
+      render(<MessageForm {...defaultProps} disabled={true} />);
+
+      expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /saving/i })).not.toBeInTheDocument();
+    });
+
+    it('disabled が true の場合、Cancelボタンが"Close"に変わる', () => {
+      render(<MessageForm {...defaultProps} disabled={true} />);
+
+      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
+    });
+
+    it('disabled が true の場合、aria-readonly属性が設定される', () => {
+      render(<MessageForm {...defaultProps} disabled={true} />);
+
+      expect(screen.getByLabelText(/code/i)).toHaveAttribute('aria-readonly', 'true');
+      expect(screen.getByLabelText(/content/i)).toHaveAttribute('aria-readonly', 'true');
+    });
+
+    it('disabled が true の場合でも、Closeボタンはクリックできる', async () => {
+      const user = userEvent.setup();
+      render(<MessageForm {...defaultProps} disabled={true} />);
+
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      expect(closeButton).not.toBeDisabled();
+
+      await user.click(closeButton);
+      expect(mockOnCancel).toHaveBeenCalledOnce();
+    });
+
+    it('isSubmittingとdisabledの両方がtrueの場合、入力欄が無効化される', () => {
+      render(<MessageForm {...defaultProps} isSubmitting={true} disabled={true} />);
+
+      expect(screen.getByLabelText(/code/i)).toBeDisabled();
+      expect(screen.getByLabelText(/content/i)).toBeDisabled();
+    });
+  });
 });

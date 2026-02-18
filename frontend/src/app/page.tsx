@@ -5,13 +5,16 @@ import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
+import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
 import { Button } from '@/components/ui/button';
 import { Plus, LogOut } from 'lucide-react';
 import { useMessageMutations } from '@/hooks/useMessageMutations';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { useAuth } from '@/hooks/useAuth';
+import { usePermission } from '@/hooks/usePermission';
 import { useRouter } from 'next/navigation';
+import { ROLES } from '@/lib/constants/roles';
 
 /**
  * Home page component for message management.
@@ -21,6 +24,7 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
   const router = useRouter();
   const { logout } = useAuth();
+  const { canCreate, isReadOnly } = usePermission();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -117,6 +121,15 @@ export default function Home() {
     }
   }, [logout, router]);
 
+  const handleCreateClick = useCallback(() => {
+    // Guard: VIEWER ロールでは何もしない
+    if (!canCreate) {
+      return;
+    }
+    createMutation.reset(); // Clear previous errors
+    setIsCreateModalOpen(true);
+  }, [canCreate, createMutation]);
+
   return (
     <main data-testid="messages-page" className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -124,16 +137,12 @@ export default function Home() {
           title="Message Management"
           description="Manage all your messages in one place"
           action={
-            <Button
-              onClick={() => {
-                createMutation.reset(); // Clear previous errors
-                setIsCreateModalOpen(true);
-              }}
-              data-testid="create-message-button"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              New Message
-            </Button>
+            <RoleBasedComponent allowedRoles={[ROLES.ADMIN]}>
+              <Button onClick={handleCreateClick} data-testid="create-message-button">
+                <Plus className="h-4 w-4 mr-2" />
+                New Message
+              </Button>
+            </RoleBasedComponent>
           }
           rightContent={
             <Button variant="outline" onClick={handleLogout}>
@@ -161,6 +170,7 @@ export default function Home() {
           isSubmitting={updateMutation.isPending}
           mode="edit"
           error={updateMutation.error}
+          isReadOnly={isReadOnly}
         />
 
         <DeleteConfirmDialog

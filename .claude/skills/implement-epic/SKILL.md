@@ -61,6 +61,7 @@ description: Execute Story implementation workflow including task management, te
    **完了済み Epic を検出した場合の処理**:
 
    a. ユーザーに報告：
+
    ```
    Epic #[N] は既に完了しています：
    - 全 Story ([M]/[M]) 完了
@@ -95,6 +96,24 @@ description: Execute Story implementation workflow including task management, te
 
    - 現在 Epic ベースブランチ（例: `feature/issue-88-auth`）にいることを確認
    - Working tree が clean であることを確認
+
+4. **作業ディレクトリ確認**（重要）
+
+   ```bash
+   pwd
+   ```
+
+   - **必ずプロジェクトルート** (`/Users/.../sandbox-claude-code`) にいることを確認
+   - ルート以外にいる場合は `cd` でルートに戻る
+   - **理由**: git コマンド、スクリプト実行は基本的にルートから実行する必要がある
+
+   **よくある問題**:
+   - `cd frontend` で移動したまま git コマンドを実行 → パスエラー
+   - `frontend/frontend` のようなネストしたディレクトリを認識してしまう
+
+   **ベストプラクティス**:
+   - frontend での作業時: `cd frontend && pnpm [command] && cd ..`
+   - 常に `pwd` で位置を確認してから git コマンドを実行
 
 ## 実装フロー
 
@@ -169,6 +188,44 @@ description: Execute Story implementation workflow including task management, te
    ```
 
 2. **実装**
+
+   **作業ディレクトリの管理**（重要）:
+
+   - **常にプロジェクトルートディレクトリで作業を開始する**
+   - frontend または backend での作業が必要な場合のみ `cd` で移動
+   - 作業完了後は必ず `cd ..` でルートに戻る
+   - git コマンドは基本的にルートディレクトリから実行
+
+   ```bash
+   # ❌ 悪い例: frontend ディレクトリで git commit
+   cd frontend
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例: ルートディレクトリから実行
+   cd frontend && pnpm format && cd ..
+   git add frontend/src/...
+   ```
+
+   **実装前の事前確認**:
+
+   - 新しいタイプのコンポーネント（Context, Provider, カスタム Hook など）を実装する前に、既存の類似実装パターンを確認
+   - テストを書く前に、同じタイプのテストファイルを Read して、プロジェクトのテストパターンに従う
+   - Storybook ストーリーを作成する前に、既存のストーリーファイルを Read して、型定義や構造を確認
+
+   **例**: Context を実装する場合
+
+   ```bash
+   # 1. 既存の Context パターンを確認
+   Read frontend/src/contexts/AuthContext.tsx
+
+   # 2. 既存のテストパターンを確認
+   Read frontend/tests/unit/hooks/useAuthContext.test.tsx
+
+   # 3. パターンに従って実装
+   ```
+
+   **基本ガイドライン**:
+
    - CLAUDE.md の開発ガイドラインに従う
    - Backend: Clean Architecture、JUnit テスト必須
    - Frontend: Functional components、named exports、テスト・Storybook 必須
@@ -204,10 +261,33 @@ description: Execute Story implementation workflow including task management, te
       - 既存テストを変更するより、新規テストを追加する方が安全
       - 既存テストは残したまま、新しいテストケースを追加できないか検討
 
-3. **ローカルテスト**
-   - Backend: `cd backend && ./mvnw test`
-   - Frontend: `cd frontend && pnpm test`
+3. **ローカルテスト**（テスト実行後は必ずルートに戻る）
+
+   **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
+
+   ```bash
+   # Backend の場合
+   cd backend && ./mvnw test && cd ..
+
+   # Frontend の場合
+   cd frontend && pnpm test && cd ..
+   ```
+
    - 全テストが通ることを確認
+   - テスト実行後、次の git コマンドのために必ずルートディレクトリに戻る
+
+   **統合テスト失敗時のトラブルシューティング**:
+
+   統合テストが失敗した場合、以下をチェック：
+
+   | 症状 | 原因の可能性 | 確認方法 | 解決策 |
+   |------|-------------|---------|--------|
+   | ログイン認証が失敗 | 古いパスワードハッシュが残っている | ログを確認: "Failed login attempt" | `ON CONFLICT DO UPDATE` を使用 |
+   | ランダムに認証失敗 | パスワードハッシュを使い回している | setUp() のコードを確認 | 各ユーザーで個別に `passwordEncoder.encode()` を呼び出す |
+   | 前回のテストデータが残る | トランザクションロールバックが無効 | `@Transactional` の有無を確認 | テストクラスに `@Transactional` を追加 |
+   | ポート競合エラー | `integration-test` ゴールを使用 | コマンド履歴を確認 | `./mvnw verify` を使用 |
+
+   詳細は `backend/CLAUDE.md` の「Integration Test Best Practices」セクションを参照。
 
 4. **セルフレビューの実施と記録**
    - 実装内容を確認
@@ -215,17 +295,34 @@ description: Execute Story implementation workflow including task management, te
    - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/self-review-task[N].[M].md` に記録
    - 必要に応じて修正を実施
 
-5. **tasklist.md の更新**
+5. **Storybook の型チェック**（Frontend のみ、Storybook ストーリーを作成した場合）
+
+   Storybook ストーリーを作成した場合、コミット前に必ず型チェックを実行：
+
+   ```bash
+   cd frontend && pnpm type-check && cd ..
+   ```
+
+   - Storybook の Story 型（`args`, `render` など）は TypeScript で厳密にチェックされる
+   - 型エラーがある場合は pre-commit hook で失敗するため、事前確認が重要
+   - 型エラーを早期発見することで、手戻りを防ぐ
+
+   **よくある型エラー**:
+   - `args` プロパティが必要なのに `render` だけを指定している
+   - Context の型が `| undefined` を含んでいない
+   - Story の `render` 関数の引数型が合っていない
+
+6. **tasklist.md の更新**
    - 完了条件のチェックボックスを更新
    - 実績時間とメモを記録
 
-6. **タスク完了**
+7. **タスク完了**
 
    ```
    TaskUpdate taskId=[id] status=completed
    ```
 
-7. **コミット**
+8. **コミット**
 
    ```bash
    git add [変更ファイル]
@@ -247,21 +344,27 @@ description: Execute Story implementation workflow including task management, te
 
    Story の全タスク完了後、push 前に必ずテストを実行する：
 
+   **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
+
    ```bash
    # Backend の場合
-   cd backend && ./mvnw test
+   cd backend && ./mvnw test && cd ..
 
    # Frontend の場合
-   cd frontend && pnpm test
+   cd frontend && pnpm test && cd ..
 
    # E2E テストを修正した場合
-   cd frontend && pnpm test:e2e
+   cd frontend && pnpm test:e2e && cd ..
    ```
+
+   - テスト実行後、次の git コマンドのために必ずルートディレクトリに戻る
+   - `pwd` で現在位置を確認してから次の操作に進む
 
    **重要**: テストコードを修正した場合、必ず以下を実行：
    - [ ] 修正したテストを実行して成功することを確認
    - [ ] 全テストを実行してリグレッションがないことを確認
    - [ ] テスト結果を tasklist.md に記録
+   - [ ] **テスト実行後、プロジェクトルートに戻ったことを確認**（`pwd`）
 
    **テスト未実行での push は禁止**:
    - テストを実行せずに push すると CI で失敗し、手戻りが発生する
@@ -277,11 +380,25 @@ description: Execute Story implementation workflow including task management, te
 
    - 時間がかかる場合はスキップ可能だが、CI 失敗のリスクがある
 
-4. **最終確認**
-   - [ ] 全タスクが完了している
+4. **最終確認**（Story 完了チェックリスト）
+
+   **必須項目**:
+   - [ ] **作業ディレクトリがプロジェクトルートであることを確認**（`pwd`）
+   - [ ] 全タスクが完了している（TaskList で確認）
    - [ ] 全テストが通過している
+     - [ ] 単体テスト成功（`./mvnw test` または `pnpm test`）
+     - [ ] 統合テスト成功（該当する場合）
+     - [ ] E2Eテスト成功（該当する場合）
+   - [ ] `./mvnw verify` または `pnpm build` が成功している
    - [ ] セルフレビューが全て記録されている
    - [ ] tasklist.md の進捗が更新されている
+   - [ ] overview.md に ✅ マークを追加している
+   - [ ] **既存のテストが全て通過することを確認**（影響を受けるテストを修正した場合）
+
+   **推奨項目**:
+   - [ ] CI チェックをローカルで実行（`./scripts/ci-check-local.sh`）
+   - [ ] コミットメッセージが適切（Co-Authored-By 含む）
+   - [ ] 変更ファイルが適切にステージングされている
 
 5. **ブランチのプッシュ**
 
@@ -293,31 +410,39 @@ description: Execute Story implementation workflow including task management, te
 
    **自動化環境での推奨方法**（`--template` は対話的なので使用不可）:
 
-   1. テンプレートファイルを読み込む
-   2. テンプレートの内容を Story の情報で埋める
-   3. 一時ファイルに保存して `--body-file` で渡す
+   **CRITICAL**: 必ず `--template` オプションを使用すること。テンプレートを使わないと Implementation Check が失敗します。
 
    ```bash
-   # 実装例（実際には自動化スクリプト内で実行）
-   # 1. テンプレート内容を埋めたファイルを /tmp/pr-description.md に作成
-   # 2. --body-file で PR 作成
    gh pr create --base feature/issue-[N]-[epic-name] \
                 --head feature/issue-[N]-[epic-name]-story[X] \
-                --title "Story [X]: [Story名]" \
-                --body-file /tmp/pr-description.md
+                --template .github/PULL_REQUEST_TEMPLATE/story.md
+   ```
+
+   **自動化スクリプトを使用する場合**:
+
+   ```bash
+   ./scripts/create-story-pr.sh [issue-number] [story-number]
+   ```
+
+   または `/create-story-pr` スキル:
+
+   ```bash
+   /create-story-pr [issue-number] [story-number]
    ```
 
    **テンプレート (`story.md`) で埋めるべき項目**:
-   - Story 番号と名前
+   - Story: #[Issue番号]
+   - Story 概要: Story [X]: [Story名]
    - 変更内容（実装した内容を箇条書き）
-   - 完了した受け入れ条件（tasklist.md から）
-   - テスト結果（単体テスト、統合テスト、動作確認）
+   - このPRで検証した受け入れ条件（tasklist.md のタスクリストをコピー）
+   - テスト（単体テスト、統合テスト、ローカルで動作確認のチェックボックス）
    - 備考（補足事項があれば）
 
-   **注意事項**:
-   - テンプレートの構造に従った PR description を作成すること
-   - テンプレートの全項目を適切に埋めること
-   - `--body` で直接長文を渡すのではなく、`--body-file` を使用すること
+   **重要な注意事項**:
+   - `--template` オプションは**必須**（Implementation Check のため）
+   - `--body` や `--body-file` は使用しない
+   - テンプレートは GitHub が自動的に表示するので、PR 作成後にブラウザで編集する
+   - CI チェックが通るまで待ってからレビュー依頼する
 
 7. **PR URL の確認**
    - PR が正しく作成されたことを確認

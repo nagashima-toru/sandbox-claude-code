@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import MessageModal from '@/components/messages/MessageModal';
-import { MessageResponse } from '@/lib/api/generated/models';
+import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
+import { AuthContext } from '@/contexts/AuthContext';
+import { ROLES } from '@/lib/constants/roles';
 
 // Mock MessageForm component
 vi.mock('@/components/messages/MessageForm', () => ({
@@ -11,22 +13,44 @@ vi.mock('@/components/messages/MessageForm', () => ({
     isSubmitting,
     onCancel,
     error,
+    disabled,
   }: {
     onSubmit: (data: { code: string; content: string }) => void;
     initialData?: MessageResponse;
     isSubmitting: boolean;
     onCancel: () => void;
     error?: unknown;
+    disabled?: boolean;
   }) => (
     <div data-testid="message-form">
       <div data-testid="form-initial-data">{JSON.stringify(initialData)}</div>
       <div data-testid="form-is-submitting">{String(isSubmitting)}</div>
       <div data-testid="form-error">{error ? 'has-error' : 'no-error'}</div>
+      <div data-testid="form-disabled">{String(disabled || false)}</div>
       <button onClick={() => onSubmit({ code: 'TEST', content: 'Test' })}>Submit</button>
       <button onClick={onCancel}>Cancel</button>
     </div>
   ),
 }));
+
+const createWrapper = (user: UserResponse | null = { username: 'admin', role: ROLES.ADMIN }) => {
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading: false,
+        error: null,
+        refetch: () => {},
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+
+  Wrapper.displayName = 'AuthContextWrapper';
+
+  return Wrapper;
+};
 
 describe('MessageModal', () => {
   const mockOnOpenChange = vi.fn();
@@ -40,20 +64,23 @@ describe('MessageModal', () => {
   };
 
   it('create モードで正しいタイトルと説明を表示する', () => {
-    render(<MessageModal {...defaultProps} mode="create" />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
 
     expect(screen.getByText('Create New Message')).toBeInTheDocument();
     expect(screen.getByText('Fill in the details to create a new message.')).toBeInTheDocument();
   });
 
   it('edit モードで正しいタイトルと説明を表示する', () => {
-    render(<MessageModal {...defaultProps} mode="edit" />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} mode="edit" />, { wrapper: Wrapper });
 
     expect(screen.getByText('Edit Message')).toBeInTheDocument();
     expect(screen.getByText('Update the message details below.')).toBeInTheDocument();
   });
 
   it('MessageForm に initialData を渡す', () => {
+    const Wrapper = createWrapper();
     const initialData: MessageResponse = {
       id: 1,
       code: 'TEST',
@@ -62,30 +89,33 @@ describe('MessageModal', () => {
       updatedAt: '2026-01-29T00:00:00Z',
     };
 
-    render(<MessageModal {...defaultProps} initialData={initialData} />);
+    render(<MessageModal {...defaultProps} initialData={initialData} />, { wrapper: Wrapper });
 
     const formInitialData = screen.getByTestId('form-initial-data');
     expect(formInitialData).toHaveTextContent(JSON.stringify(initialData));
   });
 
   it('MessageForm に isSubmitting を渡す', () => {
-    render(<MessageModal {...defaultProps} isSubmitting={true} />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} isSubmitting={true} />, { wrapper: Wrapper });
 
     const formIsSubmitting = screen.getByTestId('form-is-submitting');
     expect(formIsSubmitting).toHaveTextContent('true');
   });
 
   it('MessageForm に error を渡す', () => {
+    const Wrapper = createWrapper();
     const error = new Error('Test error');
 
-    render(<MessageModal {...defaultProps} error={error} />);
+    render(<MessageModal {...defaultProps} error={error} />, { wrapper: Wrapper });
 
     const formError = screen.getByTestId('form-error');
     expect(formError).toHaveTextContent('has-error');
   });
 
   it('MessageForm の onCancel が呼ばれたとき onOpenChange(false) を呼ぶ', () => {
-    render(<MessageModal {...defaultProps} />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} />, { wrapper: Wrapper });
 
     const cancelButton = screen.getByText('Cancel');
     cancelButton.click();
@@ -94,7 +124,8 @@ describe('MessageModal', () => {
   });
 
   it('MessageForm の onSubmit が呼ばれたとき onSubmit を呼ぶ', () => {
-    render(<MessageModal {...defaultProps} />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} />, { wrapper: Wrapper });
 
     const submitButton = screen.getByText('Submit');
     submitButton.click();
@@ -103,16 +134,105 @@ describe('MessageModal', () => {
   });
 
   it('open=false のときモーダルを表示しない', () => {
-    render(<MessageModal {...defaultProps} open={false} />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} open={false} />, { wrapper: Wrapper });
 
     // Dialog が閉じているときは MessageForm も表示されない
     expect(screen.queryByTestId('message-form')).not.toBeInTheDocument();
   });
 
   it('isSubmitting がデフォルトで false', () => {
-    render(<MessageModal {...defaultProps} />);
+    const Wrapper = createWrapper();
+    render(<MessageModal {...defaultProps} />, { wrapper: Wrapper });
 
     const formIsSubmitting = screen.getByTestId('form-is-submitting');
     expect(formIsSubmitting).toHaveTextContent('false');
+  });
+
+  describe('権限制御', () => {
+    it('ADMIN ロールの場合、create モードでモーダルが表示される', () => {
+      const Wrapper = createWrapper({ username: 'admin', role: ROLES.ADMIN });
+      render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
+
+      expect(screen.getByTestId('message-modal')).toBeInTheDocument();
+      expect(screen.getByText('Create New Message')).toBeInTheDocument();
+    });
+
+    it('VIEWER ロールの場合、create モードでモーダルが表示されない', () => {
+      const Wrapper = createWrapper({ username: 'viewer', role: ROLES.VIEWER });
+      render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
+
+      expect(screen.queryByTestId('message-modal')).not.toBeInTheDocument();
+      expect(screen.queryByText('Create New Message')).not.toBeInTheDocument();
+    });
+
+    it('VIEWER ロールの場合でも、edit モードではモーダルが表示される', () => {
+      const Wrapper = createWrapper({ username: 'viewer', role: ROLES.VIEWER });
+      const initialData: MessageResponse = {
+        id: 1,
+        code: 'TEST',
+        content: 'Test content',
+        createdAt: '2026-01-29T00:00:00Z',
+        updatedAt: '2026-01-29T00:00:00Z',
+      };
+
+      render(<MessageModal {...defaultProps} mode="edit" initialData={initialData} />, {
+        wrapper: Wrapper,
+      });
+
+      expect(screen.getByTestId('message-modal')).toBeInTheDocument();
+      expect(screen.getByText('Edit Message')).toBeInTheDocument();
+    });
+  });
+
+  describe('読み取り専用モード', () => {
+    it('isReadOnly が true の場合、タイトルが "View Message" になる', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
+        wrapper: Wrapper,
+      });
+
+      expect(screen.getByText('View Message')).toBeInTheDocument();
+      expect(screen.queryByText('Edit Message')).not.toBeInTheDocument();
+    });
+
+    it('isReadOnly が true の場合、説明が "Message details (read-only)" になる', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
+        wrapper: Wrapper,
+      });
+
+      expect(screen.getByText('Message details (read-only)')).toBeInTheDocument();
+      expect(screen.queryByText('Update the message details below.')).not.toBeInTheDocument();
+    });
+
+    it('isReadOnly が true の場合、MessageForm に disabled={true} が渡される', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
+        wrapper: Wrapper,
+      });
+
+      const formDisabled = screen.getByTestId('form-disabled');
+      expect(formDisabled).toHaveTextContent('true');
+    });
+
+    it('isReadOnly が false の場合、MessageForm に disabled={false} が渡される', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" isReadOnly={false} />, {
+        wrapper: Wrapper,
+      });
+
+      const formDisabled = screen.getByTestId('form-disabled');
+      expect(formDisabled).toHaveTextContent('false');
+    });
+
+    it('isReadOnly がデフォルトで false', () => {
+      const Wrapper = createWrapper();
+      render(<MessageModal {...defaultProps} mode="edit" />, { wrapper: Wrapper });
+
+      expect(screen.getByText('Edit Message')).toBeInTheDocument();
+      const formDisabled = screen.getByTestId('form-disabled');
+      expect(formDisabled).toHaveTextContent('false');
+    });
   });
 });

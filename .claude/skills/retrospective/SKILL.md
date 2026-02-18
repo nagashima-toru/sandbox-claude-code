@@ -12,6 +12,7 @@ description: Conduct a retrospective after completing work (Epic, Story, task, o
 ### 1. 対象の明確化
 
 まず、何を振り返るかを確認：
+
 - Epic実装全体（例: Epic #88）
 - Story実装（例: Story1 - ユーザー登録API）
 - 一般的なタスク（例: Docker環境のセットアップ）
@@ -24,27 +25,32 @@ description: Conduct a retrospective after completing work (Epic, Story, task, o
 以下の項目について分析し、具体的に記録：
 
 #### ✅ うまくいったこと
+
 - 成功した取り組みや良かった判断
 - 効率的だったプロセス
 - 役立ったツールやスキル
 
 #### 📚 学んだこと
+
 - 新しく得た技術的知識
 - 気づいたパターンやベストプラクティス
 - 失敗から学んだこと
 
 #### ⚠️ 改善点・課題
+
 - うまくいかなかったこと
 - 時間がかかった部分とその原因
 - 手戻りが発生した理由
 
 #### 🤖 自動化・スキル提案（必須）
+
 - **CLAUDE.md への追加提案**: 繰り返し説明したパターンや規約
 - **新規スクリプトの提案**: 手動で実行した定型作業
 - **新規スキルの提案**: 今後も使えそうなワークフロー
 - **既存スキルの改善提案**: 使いにくかった点
 
 #### 📋 次のアクション
+
 - 今後実施すべきタスク
 - 残課題や TODO
 - 次回の改善施策
@@ -58,13 +64,16 @@ Epic または Story の振り返りの場合、対応する Epic ディレク�
    - Issue 番号を取得（例: `88`）
 
 2. **`.epic/` から該当ディレクトリを検索**
+
    ```bash
    ls -d .epic/*-issue-88-* 2>/dev/null
    ```
+
    - 見つかった場合: Epic ディレクトリ名を取得（例: `20260203-issue-88-auth`）
    - 見つからない場合: ユーザーに確認するか、`.retrospectives/` 直下に保存
 
 3. **振り返り保存先ディレクトリを作成**
+
    ```bash
    mkdir -p .retrospectives/20260203-issue-88-auth
    ```
@@ -81,6 +90,7 @@ Epic または Story の振り返りの場合、対応する Epic ディレク�
 | セッション | `.retrospectives/` | `session-20260208-150000.md` |
 
 **ファイル名形式**:
+
 - Epic: `epic-YYYYMMDD-HHMMSS.md`
 - Story: `story[N]-[story-name]-YYYYMMDD-HHMMSS.md`
 - その他: `[topic]-YYYYMMDD-HHMMSS.md`
@@ -133,6 +143,7 @@ Epic または Story の振り返りの場合、対応する Epic ディレク�
 振り返りファイルのパスを表示し、自動化・スキル提案について特に強調して報告。
 
 **Epic/Story の場合の追加メッセージ**:
+
 ```
 ✅ 振り返りを作成しました: .retrospectives/20260203-issue-88-auth/story1-user-registration-20260208-150000.md
 
