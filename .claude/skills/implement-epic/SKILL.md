@@ -408,26 +408,12 @@ description: Execute Story implementation workflow including task management, te
 
 6. **PR 作成**（必須: テンプレート使用）
 
-   **自動化環境での推奨方法**（`--template` は対話的なので使用不可）:
-
    **CRITICAL**: 必ず `--template` オプションを使用すること。テンプレートを使わないと Implementation Check が失敗します。
 
    ```bash
    gh pr create --base feature/issue-[N]-[epic-name] \
                 --head feature/issue-[N]-[epic-name]-story[X] \
                 --template .github/PULL_REQUEST_TEMPLATE/story.md
-   ```
-
-   **自動化スクリプトを使用する場合**:
-
-   ```bash
-   ./scripts/create-story-pr.sh [issue-number] [story-number]
-   ```
-
-   または `/create-story-pr` スキル:
-
-   ```bash
-   /create-story-pr [issue-number] [story-number]
    ```
 
    **テンプレート (`story.md`) で埋めるべき項目**:

@@ -243,7 +243,7 @@ Ref: #133         ❌ Implementation Check will fail
 
 - Editing the PR body after creation does NOT re-trigger existing CI runs
 - To re-trigger CI after fixing the PR body, push an empty commit: `git commit --allow-empty -m "chore: trigger CI" && git push`
-- Always use the `/create-story-pr` skill or `./scripts/create-story-pr.sh` script to ensure correct formatting
+- Always use `/implement-epic` skill or `./scripts/create-story-pr.sh` script to ensure correct formatting
 
 ## Code Formatting
 
@@ -396,7 +396,6 @@ This section defines the working agreement between developers and Claude Code fo
 | `/plan-epic` | Generate implementation plan in .epic/ | All developers |
 | `/implement-epic` | Execute Story implementation workflow | All developers |
 | `/epic-status` | Check Epic progress status | All developers |
-| `/create-story-pr` | Create Story PR with proper format | All developers |
 | `/update-spec-approved` | Update Issue + add spec-approved label | All developers |
 | `/update-dependabot-docs` | Update docs on Dependabot PR | All developers |
 | `/generate-api` | Regenerate TypeScript API client | Frontend |
