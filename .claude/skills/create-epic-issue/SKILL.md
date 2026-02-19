@@ -87,8 +87,6 @@ AskUserQuestion を使って以下を収集：
 ## 参考資料
 
 - [CLAUDE.md](./CLAUDE.md) - 開発プロセス全体
-- [Epic Documents](./docs/development/EPIC_DOCUMENTS.md) - Epic 構造
-- [Spec PR Guide](./docs/development/SPEC_PR_GUIDE.md) - 仕様 PR 作成方法
 ```
 
 ### 4. GitHub Issue の作成

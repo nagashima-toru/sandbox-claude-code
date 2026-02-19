@@ -31,6 +31,7 @@ description: Generate test coverage reports and identify files below 90% coverag
 ### 1. 引数の解析
 
 引数から対象を判定：
+
 - `frontend` → フロントエンドのみ
 - `backend` → バックエンドのみ
 - `all` または引数なし → 両方

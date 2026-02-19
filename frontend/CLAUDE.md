@@ -391,7 +391,7 @@ const { data, isLoading } = useGetAllMessages();
 const mutation = useCreateMessage();
 ```
 
-See [docs/frontend/ORVAL_API_GENERATION.md](../docs/frontend/ORVAL_API_GENERATION.md) for details.
+See `/generate-api` skill for details.
 
 ## Storybook Quick Reference
 
@@ -421,7 +421,7 @@ export const Default: Story = {
 };
 ```
 
-See [docs/frontend/STORYBOOK.md](../docs/frontend/STORYBOOK.md) for details.
+See `/run-storybook` skill for details.
 
 ## React Context Pattern
 
@@ -763,12 +763,13 @@ useGetCurrentUser({
 - **Hooks**: Extract reusable logic, prefix with `use`
 
 **File naming**:
-| Type | Convention | Example |
-|------|------------|---------|
-| Component | PascalCase | `MessageTable.tsx` |
-| Hook | camelCase + use | `useMessages.ts` |
-| Story | + .stories | `MessageTable.stories.tsx` |
-| Test | + .test | `MessageTable.test.tsx` |
+
+| Type      | Convention      | Example                    |
+| --------- | --------------- | -------------------------- |
+| Component | PascalCase      | `MessageTable.tsx`         |
+| Hook      | camelCase + use | `useMessages.ts`           |
+| Story     | + .stories      | `MessageTable.stories.tsx` |
+| Test      | + .test         | `MessageTable.test.tsx`    |
 
 ## Accessibility (a11y)
 
@@ -780,11 +781,13 @@ useGetCurrentUser({
 
 ## Documentation Index
 
-| Document                                                      | Description                             |
-| ------------------------------------------------------------- | --------------------------------------- |
-| [Storybook](../docs/frontend/STORYBOOK.md)                    | Full Storybook guide, MSW, a11y testing |
-| [Orval API](../docs/frontend/ORVAL_API_GENERATION.md)         | API client generation details           |
-| [Docker Deployment](../docs/environment/DOCKER_DEPLOYMENT.md) | Docker development modes                |
+| Document                                           | Description                          |
+| -------------------------------------------------- | ------------------------------------ |
+| [Frontend テスト戦略](docs/TEST_STRATEGY.md)       | Vitest・RTL・Playwright の詳細ガイド |
+| [全体テスト戦略](../docs/quality/TEST_STRATEGY.md) | システム全体のテスト方針             |
+| `/run-storybook` skill                             | Storybook ガイド・MSW・a11y テスト   |
+| `/generate-api` skill                              | API クライアント生成の詳細           |
+| `/run-docker` skill                                | Docker 開発モード                    |
 
 ## Notes
 

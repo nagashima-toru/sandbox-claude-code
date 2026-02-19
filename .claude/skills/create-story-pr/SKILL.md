@@ -119,5 +119,3 @@ Next steps:
 ## 参考
 
 - **テンプレートファイル**: `.github/PULL_REQUEST_TEMPLATE/story.md`
-- **Epic Documents**: `docs/development/EPIC_DOCUMENTS.md`
-- **Git Workflow**: `docs/development/GIT_WORKFLOW.md`

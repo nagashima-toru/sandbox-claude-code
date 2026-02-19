@@ -188,7 +188,7 @@ Epic の状態に応じて、適切なスキルを使用してください。
 
 **例**: `.epic/20260203-88-auth/`
 
-See [docs/development/EPIC_DOCUMENTS.md](docs/development/EPIC_DOCUMENTS.md) for details.
+Epic Documents の詳細については各スキル（`/plan-epic`, `/implement-epic`, `/epic-status`）のガイドを参照。
 
 ## Git Workflow
 
@@ -200,8 +200,6 @@ master
        ├── feature/issue-[N]-[epic-name]-story1
        └── ...
 ```
-
-See [docs/development/GIT_WORKFLOW.md](docs/development/GIT_WORKFLOW.md) for details.
 
 ### Story PR Format Requirements
 
@@ -259,13 +257,11 @@ See [backend/CLAUDE.md](backend/CLAUDE.md) and [frontend/CLAUDE.md](frontend/CLA
 
 ## Docker
 
-See [docs/environment/DOCKER_DEPLOYMENT.md](docs/environment/DOCKER_DEPLOYMENT.md) for details.
+Run `docker compose up` for development mode (hot reload), or `docker compose -f docker-compose.yml up` for production mode. Use `/run-docker` skill for details.
 
 ## Local CI Verification
 
-Run `./scripts/ci-check-local.sh` before creating PRs.
-
-See [docs/quality/LOCAL_CI_VERIFICATION.md](docs/quality/LOCAL_CI_VERIFICATION.md) for details.
+Run `./scripts/ci-check-local.sh` before creating PRs. Use `/verify` skill for architecture checks.
 
 ## Key Conventions
 
@@ -287,6 +283,18 @@ See [docs/quality/LOCAL_CI_VERIFICATION.md](docs/quality/LOCAL_CI_VERIFICATION.m
 
 - Branch: `feature/`, `bugfix/`, `hotfix/`
 - Run CI check before PR: `./scripts/ci-check-local.sh`
+
+### .gitignore ルール
+
+| Scope | File | Add when |
+|-------|------|----------|
+| IDE/OS/cross-project | `.gitignore` (root) | Affects both backend and frontend |
+| Java/Maven/Spring | `backend/.gitignore` | Only backend directory |
+| Node.js/Next.js/pnpm | `frontend/.gitignore` | Only frontend directory |
+
+### 仕様 PR の空実装ルール
+
+仕様 PR で OpenAPI エンドポイントを追加する場合、Epic ブランチのビルドエラーを防ぐためスタブ実装（`throw new UnsupportedOperationException("Not implemented yet - Story N")`）を含めること。
 
 ### Working Directory
 
@@ -364,29 +372,40 @@ This section defines the working agreement between developers and Claude Code fo
 
 ## Documentation Index
 
+### 人間向け知識ドキュメント (docs/)
+
 | Document | Description | Audience |
 |----------|-------------|----------|
-| [Epic Documents](docs/development/EPIC_DOCUMENTS.md) | Epic-based development planning | All developers |
-| [Spec PR Guide](docs/development/SPEC_PR_GUIDE.md) | How to create specification PRs | Backend/Frontend |
-| [Git Workflow](docs/development/GIT_WORKFLOW.md) | Branch strategy and PR workflow | All developers |
-| [Docker Deployment](docs/environment/DOCKER_DEPLOYMENT.md) | Docker dev/prod modes | All developers |
-| [Git Worktree](docs/environment/GIT_WORKTREE.md) | Multi-environment development | All developers |
-| [.gitignore Rules](docs/environment/GITIGNORE_RULES.md) | .gitignore management | All developers |
-| [Local CI Verification](docs/quality/LOCAL_CI_VERIFICATION.md) | CI checks before push | All developers |
-| [Markdown Linting](docs/quality/MARKDOWN_LINTING.md) | Markdown validation | All developers |
-| [Security](docs/quality/SECURITY.md) | Security checks & Dependabot | All developers |
-| [Storybook](docs/frontend/STORYBOOK.md) | Component development | Frontend |
-| [Orval API Generation](docs/frontend/ORVAL_API_GENERATION.md) | API client generation | Frontend |
-| [Frontend Performance](docs/frontend/FRONTEND_PERFORMANCE_MONITORING.md) | Bundle size monitoring | Frontend |
-| [Deployment](docs/deployment/DEPLOYMENT.md) | CD pipeline & deployment | DevOps |
-| [Dependabot Docs Update](docs/deployment/DEPENDABOT_DOCS_UPDATE.md) | Docs update for dependencies | All developers |
 | [Architecture Overview](docs/architecture/README.md) | System architecture | Architects |
 | [C4 Context](docs/architecture/c4-context.md) | System context diagram | Architects |
 | [C4 Container](docs/architecture/c4-container.md) | Container architecture | Architects |
 | [API Design](docs/architecture/api/README.md) | API design guidelines | Backend/Frontend |
 | [Error Handling](docs/architecture/api/error-handling.md) | RFC 7807 error handling | Backend/Frontend |
 | [ADR-0001](docs/adr/0001-use-openapi-first.md) | OpenAPI-First decision | Architects |
-| [Test Strategy](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines | Backend |
+| [テスト戦略（全体）](docs/quality/TEST_STRATEGY.md) | System-wide test strategy | All developers |
+| [Security](docs/quality/SECURITY.md) | Security checks & Dependabot | All developers |
+| [Test Strategy (Backend)](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines | Backend |
+| [Test Strategy (Frontend)](frontend/docs/TEST_STRATEGY.md) | Frontend testing guidelines | Frontend |
+
+### AI 操作スキル (.claude/skills/)
+
+| Skill | Description | Audience |
+|-------|-------------|----------|
+| `/create-epic-issue` | Create GitHub Epic Issue | All developers |
+| `/create-spec-pr` | Create OpenAPI spec + acceptance criteria | Backend/Frontend |
+| `/plan-epic` | Generate implementation plan in .epic/ | All developers |
+| `/implement-epic` | Execute Story implementation workflow | All developers |
+| `/epic-status` | Check Epic progress status | All developers |
+| `/create-story-pr` | Create Story PR with proper format | All developers |
+| `/update-spec-approved` | Update Issue + add spec-approved label | All developers |
+| `/update-dependabot-docs` | Update docs on Dependabot PR | All developers |
+| `/generate-api` | Regenerate TypeScript API client | Frontend |
+| `/run-storybook` | Start Storybook development server | Frontend |
+| `/run-docker` | Manage Docker dev/prod environments | All developers |
+| `/setup-worktree` | Set up git worktree environment | All developers |
+| `/verify` | Run Maven verify for architecture tests | Backend |
+| `/test-coverage` | Generate test coverage reports | All developers |
+| `/retrospective` | Conduct retrospective after work | All developers |
 
 ### Subdirectory Documentation
 
