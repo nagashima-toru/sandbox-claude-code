@@ -261,7 +261,7 @@ Run `docker compose up` for development mode (hot reload), or `docker compose -f
 
 ## Local CI Verification
 
-Run `./scripts/ci-check-local.sh` before creating PRs. Use `/verify` skill for architecture checks.
+Run `./scripts/ci-check-local.sh` before creating PRs. Architecture checks: `cd backend && ./mvnw verify`.
 
 ## Key Conventions
 
@@ -403,7 +403,6 @@ This section defines the working agreement between developers and Claude Code fo
 | `/run-storybook` | Start Storybook development server | Frontend |
 | `/run-docker` | Manage Docker dev/prod environments | All developers |
 | `/setup-worktree` | Set up git worktree environment | All developers |
-| `/verify` | Run Maven verify for architecture tests | Backend |
 | `/test-coverage` | Generate test coverage reports | All developers |
 | `/retrospective` | Conduct retrospective after work | All developers |
 
