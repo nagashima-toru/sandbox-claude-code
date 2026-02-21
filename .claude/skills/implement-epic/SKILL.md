@@ -204,6 +204,10 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
 3. **Story ディレクトリの確認**
    - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
    - 全タスクの内容と受け入れ条件を理解する
+   - **開始日時の記録**（未記載の場合）: tasklist.md の「進捗」セクションに開始日時を Edit ツールで記録する
+     ```
+     - 開始日時: YYYY-MM-DD
+     ```
 
 4. **Story ブランチの作成**
 
@@ -401,9 +405,23 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    - Context の型が `| undefined` を含んでいない
    - Story の `render` 関数の引数型が合っていない
 
-7. **tasklist.md の更新**
-   - 完了条件のチェックボックスを更新
-   - 実績時間とメモを記録
+7. **tasklist.md の更新**（必須）
+
+   完了したタスクの完了条件チェックボックスを Edit ツールで `[ ]` → `[x]` に変更する：
+
+   ```markdown
+   # 変更前
+   - [ ] named export パターンを使用している
+   - [ ] Props に explicit interface 定義がある
+
+   # 変更後
+   - [x] named export パターンを使用している
+   - [x] Props に explicit interface 定義がある
+   ```
+
+   **対象**: 当該タスク（Task N.M）の「完了条件」セクション内のチェックボックス全て
+
+   **注意**: このファイルは Step 9 のコミットに一緒に含める
 
 8. **タスク完了**
 
@@ -414,7 +432,7 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
 9. **コミット**
 
    ```bash
-   git add [変更ファイル]
+   git add [変更ファイル] .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
    git commit -m "[type]: [タスクの説明] (#[issue番号])
 
    [詳細な変更内容]
@@ -426,7 +444,41 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
 
 **全タスク完了後：**
 
-1. **overview.md の更新**
+1. **tasklist.md の最終更新**（最初に実施）
+
+   全タスク完了後、tasklist.md を Edit ツールで最終更新する：
+
+   **1.1. Story の受け入れ基準チェックボックスを更新**（tasklist.md 上部の「受け入れ基準」セクション）
+
+   ```markdown
+   # 変更前
+   - [ ] `LanguageSwitcher` ボタンがログインページに表示される
+
+   # 変更後
+   - [x] `LanguageSwitcher` ボタンがログインページに表示される
+   ```
+
+   **1.2. 進捗セクションを更新**（tasklist.md 末尾の「進捗」セクション）
+
+   ```markdown
+   ## 進捗
+
+   - 開始日時: YYYY-MM-DD
+   - 完了日時: YYYY-MM-DD
+   - 実績時間: 約Xh
+   - メモ: [実装中の気づき・工夫・課題など]
+   ```
+
+   **1.3. コミット**
+
+   ```bash
+   git add .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
+   git commit -m "docs: update tasklist.md progress for Story [N] (#[issue番号])
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   ```
+
+2. **overview.md の更新**
    - `.epic/[日付]-[issue番号]-[epic名]/overview.md` の該当 Story に ✅ マーク
 
 2. **Story 全体のテスト実行**（必須）
@@ -479,7 +531,10 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
      - [ ] E2Eテスト成功（該当する場合）
    - [ ] `./mvnw verify` または `pnpm build` が成功している
    - [ ] セルフレビューが全て記録されている
-   - [ ] tasklist.md の進捗が更新されている
+   - [ ] tasklist.md の受け入れ基準チェックボックスが全て `[x]` になっている
+   - [ ] tasklist.md の完了条件チェックボックスが全て `[x]` になっている
+   - [ ] tasklist.md の進捗セクション（完了日時・実績時間・メモ）が更新されている
+   - [ ] tasklist.md の変更がコミットされている
    - [ ] overview.md に ✅ マークを追加している
    - [ ] **既存のテストが全て通過することを確認**（影響を受けるテストを修正した場合）
 
@@ -616,7 +671,8 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
 
 - [ ] 全タスクのコミットが完了
 - [ ] セルフレビューが全て記録済み
-- [ ] tasklist.md が最新
+- [ ] tasklist.md の全チェックボックスが `[x]` になっている（受け入れ基準・完了条件）
+- [ ] tasklist.md の進捗セクションが更新されている（完了日時・実績時間・メモ）
 - [ ] overview.md が更新済み
 - [ ] 全テストが通過
 - [ ] Task サブエージェント（`review-implementation story` 相当）でコードレビュー実施済み
