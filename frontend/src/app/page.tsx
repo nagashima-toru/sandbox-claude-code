@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
 import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
 import { Button } from '@/components/ui/button';
 import { Plus, LogOut } from 'lucide-react';
@@ -145,10 +146,13 @@ export default function Home() {
             </RoleBasedComponent>
           }
           rightContent={
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           }
         />
         <MessageTable onEdit={handleEditClick} onDelete={handleDeleteClick} />
