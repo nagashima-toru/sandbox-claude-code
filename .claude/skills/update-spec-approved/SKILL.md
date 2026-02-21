@@ -1,9 +1,25 @@
 ---
 name: update-spec-approved
-description: Update Issue with approved specification details and add spec-approved label after merging spec PR.
+description: "[Human-Only] Update Issue with approved specification details and add spec-approved label after merging spec PR."
+disable-model-invocation: true
 ---
 
 # Issue更新と承認コマンド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 仕様PRのマージという外部状態変更を前提とする（マージ済みであることの確認が必要）
+- GitHub Issue の更新・ラベル付与という副作用を含む
+- 誤った呼び出しでレビュー未完の仕様が承認済みになる可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/update-spec-approved` を直接実行してください」と報告する。
+
+---
 
 ## 概要
 

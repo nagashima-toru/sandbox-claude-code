@@ -1,9 +1,26 @@
 ---
 name: create-spec-pr
-description: Understand requirements, investigate current implementation, and create OpenAPI specification and acceptance criteria.
+description: "[Human-Only] Understand requirements, investigate current implementation, and create OpenAPI specification and acceptance criteria."
+disable-model-invocation: true
 ---
 
 # 仕様 PR 作成コマンド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 複数フェーズ（要求理解・実装調査・仕様PR作成）にわたる長時間の作業を含む
+- ユーザーとの対話（AskUserQuestion）を前提とする
+- Git ブランチ作成・コミット・GitHub PR 作成などの副作用を含む
+- 誤った呼び出しで意図しないブランチや PR が作成される可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/create-spec-pr` を直接実行してください」と報告する。
+
+---
 
 ## 概要
 

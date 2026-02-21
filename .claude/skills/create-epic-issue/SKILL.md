@@ -1,9 +1,25 @@
 ---
 name: create-epic-issue
-description: Create a GitHub Epic Issue and confirm the Issue number for SDD workflow.
+description: "[Human-Only] Create a GitHub Epic Issue and confirm the Issue number for SDD workflow."
+disable-model-invocation: true
 ---
 
 # Epic Issue 作成コマンド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- ユーザーとの対話（AskUserQuestion）を前提とする（タイトル・背景・目的・スコープの収集）
+- GitHub Issue 作成という副作用を含む
+- 誤った呼び出しで不要な Issue が作成される可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/create-epic-issue` を直接実行してください」と報告する。
+
+---
 
 ## 概要
 

@@ -94,12 +94,15 @@ SDDワークフローを効率化するため、各ステップに対応する�
 | 8 | 計画レビュー | - | 手動 | 人による最終確認 |
 | 9-12 | 実装/テスト | `/implement-epic` | `/implement-epic [Issue番号]` | Story実装と PR 作成 |
 | - | Epic進捗確認 | `/epic-status` | `/epic-status [Issue番号]` | いつでも実行可能 |
+| - | 品質レビュー | `/review-implementation` | `/review-implementation [plan\|story]` | plan-epic/implement-epic から自動呼び出し |
 | 13 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
 
 **スキルの特徴**:
 
 - `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（仕様PR作成）を一括実行
-- `/plan-epic`: ステップ7で計画を作成後、自動的にセルフレビューを実行
+- `/plan-epic`: ステップ7で計画を作成後、自動的に `/review-implementation plan` を呼び出し
+- `/implement-epic`: Story 完了後に自動的に `/review-implementation story` を呼び出し
+- `/review-implementation`: `backend/docs/BEST_PRACTICES.md` と `frontend/docs/BEST_PRACTICES.md` を参照した明確な観点でレビューを実施
 - ステップ8（計画レビュー）は人が行うが、ステップ7の自動レビューで品質を担保
 
 **使用例**:
@@ -389,21 +392,34 @@ This section defines the working agreement between developers and Claude Code fo
 
 ### AI 操作スキル (.claude/skills/)
 
-| Skill | Description | Audience |
-|-------|-------------|----------|
-| `/create-epic-issue` | Create GitHub Epic Issue | All developers |
-| `/create-spec-pr` | Create OpenAPI spec + acceptance criteria | Backend/Frontend |
-| `/plan-epic` | Generate implementation plan in .epic/ | All developers |
-| `/implement-epic` | Execute Story implementation workflow | All developers |
-| `/epic-status` | Check Epic progress status | All developers |
-| `/update-spec-approved` | Update Issue + add spec-approved label | All developers |
-| `/update-dependabot-docs` | Update docs on Dependabot PR | All developers |
-| `/generate-api` | Regenerate TypeScript API client | Frontend |
-| `/run-storybook` | Start Storybook development server | Frontend |
-| `/run-docker` | Manage Docker dev/prod environments | All developers |
-| `/setup-worktree` | Set up git worktree environment | All developers |
-| `/test-coverage` | Generate test coverage reports | All developers |
-| `/retrospective` | Conduct retrospective after work | All developers |
+スキルには **Human-Only（ユーザー専用）** と **Agent-Callable（エージェント対応）** の2種類があります。
+
+**エージェント（Task ツール）からは Human-Only スキルを呼び出してはいけません。**
+Agent-Callable スキルを呼び出す場合は Skill ツールではなく **Task ツール（サブエージェント）** を使用すること。
+
+#### Human-Only スキル
+
+| Skill | Description | SDDステップ |
+|-------|-------------|-----------|
+| `/create-epic-issue` | Create GitHub Epic Issue | Step 1 |
+| `/create-spec-pr` | Create OpenAPI spec + acceptance criteria | Step 2-4 |
+| `/update-spec-approved` | Update Issue + add spec-approved label | Step 6 |
+| `/plan-epic` | Generate implementation plan in .epic/ | Step 7 |
+| `/implement-epic` | Execute Story implementation workflow | Step 9-12 |
+| `/setup-worktree` | Set up git worktree environment | - |
+
+#### Agent-Callable スキル
+
+| Skill | Description | 呼び出し元 |
+|-------|-------------|-----------|
+| `/review-implementation` | Review plan or Story implementation quality | plan-epic Step 10、implement-epic Phase 3 Step 5（Task 経由） |
+| `/epic-status` | Check Epic progress status | ユーザー・エージェント |
+| `/generate-api` | Regenerate TypeScript API client | ユーザー・エージェント |
+| `/test-coverage` | Generate test coverage reports | ユーザー・エージェント |
+| `/retrospective` | Conduct retrospective after work | ユーザー |
+| `/update-dependabot-docs` | Update docs on Dependabot PR | CI/Dependabot |
+| `/run-storybook` | Start Storybook development server | ユーザー |
+| `/run-docker` | Manage Docker dev/prod environments | ユーザー |
 
 ### Subdirectory Documentation
 

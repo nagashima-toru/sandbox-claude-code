@@ -1,9 +1,26 @@
 ---
 name: implement-epic
-description: Execute Story implementation workflow including task management, testing, and PR creation for Epic realization.
+description: "[Human-Only] Execute Story implementation workflow including task management, testing, and PR creation for Epic realization."
+disable-model-invocation: true
 ---
 
 # Epic 実装ガイド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 複数フェーズ・複数 Story にわたる長時間の作業を含む
+- ユーザーとの対話（AskUserQuestion）を前提とする（Epic・Story 選択・実装方針確認）
+- Git ブランチ作成・コミット・プッシュ・GitHub PR 作成などの副作用を含む
+- 誤った呼び出しでリポジトリ状態や GitHub 状態が壊れる可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/implement-epic` を直接実行してください」と報告する。
+
+---
 
 ## Epic の選択
 
@@ -43,6 +60,27 @@ description: Execute Story implementation workflow including task management, te
 5. **完了済み Epic を選択した場合**: 「実行前の必須確認」セクションの完了済み Epic 処理フローに従う
 
 ## 実行前の必須確認
+
+### 0. ベストプラクティスの読み込み（必須・最初に実行）
+
+実装を始める前に、品質基準を把握するために以下を読み込む：
+
+```bash
+Read backend/docs/BEST_PRACTICES.md   # Clean Architecture規則・テスト戦略・実装パターン・アンチパターン
+Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパターン・テスト戦略・アンチパターン
+```
+
+**読み込み目的**:
+
+- Clean Architecture 依存ルールを把握し、import 違反を事前に防ぐ
+- レイヤー別テスト種別（Pure Unit / Mockito / Testcontainers / MockMvc）と対象を確認する
+- 実装パターン（UseCase / Repository / Mapper の標準構造）を把握する
+- よくあるアンチパターン（パスワードハッシュ使い回し・`integration-test` ゴール・Context の `| undefined` 未設定など）を頭に入れる
+
+**この手順をスキップしてはいけない**: 読み込みなしで実装すると、アンチパターンの踏み込みや
+テストクラスの種別誤りが起きやすく、後から修正が必要になる。
+
+---
 
 1. **Epic 完了状態の確認**（最優先）
 
@@ -187,7 +225,53 @@ description: Execute Story implementation workflow including task management, te
    TaskUpdate taskId=[id] status=in_progress
    ```
 
-2. **実装**
+2. **ステップ 2-Pre: 実装タイプ別事前確認（必須）**
+
+   タスクの実装を始める前に、実装タイプに応じた事前確認チェックリストを完了させる。
+
+   **Backend 必須事前確認**:
+
+   - [ ] 実装クラスのレイヤーを特定した（domain / application / infrastructure / presentation）
+   - [ ] 同レイヤーの既存クラス実装パターンを最低1つ `Read` した
+   - [ ] 対応するテストクラスのパターンを `Read` した
+   - [ ] `import` が Clean Architecture 依存ルールに違反しないことを確認した
+   - [ ] `backend/docs/BEST_PRACTICES.md` §1〜§2 を確認した
+
+   **例**: UseCase を実装する場合
+
+   ```bash
+   # 1. 既存の UseCase パターンを確認
+   Read backend/src/main/java/.../application/usecase/GetMessageUseCase.java
+
+   # 2. 対応するテストパターンを確認
+   Read backend/src/test/java/.../application/usecase/GetMessageUseCaseTest.java
+
+   # 3. BEST_PRACTICES.md のテスト戦略を確認
+   Read backend/docs/BEST_PRACTICES.md
+   ```
+
+   **Frontend 必須事前確認**:
+
+   - [ ] 実装ファイル種別を特定した（Component / Hook / Context / Story / Test）
+   - [ ] 同種別の既存ファイルのパターンを最低1つ `Read` した
+   - [ ] Context: `| undefined` 型パターンを確認した（Context 実装時）
+   - [ ] Story: `pnpm type-check` を事前実行する準備をした（Storybook 作成時）
+   - [ ] `frontend/docs/BEST_PRACTICES.md` §1〜§3 を確認した
+
+   **例**: Context を実装する場合
+
+   ```bash
+   # 1. 既存の Context パターンを確認
+   Read frontend/src/contexts/AuthContext.tsx
+
+   # 2. 既存のテストパターンを確認
+   Read frontend/tests/unit/hooks/useAuthContext.test.tsx
+
+   # 3. BEST_PRACTICES.md の Context パターンを確認
+   Read frontend/docs/BEST_PRACTICES.md
+   ```
+
+3. **実装**
 
    **作業ディレクトリの管理**（重要）:
 
@@ -204,24 +288,6 @@ description: Execute Story implementation workflow including task management, te
    # ✅ 良い例: ルートディレクトリから実行
    cd frontend && pnpm format && cd ..
    git add frontend/src/...
-   ```
-
-   **実装前の事前確認**:
-
-   - 新しいタイプのコンポーネント（Context, Provider, カスタム Hook など）を実装する前に、既存の類似実装パターンを確認
-   - テストを書く前に、同じタイプのテストファイルを Read して、プロジェクトのテストパターンに従う
-   - Storybook ストーリーを作成する前に、既存のストーリーファイルを Read して、型定義や構造を確認
-
-   **例**: Context を実装する場合
-
-   ```bash
-   # 1. 既存の Context パターンを確認
-   Read frontend/src/contexts/AuthContext.tsx
-
-   # 2. 既存のテストパターンを確認
-   Read frontend/tests/unit/hooks/useAuthContext.test.tsx
-
-   # 3. パターンに従って実装
    ```
 
    **基本ガイドライン**:
@@ -254,31 +320,54 @@ description: Execute Story implementation workflow including task management, te
       この変更を行ってよろしいですか？」
       ```
 
-      - テストケースの変更は仕様の変更を意味する可能性がある
-      - 自己判断での変更は避け、必ずユーザーの承認を得る
-
    c. **新規テスト追加の優先**
       - 既存テストを変更するより、新規テストを追加する方が安全
       - 既存テストは残したまま、新しいテストケースを追加できないか検討
 
-3. **ローカルテスト**（テスト実行後は必ずルートに戻る）
+4. **ローカルテスト**（テスト実行後は必ずルートに戻る）
 
    **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
 
+   **Backend テスト実行と完了条件**:
+
    ```bash
-   # Backend の場合
+   # 単体テスト + アーキテクチャテスト
    cd backend && ./mvnw test && cd ..
 
-   # Frontend の場合
-   cd frontend && pnpm test && cd ..
+   # 統合テスト（必須: integration-test ゴールは禁止）
+   cd backend && ./mvnw verify && cd ..
    ```
 
-   - 全テストが通ることを確認
-   - テスト実行後、次の git コマンドのために必ずルートディレクトリに戻る
+   **Backend 完了条件チェックリスト**:
+   - [ ] 新規クラスに対応するテストクラスが存在する
+   - [ ] テスト構造が AAA パターンに従っている
+   - [ ] `./mvnw test` が成功している
+   - [ ] `./mvnw verify` が成功している（ArchitectureTest 含む）
+   - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §2 参照）
+   - [ ] `import` が Clean Architecture 依存ルールに違反していない
+
+   **Frontend テスト実行と完了条件**:
+
+   ```bash
+   # 単体テスト + コンポーネントテスト
+   cd frontend && pnpm test && cd ..
+
+   # 型チェック（Storybook 作成時は必須）
+   cd frontend && pnpm type-check && cd ..
+
+   # E2E テスト（E2E テストを修正した場合）
+   cd frontend && pnpm test:e2e && cd ..
+   ```
+
+   **Frontend 完了条件チェックリスト**:
+   - [ ] named export になっている
+   - [ ] Context 型に `| undefined` が含まれている（Context 実装時）
+   - [ ] 新規コンポーネントに Storybook が作成されている
+   - [ ] `pnpm type-check` が成功している
+   - [ ] `pnpm test` が成功している
+   - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §4 参照）
 
    **統合テスト失敗時のトラブルシューティング**:
-
-   統合テストが失敗した場合、以下をチェック：
 
    | 症状 | 原因の可能性 | 確認方法 | 解決策 |
    |------|-------------|---------|--------|
@@ -287,15 +376,15 @@ description: Execute Story implementation workflow including task management, te
    | 前回のテストデータが残る | トランザクションロールバックが無効 | `@Transactional` の有無を確認 | テストクラスに `@Transactional` を追加 |
    | ポート競合エラー | `integration-test` ゴールを使用 | コマンド履歴を確認 | `./mvnw verify` を使用 |
 
-   詳細は `backend/CLAUDE.md` の「Integration Test Best Practices」セクションを参照。
+   詳細は `backend/docs/BEST_PRACTICES.md` §5（よくあるアンチパターン）を参照。
 
-4. **セルフレビューの実施と記録**
+5. **セルフレビューの実施と記録**
    - 実装内容を確認
    - 重要な指摘事項を抽出
    - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/self-review-task[N].[M].md` に記録
    - 必要に応じて修正を実施
 
-5. **Storybook の型チェック**（Frontend のみ、Storybook ストーリーを作成した場合）
+6. **Storybook の型チェック**（Frontend のみ、Storybook ストーリーを作成した場合）
 
    Storybook ストーリーを作成した場合、コミット前に必ず型チェックを実行：
 
@@ -307,22 +396,22 @@ description: Execute Story implementation workflow including task management, te
    - 型エラーがある場合は pre-commit hook で失敗するため、事前確認が重要
    - 型エラーを早期発見することで、手戻りを防ぐ
 
-   **よくある型エラー**:
+   **よくある型エラー**（`frontend/docs/BEST_PRACTICES.md` §5 参照）:
    - `args` プロパティが必要なのに `render` だけを指定している
    - Context の型が `| undefined` を含んでいない
    - Story の `render` 関数の引数型が合っていない
 
-6. **tasklist.md の更新**
+7. **tasklist.md の更新**
    - 完了条件のチェックボックスを更新
    - 実績時間とメモを記録
 
-7. **タスク完了**
+8. **タスク完了**
 
    ```
    TaskUpdate taskId=[id] status=completed
    ```
 
-8. **コミット**
+9. **コミット**
 
    ```bash
    git add [変更ファイル]
@@ -330,7 +419,7 @@ description: Execute Story implementation workflow including task management, te
 
    [詳細な変更内容]
 
-   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
    ```
 
 ### Phase 3: Story の完了
@@ -368,7 +457,6 @@ description: Execute Story implementation workflow including task management, te
 
    **テスト未実行での push は禁止**:
    - テストを実行せずに push すると CI で失敗し、手戻りが発生する
-   - 「e2e テストの確認したよな？」と言われないように、必ずローカルで確認する
 
 3. **CI チェックのローカル実行**（推奨）
 
@@ -400,13 +488,56 @@ description: Execute Story implementation workflow including task management, te
    - [ ] コミットメッセージが適切（Co-Authored-By 含む）
    - [ ] 変更ファイルが適切にステージングされている
 
-5. **ブランチのプッシュ**
+5. **コードレビュー（Task サブエージェント経由）**
+
+   push 前に Task ツールを使ってサブエージェントでコードレビューを実施する。
+   Skill ツールを直接呼び出さないこと（メインコンテキストにレビュー処理が蓄積するため）。
+
+   事前に変更ファイルリストを取得する:
+   ```bash
+   git diff --name-only [BASE_BRANCH]...[STORY_BRANCH]
+   ```
+
+   Task ツールを呼び出す際は以下のプロンプトを使用する（各プレースホルダーを実際の値に置換すること）:
+
+   - subagent_type: `"general-purpose"`
+   - prompt:
+
+   ```
+   あなたは Story 実装レビュアーです。以下の実装変更をレビューし、品質評価レポートを出力してください。
+
+   ## レビュー対象ファイル（以下を Read で読み込んでレビューする）
+
+   [変更ファイルリストをここに貼り付け。frontend/src/lib/api/generated/ 配下は除く]
+
+   ## 実行手順
+
+   1. 上記ファイルを Read で読み込む
+   2. 以下を Read で読み込む:
+      - backend/docs/BEST_PRACTICES.md
+      - frontend/docs/BEST_PRACTICES.md
+   3. .claude/skills/review-implementation/SKILL.md を読み込み、
+      「story レビュー観点」に従って評価する:
+      - Clean Architecture 依存ルール違反
+      - テストクラスの存在と品質（AAA パターン・命名規則）
+      - Frontend named export / Context 型 / Storybook
+      - テスト網羅性
+      - セキュリティ（Backend のみ）
+   4. 「出力形式」セクションの形式（✅ 🔴 🟡 🔵 🎯）でレポートを出力する
+   ```
+
+   **レビュー結果に基づく対応**:
+   - 🔴 必須修正: 修正してから push する
+   - 🟡 推奨修正: push 前に修正するか、後続 Story での対応を検討する
+   - 🔵 提案のみ: push して問題なし
+
+6. **ブランチのプッシュ**
 
    ```bash
    git push origin feature/issue-[N]-[epic-name]-story[X]
    ```
 
-6. **PR 作成**（必須: テンプレート使用）
+7. **PR 作成**（必須: テンプレート使用）
 
    **CRITICAL**: 必ず `--template` オプションを使用すること。テンプレートを使わないと Implementation Check が失敗します。
 
@@ -430,11 +561,11 @@ description: Execute Story implementation workflow including task management, te
    - テンプレートは GitHub が自動的に表示するので、PR 作成後にブラウザで編集する
    - CI チェックが通るまで待ってからレビュー依頼する
 
-7. **PR URL の確認**
+8. **PR URL の確認**
    - PR が正しく作成されたことを確認
    - URL をユーザーに報告
 
-8. **Story の振り返り**（推奨）
+9. **Story の振り返り**（推奨）
 
    Story 実装完了後、学びや改善点を記録：
 
@@ -451,7 +582,6 @@ description: Execute Story implementation workflow including task management, te
 
    **保存場所**: `.retrospectives/[epic-dir]/story[N]-[name]-[timestamp].md`
    - Epic #88 の Story1 の場合: `.retrospectives/20260203-issue-88-auth/story1-user-registration-20260208-150000.md`
-   - 同じ Epic の振り返りが1つのフォルダにまとまり、後で Epic 全体の振り返りを行う際に参照できる
 
    **スキップ条件**:
    - 非常にシンプルな Story（1タスク、30分未満）
@@ -464,7 +594,7 @@ description: Execute Story implementation workflow including task management, te
 ### テスト失敗時
 
 1. エラーログを確認
-2. 原因を特定して修正
+2. 原因を特定して修正（`backend/docs/BEST_PRACTICES.md` §5 のアンチパターンも確認）
 3. 再度テスト実行
 4. 失敗が続く場合は AskUserQuestion で相談
 
@@ -489,4 +619,12 @@ description: Execute Story implementation workflow including task management, te
 - [ ] tasklist.md が最新
 - [ ] overview.md が更新済み
 - [ ] 全テストが通過
+- [ ] Task サブエージェント（`review-implementation story` 相当）でコードレビュー実施済み
 - [ ] PR がテンプレートで作成済み
+
+## 参考資料
+
+- [backend/docs/BEST_PRACTICES.md](../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
+- [frontend/docs/BEST_PRACTICES.md](../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
+- [backend/docs/TEST_STRATEGY.md](../../backend/docs/TEST_STRATEGY.md) - バックエンドテスト戦略
+- [frontend/docs/TEST_STRATEGY.md](../../frontend/docs/TEST_STRATEGY.md) - フロントエンドテスト戦略
