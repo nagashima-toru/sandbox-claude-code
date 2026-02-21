@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { MessageTableHeader } from '@/components/messages/MessageTableHeader';
+import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 
 describe('MessageTableHeader', () => {
   it('すべてのカラムヘッダーが表示される', () => {
@@ -10,13 +11,14 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     expect(screen.getByText('ID')).toBeInTheDocument();
-    expect(screen.getByText('Code')).toBeInTheDocument();
-    expect(screen.getByText('Content')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getByText('コード')).toBeInTheDocument();
+    expect(screen.getByText('コンテンツ')).toBeInTheDocument();
+    expect(screen.getByText('操作')).toBeInTheDocument();
   });
 
   it('IDカラムクリックで onSort が呼ばれる', async () => {
@@ -26,7 +28,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="code" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const idButton = screen.getByRole('button', { name: /sort by id/i });
@@ -43,7 +46,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const codeButton = screen.getByRole('button', { name: /sort by code/i });
@@ -60,7 +64,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const contentButton = screen.getByRole('button', { name: /sort by content/i });
@@ -76,7 +81,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="code" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const idButton = screen.getByRole('button', { name: /sort by id/i });
@@ -94,7 +100,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const idButton = screen.getByRole('button', {
@@ -109,7 +116,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="code" sortDirection="desc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const codeButton = screen.getByRole('button', {
@@ -124,7 +132,8 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const codeButton = screen.getByRole('button', { name: 'Sort by Code' });
@@ -136,10 +145,12 @@ describe('MessageTableHeader', () => {
 
   it('sortFieldとsortDirectionを変更すると表示が更新される', () => {
     const onSort = vi.fn();
+    const Wrapper = createLocaleWrapper();
     const { rerender } = render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: Wrapper }
     );
 
     // 初期状態: ID昇順

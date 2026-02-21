@@ -7,6 +7,7 @@ import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
 import * as messageApi from '@/lib/api/generated/message/message';
 import { AuthContext } from '@/contexts/AuthContext';
 import { ROLES } from '@/lib/constants/roles';
+import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 
 // Mock the API module
 vi.mock('@/lib/api/generated/message/message', () => ({
@@ -31,19 +32,23 @@ const createWrapper = (user: UserResponse | null = { username: 'admin', role: RO
     },
   });
 
+  const LocaleWrapper = createLocaleWrapper();
+
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider
-        value={{
-          user,
-          isLoading: false,
-          error: null,
-          refetch: () => {},
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
-    </QueryClientProvider>
+    <LocaleWrapper>
+      <QueryClientProvider client={queryClient}>
+        <AuthContext.Provider
+          value={{
+            user,
+            isLoading: false,
+            error: null,
+            refetch: () => {},
+          }}
+        >
+          {children}
+        </AuthContext.Provider>
+      </QueryClientProvider>
+    </LocaleWrapper>
   );
 
   Wrapper.displayName = 'QueryClientWrapper';
