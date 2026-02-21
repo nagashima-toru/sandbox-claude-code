@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
@@ -32,6 +33,9 @@ export default function LoginPage() {
       data-testid="login-page"
       className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12"
     >
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold">ログイン</h1>
