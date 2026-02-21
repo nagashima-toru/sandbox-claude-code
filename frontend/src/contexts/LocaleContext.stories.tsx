@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { LocaleProvider, LocaleContext, useLocale } from './LocaleContext';
+import enMessages from '../../messages/en.json';
+import jaMessages from '../../messages/ja.json';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -77,7 +79,7 @@ export const EnglishLocale: Story = {
       value={{
         locale: 'en',
         setLocale: () => {},
-        messages: {},
+        messages: enMessages as Record<string, unknown>,
       }}
     >
       <LocaleDemo />
@@ -97,7 +99,7 @@ export const JapaneseLocale: Story = {
       value={{
         locale: 'ja',
         setLocale: () => {},
-        messages: {},
+        messages: jaMessages as Record<string, unknown>,
       }}
     >
       <LocaleDemo />
