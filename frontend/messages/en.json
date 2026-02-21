@@ -1,0 +1,63 @@
+{
+  "login": {
+    "title": "Login",
+    "subtitle": "Please sign in to Message Management System",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Login",
+    "submitting": "Signing in...",
+    "error": "Login failed. Username or password is incorrect."
+  },
+  "navigation": {
+    "logout": "Logout"
+  },
+  "messages": {
+    "pageTitle": "Message Management",
+    "pageDescription": "Manage all your messages in one place",
+    "newMessage": "New Message",
+    "table": {
+      "id": "ID",
+      "code": "Code",
+      "content": "Content",
+      "actions": "Actions"
+    },
+    "form": {
+      "codeLabel": "Code",
+      "contentLabel": "Content",
+      "codePlaceholder": "Enter message code",
+      "contentPlaceholder": "Enter message content",
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close",
+      "viewTitle": "View Message",
+      "createDescription": "Fill in the details to create a new message.",
+      "editDescription": "Update the message details below.",
+      "viewDescription": "Message details (read-only)"
+    },
+    "modal": {
+      "createTitle": "Create Message",
+      "editTitle": "Edit Message"
+    },
+    "deleteDialog": {
+      "title": "Delete Message",
+      "description": "Are you sure you want to delete this message? This action cannot be undone.",
+      "codeLabel": "Code:",
+      "contentLabel": "Content:",
+      "deleting": "Deleting...",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "conflict": "A message with this code already exists. Please use a different code.",
+      "notFound": "Message not found. It may have been deleted.",
+      "badRequest": "Invalid input. Please check your data.",
+      "serverError": "Server error. Please try again later.",
+      "networkError": "Network error. Please check your connection and try again.",
+      "unexpected": "An unexpected error occurred. Please try again."
+    }
+  },
+  "common": {
+    "loading": "Loading..."
+  }
+}
