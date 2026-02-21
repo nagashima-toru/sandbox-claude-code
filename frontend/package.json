@@ -36,6 +36,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.563.0",
     "next": "^16.1.6",
+    "next-intl": "^4.8.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.71.1",
@@ -97,7 +98,18 @@
     "overrides": {
       "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1",
       "js-yaml@>=4.0.0 <4.1.1": ">=4.1.1",
-      "micromatch@<4.0.8": ">=4.0.8"
+      "micromatch@<4.0.8": ">=4.0.8",
+      "glob>minimatch": ">=10.2.1",
+      "@typescript-eslint/typescript-estree>minimatch": ">=10.2.1",
+      "typedoc>minimatch": ">=10.2.1",
+      "@eslint/eslintrc>ajv": "^6.14.0",
+      "eslint>ajv": "^6.14.0",
+      "@scalar/openapi-parser>ajv": ">=8.18.0"
+    },
+    "auditConfig": {
+      "ignoreCves": [
+        "CVE-2026-26996"
+      ]
     }
   }
 }

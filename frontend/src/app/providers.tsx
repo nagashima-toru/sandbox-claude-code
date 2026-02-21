@@ -2,8 +2,10 @@
 
 import { isServer, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { NextIntlClientProvider } from 'next-intl';
 import { makeQueryClient } from '@/lib/query-client';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { LocaleProvider, useLocale } from '@/contexts/LocaleContext';
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
@@ -21,6 +23,19 @@ function getQueryClient() {
   }
 }
 
+/**
+ * Inner provider that reads locale from LocaleContext and provides NextIntlClientProvider.
+ * Must be a child of LocaleProvider.
+ */
+function IntlProviderWrapper({ children }: { children: React.ReactNode }) {
+  const { locale, messages } = useLocale();
+  return (
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      {children}
+    </NextIntlClientProvider>
+  );
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   // NOTE: Avoid useState when initializing the query client if you don't
   //       have a suspense boundary between this and the code that may
@@ -29,12 +44,16 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {children}
-        {/* React Query Devtools - only in development */}
-        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
-      </AuthProvider>
-    </QueryClientProvider>
+    <LocaleProvider>
+      <IntlProviderWrapper>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            {children}
+            {/* React Query Devtools - only in development */}
+            {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+          </AuthProvider>
+        </QueryClientProvider>
+      </IntlProviderWrapper>
+    </LocaleProvider>
   );
 }
