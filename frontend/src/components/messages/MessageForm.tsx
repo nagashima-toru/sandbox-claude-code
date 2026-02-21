@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { messageSchema, MessageFormData } from '@/lib/validations/message';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +37,7 @@ interface MessageFormProps {
  * @param error - API error object to display error messages from server
  * @param disabled - If true, all form fields will be disabled (read-only mode)
  */
-export default function MessageForm({
+export function MessageForm({
   onSubmit,
   initialData,
   isSubmitting = false,
@@ -44,6 +45,8 @@ export default function MessageForm({
   error,
   disabled = false,
 }: MessageFormProps) {
+  const t = useTranslations('messages.form');
+  const tRoot = useTranslations();
   const form = useForm<MessageFormData>({
     resolver: zodResolver(messageSchema),
     defaultValues: {
@@ -56,7 +59,7 @@ export default function MessageForm({
     onSubmit(data);
   };
 
-  const errorMessage = getApiErrorMessage(error);
+  const errorMessage = getApiErrorMessage(error, tRoot);
 
   return (
     <Form {...form}>
@@ -75,10 +78,10 @@ export default function MessageForm({
           name="code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Code</FormLabel>
+              <FormLabel>{t('codeLabel')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter message code"
+                  placeholder={t('codePlaceholder')}
                   {...field}
                   disabled={isSubmitting || disabled}
                   aria-disabled={isSubmitting || disabled}
@@ -96,11 +99,11 @@ export default function MessageForm({
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Content</FormLabel>
+              <FormLabel>{t('contentLabel')}</FormLabel>
               <FormControl>
                 <textarea
                   className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="Enter message content"
+                  placeholder={t('contentPlaceholder')}
                   {...field}
                   disabled={isSubmitting || disabled}
                   aria-disabled={isSubmitting || disabled}
@@ -121,7 +124,7 @@ export default function MessageForm({
             disabled={isSubmitting}
             data-testid="message-form-cancel"
           >
-            {disabled ? 'Close' : 'Cancel'}
+            {disabled ? t('close') : t('cancel')}
           </Button>
           {!disabled && (
             <Button
@@ -130,7 +133,7 @@ export default function MessageForm({
               aria-disabled={isSubmitting}
               data-testid="message-form-submit"
             >
-              {isSubmitting ? 'Saving...' : 'Save'}
+              {isSubmitting ? t('saving') : t('save')}
             </Button>
           )}
         </div>
@@ -138,3 +141,5 @@ export default function MessageForm({
     </Form>
   );
 }
+
+export default MessageForm;

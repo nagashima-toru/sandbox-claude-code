@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MessageForm from '@/components/messages/MessageForm';
 import { MessageResponse } from '@/lib/api/generated/models';
+import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 
 describe('MessageForm', () => {
   const mockOnSubmit = vi.fn();
@@ -20,12 +21,12 @@ describe('MessageForm', () => {
 
   describe('レンダリング', () => {
     it('フォームが正しくレンダリングされる', () => {
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      expect(screen.getByLabelText(/code/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/content/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+      expect(screen.getByTestId('message-code-input')).toBeInTheDocument();
+      expect(screen.getByTestId('message-content-input')).toBeInTheDocument();
+      expect(screen.getByTestId('message-form-cancel')).toBeInTheDocument();
+      expect(screen.getByTestId('message-form-submit')).toBeInTheDocument();
     });
 
     it('初期データが設定されている場合、フォームに値が表示される', () => {
@@ -37,35 +38,39 @@ describe('MessageForm', () => {
         updatedAt: '2026-01-29T00:00:00Z',
       };
 
-      render(<MessageForm {...defaultProps} initialData={initialData} />);
+      render(<MessageForm {...defaultProps} initialData={initialData} />, {
+        wrapper: createLocaleWrapper(),
+      });
 
-      expect(screen.getByLabelText(/code/i)).toHaveValue('TEST001');
-      expect(screen.getByLabelText(/content/i)).toHaveValue('Test message content');
+      expect(screen.getByTestId('message-code-input')).toHaveValue('TEST001');
+      expect(screen.getByTestId('message-content-input')).toHaveValue('Test message content');
     });
 
     it('エラーメッセージが表示される', () => {
       const error = new Error('Something went wrong');
-      render(<MessageForm {...defaultProps} error={error} />);
+      render(<MessageForm {...defaultProps} error={error} />, { wrapper: createLocaleWrapper() });
 
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
     });
 
     it('送信中の場合、ボタンが無効化される', () => {
-      render(<MessageForm {...defaultProps} isSubmitting={true} />);
+      render(<MessageForm {...defaultProps} isSubmitting={true} />, {
+        wrapper: createLocaleWrapper(),
+      });
 
-      expect(screen.getByRole('button', { name: /saving/i })).toBeDisabled();
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
-      expect(screen.getByLabelText(/code/i)).toBeDisabled();
-      expect(screen.getByLabelText(/content/i)).toBeDisabled();
+      expect(screen.getByTestId('message-form-submit')).toBeDisabled();
+      expect(screen.getByTestId('message-form-cancel')).toBeDisabled();
+      expect(screen.getByTestId('message-code-input')).toBeDisabled();
+      expect(screen.getByTestId('message-content-input')).toBeDisabled();
     });
   });
 
   describe('フォーム入力', () => {
     it('codeフィールドに入力できる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
+      const codeInput = screen.getByTestId('message-code-input');
       await user.type(codeInput, 'TEST001');
 
       expect(codeInput).toHaveValue('TEST001');
@@ -73,9 +78,9 @@ describe('MessageForm', () => {
 
     it('contentフィールドに入力できる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const contentInput = screen.getByLabelText(/content/i);
+      const contentInput = screen.getByTestId('message-content-input');
       await user.type(contentInput, 'Test content');
 
       expect(contentInput).toHaveValue('Test content');
@@ -83,10 +88,10 @@ describe('MessageForm', () => {
 
     it('両方のフィールドに入力できる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
-      const contentInput = screen.getByLabelText(/content/i);
+      const codeInput = screen.getByTestId('message-code-input');
+      const contentInput = screen.getByTestId('message-content-input');
 
       await user.type(codeInput, 'TEST001');
       await user.type(contentInput, 'Test content');
@@ -99,9 +104,9 @@ describe('MessageForm', () => {
   describe('バリデーション', () => {
     it('codeが空の場合、エラーメッセージを表示する', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -113,12 +118,12 @@ describe('MessageForm', () => {
 
     it('contentが空の場合、エラーメッセージを表示する', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
+      const codeInput = screen.getByTestId('message-code-input');
       await user.type(codeInput, 'TEST001');
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -130,12 +135,12 @@ describe('MessageForm', () => {
 
     it('codeが51文字以上の場合、エラーメッセージを表示する', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
+      const codeInput = screen.getByTestId('message-code-input');
       await user.type(codeInput, 'A'.repeat(51));
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -147,15 +152,15 @@ describe('MessageForm', () => {
 
     it('contentが501文字以上の場合、エラーメッセージを表示する', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
-      const contentInput = screen.getByLabelText(/content/i);
+      const codeInput = screen.getByTestId('message-code-input');
+      const contentInput = screen.getByTestId('message-content-input');
 
       await user.type(codeInput, 'TEST001');
       await user.type(contentInput, 'A'.repeat(501));
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -167,9 +172,9 @@ describe('MessageForm', () => {
 
     it('両方のフィールドが無効な場合、複数のエラーメッセージを表示する', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -184,15 +189,15 @@ describe('MessageForm', () => {
   describe('送信処理', () => {
     it('有効なデータを送信できる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
-      const contentInput = screen.getByLabelText(/content/i);
+      const codeInput = screen.getByTestId('message-code-input');
+      const contentInput = screen.getByTestId('message-content-input');
 
       await user.type(codeInput, 'TEST001');
       await user.type(contentInput, 'Test content');
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -205,9 +210,9 @@ describe('MessageForm', () => {
 
     it('キャンセルボタンをクリックするとonCancelが呼ばれる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
+      const cancelButton = screen.getByTestId('message-form-cancel');
       await user.click(cancelButton);
 
       expect(mockOnCancel).toHaveBeenCalledOnce();
@@ -216,9 +221,11 @@ describe('MessageForm', () => {
 
     it('送信中はフォームを再送信できない', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} isSubmitting={true} />);
+      render(<MessageForm {...defaultProps} isSubmitting={true} />, {
+        wrapper: createLocaleWrapper(),
+      });
 
-      const submitButton = screen.getByRole('button', { name: /saving/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       expect(submitButton).toBeDisabled();
 
       await user.click(submitButton);
@@ -235,13 +242,15 @@ describe('MessageForm', () => {
         updatedAt: '2026-01-29T00:00:00Z',
       };
 
-      render(<MessageForm {...defaultProps} initialData={initialData} />);
+      render(<MessageForm {...defaultProps} initialData={initialData} />, {
+        wrapper: createLocaleWrapper(),
+      });
 
-      const contentInput = screen.getByLabelText(/content/i);
+      const contentInput = screen.getByTestId('message-content-input');
       await user.clear(contentInput);
       await user.type(contentInput, 'Updated content');
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -254,10 +263,10 @@ describe('MessageForm', () => {
 
     it('最大文字数ちょうどのデータを送信できる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} />);
+      render(<MessageForm {...defaultProps} />, { wrapper: createLocaleWrapper() });
 
-      const codeInput = screen.getByLabelText(/code/i);
-      const contentInput = screen.getByLabelText(/content/i);
+      const codeInput = screen.getByTestId('message-code-input');
+      const contentInput = screen.getByTestId('message-content-input');
 
       const maxCode = 'A'.repeat(50);
       const maxContent = 'B'.repeat(500);
@@ -265,7 +274,7 @@ describe('MessageForm', () => {
       await user.type(codeInput, maxCode);
       await user.type(contentInput, maxContent);
 
-      const submitButton = screen.getByRole('button', { name: /save/i });
+      const submitButton = screen.getByTestId('message-form-submit');
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -280,14 +289,14 @@ describe('MessageForm', () => {
   describe('エラー表示', () => {
     it('APIエラーが発生した場合、エラーメッセージを表示する', () => {
       const error = { response: { data: { message: 'Code already exists' } } };
-      render(<MessageForm {...defaultProps} error={error} />);
+      render(<MessageForm {...defaultProps} error={error} />, { wrapper: createLocaleWrapper() });
 
       expect(screen.getByText(/code already exists/i)).toBeInTheDocument();
     });
 
     it('一般的なエラーが発生した場合、デフォルトメッセージを表示する', () => {
       const error = new Error('Network error');
-      render(<MessageForm {...defaultProps} error={error} />);
+      render(<MessageForm {...defaultProps} error={error} />, { wrapper: createLocaleWrapper() });
 
       expect(screen.getByText(/network error/i)).toBeInTheDocument();
     });
@@ -295,38 +304,37 @@ describe('MessageForm', () => {
 
   describe('読み取り専用モード', () => {
     it('disabled が true の場合、全ての入力欄が無効化される', () => {
-      render(<MessageForm {...defaultProps} disabled={true} />);
+      render(<MessageForm {...defaultProps} disabled={true} />, { wrapper: createLocaleWrapper() });
 
-      expect(screen.getByLabelText(/code/i)).toBeDisabled();
-      expect(screen.getByLabelText(/content/i)).toBeDisabled();
+      expect(screen.getByTestId('message-code-input')).toBeDisabled();
+      expect(screen.getByTestId('message-content-input')).toBeDisabled();
     });
 
     it('disabled が true の場合、Saveボタンが非表示になる', () => {
-      render(<MessageForm {...defaultProps} disabled={true} />);
+      render(<MessageForm {...defaultProps} disabled={true} />, { wrapper: createLocaleWrapper() });
 
-      expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /saving/i })).not.toBeInTheDocument();
+      expect(screen.queryByTestId('message-form-submit')).not.toBeInTheDocument();
     });
 
-    it('disabled が true の場合、Cancelボタンが"Close"に変わる', () => {
-      render(<MessageForm {...defaultProps} disabled={true} />);
+    it('disabled が true の場合、Cancelボタンが"閉じる"に変わる', () => {
+      render(<MessageForm {...defaultProps} disabled={true} />, { wrapper: createLocaleWrapper() });
 
-      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
+      const cancelButton = screen.getByTestId('message-form-cancel');
+      expect(cancelButton).toHaveTextContent('閉じる');
     });
 
     it('disabled が true の場合、aria-readonly属性が設定される', () => {
-      render(<MessageForm {...defaultProps} disabled={true} />);
+      render(<MessageForm {...defaultProps} disabled={true} />, { wrapper: createLocaleWrapper() });
 
-      expect(screen.getByLabelText(/code/i)).toHaveAttribute('aria-readonly', 'true');
-      expect(screen.getByLabelText(/content/i)).toHaveAttribute('aria-readonly', 'true');
+      expect(screen.getByTestId('message-code-input')).toHaveAttribute('aria-readonly', 'true');
+      expect(screen.getByTestId('message-content-input')).toHaveAttribute('aria-readonly', 'true');
     });
 
     it('disabled が true の場合でも、Closeボタンはクリックできる', async () => {
       const user = userEvent.setup();
-      render(<MessageForm {...defaultProps} disabled={true} />);
+      render(<MessageForm {...defaultProps} disabled={true} />, { wrapper: createLocaleWrapper() });
 
-      const closeButton = screen.getByRole('button', { name: /close/i });
+      const closeButton = screen.getByTestId('message-form-cancel');
       expect(closeButton).not.toBeDisabled();
 
       await user.click(closeButton);
@@ -334,10 +342,12 @@ describe('MessageForm', () => {
     });
 
     it('isSubmittingとdisabledの両方がtrueの場合、入力欄が無効化される', () => {
-      render(<MessageForm {...defaultProps} isSubmitting={true} disabled={true} />);
+      render(<MessageForm {...defaultProps} isSubmitting={true} disabled={true} />, {
+        wrapper: createLocaleWrapper(),
+      });
 
-      expect(screen.getByLabelText(/code/i)).toBeDisabled();
-      expect(screen.getByLabelText(/content/i)).toBeDisabled();
+      expect(screen.getByTestId('message-code-input')).toBeDisabled();
+      expect(screen.getByTestId('message-content-input')).toBeDisabled();
     });
   });
 });
