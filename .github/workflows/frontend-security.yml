@@ -56,11 +56,15 @@ jobs:
           AUDIT_OUTPUT=$(pnpm audit --json 2>&1 || true)
 
           # 脆弱性の統計を抽出
-          if echo "$AUDIT_OUTPUT" | jq -e '.metadata' > /dev/null 2>&1; then
-            CRITICAL=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.critical // 0')
-            HIGH=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.high // 0')
-            MODERATE=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.moderate // 0')
-            LOW=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.low // 0')
+          # .advisories を使用することで pnpm.auditConfig.ignoreCves で抑制済みの脆弱性を除外する
+          # (.metadata.vulnerabilities は ignoreCves 適用前の raw カウントのため使用しない)
+          if echo "$AUDIT_OUTPUT" | jq -e '.advisories' > /dev/null 2>&1; then
+            CRITICAL=$(echo "$AUDIT_OUTPUT" | jq -r '[.advisories | to_entries[] | select(.value.severity == "critical")] | length')
+            HIGH=$(echo "$AUDIT_OUTPUT" | jq -r '[.advisories | to_entries[] | select(.value.severity == "high")] | length')
+            MODERATE=$(echo "$AUDIT_OUTPUT" | jq -r '[.advisories | to_entries[] | select(.value.severity == "moderate")] | length')
+            LOW=$(echo "$AUDIT_OUTPUT" | jq -r '[.advisories | to_entries[] | select(.value.severity == "low")] | length')
+            RAW_HIGH=$(echo "$AUDIT_OUTPUT" | jq -r '.metadata.vulnerabilities.high // 0')
+            IGNORED=$((RAW_HIGH - HIGH))
 
             echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
             echo "| -------- | ----- |" >> $GITHUB_STEP_SUMMARY
@@ -68,6 +72,9 @@ jobs:
             echo "| 🟠 High | $HIGH |" >> $GITHUB_STEP_SUMMARY
             echo "| 🟡 Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
             echo "| ⚪ Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+            if [ "$IGNORED" -gt 0 ]; then
+              echo "| 🔕 Ignored (via auditConfig.ignoreCves) | $IGNORED |" >> $GITHUB_STEP_SUMMARY
+            fi
             echo "" >> $GITHUB_STEP_SUMMARY
 
             # Critical または High の脆弱性がある場合は失敗
