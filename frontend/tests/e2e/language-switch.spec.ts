@@ -144,8 +144,9 @@ test.describe('言語切り替え機能 (Task 4.1)', () => {
     await page.getByTestId('login-password-input').fill('wrongpassword');
     await page.getByTestId('login-submit-button').click();
 
-    // Error message should appear in English (no waitForTimeout - rely on toBeVisible timeout)
-    const errorAlert = page.locator('[role="alert"]');
+    // Error message should appear in English
+    // Use form [role="alert"] to avoid matching Next.js route announcer (#__next-route-announcer__)
+    const errorAlert = page.locator('form [role="alert"]');
     await expect(errorAlert).toBeVisible({ timeout: 10000 });
     await expect(errorAlert).toContainText('Login failed');
   });
