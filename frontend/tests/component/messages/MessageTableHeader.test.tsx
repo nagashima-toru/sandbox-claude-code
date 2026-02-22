@@ -32,7 +32,7 @@ describe('MessageTableHeader', () => {
       { wrapper: createLocaleWrapper() }
     );
 
-    const idButton = screen.getByRole('button', { name: /sort by id/i });
+    const idButton = screen.getByRole('button', { name: /IDでソート/ });
     await user.click(idButton);
 
     expect(onSort).toHaveBeenCalledWith('id');
@@ -50,7 +50,7 @@ describe('MessageTableHeader', () => {
       { wrapper: createLocaleWrapper() }
     );
 
-    const codeButton = screen.getByRole('button', { name: /sort by code/i });
+    const codeButton = screen.getByRole('button', { name: /コードでソート/ });
     await user.click(codeButton);
 
     expect(onSort).toHaveBeenCalledWith('code');
@@ -68,7 +68,7 @@ describe('MessageTableHeader', () => {
       { wrapper: createLocaleWrapper() }
     );
 
-    const contentButton = screen.getByRole('button', { name: /sort by content/i });
+    const contentButton = screen.getByRole('button', { name: /コンテンツでソート/ });
     await user.click(contentButton);
 
     expect(onSort).toHaveBeenCalledWith('content');
@@ -85,9 +85,9 @@ describe('MessageTableHeader', () => {
       { wrapper: createLocaleWrapper() }
     );
 
-    const idButton = screen.getByRole('button', { name: /sort by id/i });
-    const codeButton = screen.getByRole('button', { name: /sort by code/i });
-    const contentButton = screen.getByRole('button', { name: /sort by content/i });
+    const idButton = screen.getByRole('button', { name: /IDでソート/ });
+    const codeButton = screen.getByRole('button', { name: /コードでソート/ });
+    const contentButton = screen.getByRole('button', { name: /コンテンツでソート/ });
 
     expect(idButton).toHaveAttribute('aria-pressed', 'false');
     expect(codeButton).toHaveAttribute('aria-pressed', 'true');
@@ -105,7 +105,7 @@ describe('MessageTableHeader', () => {
     );
 
     const idButton = screen.getByRole('button', {
-      name: /sort by id, currently ascending/i,
+      name: /IDでソート（昇順）/,
     });
     expect(idButton).toBeInTheDocument();
   });
@@ -121,7 +121,7 @@ describe('MessageTableHeader', () => {
     );
 
     const codeButton = screen.getByRole('button', {
-      name: /sort by code, currently descending/i,
+      name: /コードでソート（降順）/,
     });
     expect(codeButton).toBeInTheDocument();
   });
@@ -136,8 +136,8 @@ describe('MessageTableHeader', () => {
       { wrapper: createLocaleWrapper() }
     );
 
-    const codeButton = screen.getByRole('button', { name: 'Sort by Code' });
-    const contentButton = screen.getByRole('button', { name: 'Sort by Content' });
+    const codeButton = screen.getByRole('button', { name: 'コードでソート' });
+    const contentButton = screen.getByRole('button', { name: 'コンテンツでソート' });
 
     expect(codeButton).toBeInTheDocument();
     expect(contentButton).toBeInTheDocument();
@@ -154,9 +154,7 @@ describe('MessageTableHeader', () => {
     );
 
     // 初期状態: ID昇順
-    expect(
-      screen.getByRole('button', { name: /sort by id, currently ascending/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /IDでソート（昇順）/ })).toBeInTheDocument();
 
     // 再レンダリング: Code降順
     rerender(
@@ -165,9 +163,7 @@ describe('MessageTableHeader', () => {
       </table>
     );
 
-    expect(
-      screen.getByRole('button', { name: /sort by code, currently descending/i })
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sort by ID' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /コードでソート（降順）/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'IDでソート' })).toBeInTheDocument();
   });
 });

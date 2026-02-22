@@ -386,7 +386,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const codeHeader = screen.getByRole('button', { name: /code/i });
+      const codeHeader = screen.getByRole('button', { name: /コードでソート/ });
       await user.click(codeHeader);
 
       await waitFor(() => {
