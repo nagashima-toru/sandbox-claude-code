@@ -6,7 +6,10 @@
     "password": "Password",
     "submit": "Login",
     "submitting": "Signing in...",
-    "error": "Login failed. Username or password is incorrect."
+    "error": "Login failed. Username or password is incorrect.",
+    "devAccounts": "Development accounts:",
+    "adminLabel": "Admin",
+    "viewerLabel": "Viewer"
   },
   "navigation": {
     "logout": "Logout"

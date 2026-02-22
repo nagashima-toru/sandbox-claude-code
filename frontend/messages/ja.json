@@ -6,7 +6,10 @@
     "password": "パスワード",
     "submit": "ログイン",
     "submitting": "ログイン中...",
-    "error": "ログインに失敗しました。ユーザー名またはパスワードが正しくありません。"
+    "error": "ログインに失敗しました。ユーザー名またはパスワードが正しくありません。",
+    "devAccounts": "開発環境用アカウント:",
+    "adminLabel": "管理者",
+    "viewerLabel": "閲覧者"
   },
   "navigation": {
     "logout": "ログアウト"

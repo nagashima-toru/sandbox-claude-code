@@ -98,12 +98,12 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>開発環境用アカウント:</p>
+          <p>{t('devAccounts')}</p>
           <p className="mt-1">
-            <strong>管理者:</strong> admin / admin123
+            <strong>{t('adminLabel')}:</strong> admin / admin123
           </p>
           <p>
-            <strong>閲覧者:</strong> viewer / viewer123
+            <strong>{t('viewerLabel')}:</strong> viewer / viewer123
           </p>
         </div>
       </div>
