@@ -22,7 +22,10 @@
       "id": "ID",
       "code": "Code",
       "content": "Content",
-      "actions": "Actions"
+      "actions": "Actions",
+      "sortBy": "Sort by {field}",
+      "sortByAsc": "Sort by {field}, currently ascending",
+      "sortByDesc": "Sort by {field}, currently descending"
     },
     "form": {
       "codeLabel": "Code",

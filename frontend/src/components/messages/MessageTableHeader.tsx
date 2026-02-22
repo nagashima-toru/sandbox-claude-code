@@ -31,15 +31,15 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
   );
 
   const getSortLabel = useCallback(
-    (field: SortField, fieldName: string) => {
+    (field: SortField, translatedName: string) => {
       if (sortField !== field) {
-        return `Sort by ${fieldName}`;
+        return t('sortBy', { field: translatedName });
       }
       return sortDirection === 'asc'
-        ? `Sort by ${fieldName}, currently ascending`
-        : `Sort by ${fieldName}, currently descending`;
+        ? t('sortByAsc', { field: translatedName })
+        : t('sortByDesc', { field: translatedName });
     },
-    [sortField, sortDirection]
+    [sortField, sortDirection, t]
   );
 
   return (
@@ -49,10 +49,10 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
           <button
             onClick={() => onSort('id')}
             className="flex items-center hover:text-foreground"
-            aria-label={getSortLabel('id', 'ID')}
+            aria-label={getSortLabel('id', t('id'))}
             aria-pressed={sortField === 'id'}
           >
-            ID
+            {t('id')}
             {getSortIcon('id')}
           </button>
         </TableHead>
@@ -60,7 +60,7 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
           <button
             onClick={() => onSort('code')}
             className="flex items-center hover:text-foreground"
-            aria-label={getSortLabel('code', 'Code')}
+            aria-label={getSortLabel('code', t('code'))}
             aria-pressed={sortField === 'code'}
           >
             {t('code')}
@@ -71,7 +71,7 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
           <button
             onClick={() => onSort('content')}
             className="flex items-center hover:text-foreground"
-            aria-label={getSortLabel('content', 'Content')}
+            aria-label={getSortLabel('content', t('content'))}
             aria-pressed={sortField === 'content'}
           >
             {t('content')}
