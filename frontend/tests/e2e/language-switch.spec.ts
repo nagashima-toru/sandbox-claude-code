@@ -1,47 +1,42 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { login } from './helpers';
 
-// Helper: switch to English (clicks EN button when in Japanese mode)
-async function switchToEnglish(page: import('@playwright/test').Page) {
+// Helper: clear locale from localStorage and navigate to login page
+async function clearLocale(page: Page) {
+  await page.goto('/login');
+  await page.evaluate(() => localStorage.removeItem('locale'));
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByTestId('language-switcher')).toBeVisible({ timeout: 10000 });
+}
+
+// Helper: switch to English (click EN button in Japanese mode, wait for DOM change)
+async function switchToEnglish(page: Page) {
   const switcher = page.getByTestId('language-switcher');
   await expect(switcher).toBeVisible({ timeout: 5000 });
   // Button shows "EN" when locale is 'ja'
   if ((await switcher.textContent())?.trim() === 'EN') {
     await switcher.click();
-    await page.waitForTimeout(300);
+    // Wait until the button changes to "日" (locale is now 'en')
+    await expect(switcher).toHaveText('日', { timeout: 3000 });
   }
 }
 
-// Helper: switch to Japanese (clicks 日 button when in English mode)
-async function switchToJapanese(page: import('@playwright/test').Page) {
+// Helper: switch to Japanese (click 日 button in English mode, wait for DOM change)
+async function switchToJapanese(page: Page) {
   const switcher = page.getByTestId('language-switcher');
   await expect(switcher).toBeVisible({ timeout: 5000 });
   // Button shows "日" when locale is 'en'
   if ((await switcher.textContent())?.trim() === '日') {
     await switcher.click();
-    await page.waitForTimeout(300);
-  }
-}
-
-// Helper: ensure Japanese (default) mode
-async function ensureJapanese(page: import('@playwright/test').Page) {
-  const switcher = page.getByTestId('language-switcher');
-  await expect(switcher).toBeVisible({ timeout: 5000 });
-  const text = (await switcher.textContent())?.trim();
-  // If showing "日", we are in English mode; click to go back to Japanese
-  if (text === '日') {
-    await switcher.click();
-    await page.waitForTimeout(300);
+    // Wait until the button changes to "EN" (locale is now 'ja')
+    await expect(switcher).toHaveText('EN', { timeout: 3000 });
   }
 }
 
 test.describe('言語切り替え機能 (Task 4.1)', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage to start with default Japanese
-    await page.goto('/login');
-    await page.evaluate(() => localStorage.removeItem('locale'));
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    await clearLocale(page);
   });
 
   test('ログイン画面に言語切り替えボタンが表示される', async ({ page }) => {
@@ -54,8 +49,8 @@ test.describe('言語切り替え機能 (Task 4.1)', () => {
   });
 
   test('日本語選択時にログイン画面のUIテキストが日本語で表示される', async ({ page }) => {
-    // Default is Japanese, ensure we are in Japanese mode
-    await ensureJapanese(page);
+    // After clearLocale, default is Japanese - verify switcher shows "EN"
+    await expect(page.getByTestId('language-switcher')).toHaveText('EN');
 
     await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible();
     await expect(page.getByText('ユーザー名')).toBeVisible();
@@ -136,8 +131,9 @@ test.describe('言語切り替え機能 (Task 4.1)', () => {
     // Cancel button
     await expect(page.getByTestId('message-form-cancel')).toContainText('Cancel');
 
-    // Close modal
+    // Close modal and verify it closes
     await page.getByTestId('message-form-cancel').click();
+    await expect(modal).not.toBeVisible({ timeout: 10000 });
   });
 
   test('ログインエラーメッセージが英語で表示される', async ({ page }) => {
@@ -148,10 +144,7 @@ test.describe('言語切り替え機能 (Task 4.1)', () => {
     await page.getByTestId('login-password-input').fill('wrongpassword');
     await page.getByTestId('login-submit-button').click();
 
-    // Wait for error response
-    await page.waitForTimeout(3000);
-
-    // Error message should appear in English
+    // Error message should appear in English (no waitForTimeout - rely on toBeVisible timeout)
     const errorAlert = page.locator('[role="alert"]');
     await expect(errorAlert).toBeVisible({ timeout: 10000 });
     await expect(errorAlert).toContainText('Login failed');
@@ -160,11 +153,7 @@ test.describe('言語切り替え機能 (Task 4.1)', () => {
 
 test.describe('言語設定の永続化 (Task 4.2)', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage to start with default Japanese
-    await page.goto('/login');
-    await page.evaluate(() => localStorage.removeItem('locale'));
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    await clearLocale(page);
   });
 
   test('英語選択後にページをリロードしても英語が維持される', async ({ page }) => {
@@ -177,8 +166,7 @@ test.describe('言語設定の永続化 (Task 4.2)', () => {
 
     // Should still be in English
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible({ timeout: 10000 });
-    const switcher = page.getByTestId('language-switcher');
-    await expect(switcher).toHaveText('日'); // Shows "日" when in English mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('日'); // Shows "日" when in English mode
   });
 
   test('日本語に戻した後にページをリロードしても日本語が維持される', async ({ page }) => {
@@ -196,8 +184,7 @@ test.describe('言語設定の永続化 (Task 4.2)', () => {
 
     // Should still be in Japanese
     await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible({ timeout: 10000 });
-    const switcher = page.getByTestId('language-switcher');
-    await expect(switcher).toHaveText('EN'); // Shows "EN" when in Japanese mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('EN'); // Shows "EN" when in Japanese mode
   });
 
   test('ログイン後も選択言語が引き継がれる', async ({ page }) => {
@@ -216,8 +203,7 @@ test.describe('言語設定の永続化 (Task 4.2)', () => {
     await expect(page.getByRole('heading', { name: 'Message Management' })).toBeVisible({
       timeout: 10000,
     });
-    const switcher = page.getByTestId('language-switcher');
-    await expect(switcher).toHaveText('日'); // Shows "日" when in English mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('日'); // Shows "日" when in English mode
   });
 
   test('ログアウト後も選択言語が引き継がれる', async ({ page }) => {
@@ -238,16 +224,14 @@ test.describe('言語設定の永続化 (Task 4.2)', () => {
 
     // Login page should still be in English
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible({ timeout: 10000 });
-    const switcher = page.getByTestId('language-switcher');
-    await expect(switcher).toHaveText('日'); // Shows "日" when in English mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('日'); // Shows "日" when in English mode
   });
 
   test('初回アクセス時のデフォルト言語は日本語である', async ({ page }) => {
-    // localStorage is already cleared in beforeEach
+    // localStorage is already cleared in beforeEach (clearLocale)
     // Default should be Japanese
     await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible({ timeout: 10000 });
-    const switcher = page.getByTestId('language-switcher');
-    await expect(switcher).toHaveText('EN'); // Shows "EN" when in Japanese mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('EN'); // Shows "EN" when in Japanese mode
   });
 
   test('言語設定がlocalStorageに保存される', async ({ page }) => {
