@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
@@ -14,6 +15,7 @@ interface MessageTableHeaderProps {
 }
 
 export function MessageTableHeader({ sortField, sortDirection, onSort }: MessageTableHeaderProps) {
+  const t = useTranslations('messages.table');
   const getSortIcon = useCallback(
     (field: SortField) => {
       if (sortField !== field) {
@@ -29,15 +31,15 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
   );
 
   const getSortLabel = useCallback(
-    (field: SortField, fieldName: string) => {
+    (field: SortField, translatedName: string) => {
       if (sortField !== field) {
-        return `Sort by ${fieldName}`;
+        return t('sortBy', { field: translatedName });
       }
       return sortDirection === 'asc'
-        ? `Sort by ${fieldName}, currently ascending`
-        : `Sort by ${fieldName}, currently descending`;
+        ? t('sortByAsc', { field: translatedName })
+        : t('sortByDesc', { field: translatedName });
     },
-    [sortField, sortDirection]
+    [sortField, sortDirection, t]
   );
 
   return (
@@ -47,10 +49,10 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
           <button
             onClick={() => onSort('id')}
             className="flex items-center hover:text-foreground"
-            aria-label={getSortLabel('id', 'ID')}
+            aria-label={getSortLabel('id', t('id'))}
             aria-pressed={sortField === 'id'}
           >
-            ID
+            {t('id')}
             {getSortIcon('id')}
           </button>
         </TableHead>
@@ -58,10 +60,10 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
           <button
             onClick={() => onSort('code')}
             className="flex items-center hover:text-foreground"
-            aria-label={getSortLabel('code', 'Code')}
+            aria-label={getSortLabel('code', t('code'))}
             aria-pressed={sortField === 'code'}
           >
-            Code
+            {t('code')}
             {getSortIcon('code')}
           </button>
         </TableHead>
@@ -69,14 +71,14 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
           <button
             onClick={() => onSort('content')}
             className="flex items-center hover:text-foreground"
-            aria-label={getSortLabel('content', 'Content')}
+            aria-label={getSortLabel('content', t('content'))}
             aria-pressed={sortField === 'content'}
           >
-            Content
+            {t('content')}
             {getSortIcon('content')}
           </button>
         </TableHead>
-        <TableHead className="w-[150px] text-right">Actions</TableHead>
+        <TableHead className="w-[150px] text-right">{t('actions')}</TableHead>
       </TableRow>
     </TableHeader>
   );

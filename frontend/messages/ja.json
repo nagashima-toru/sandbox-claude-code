@@ -6,7 +6,10 @@
     "password": "パスワード",
     "submit": "ログイン",
     "submitting": "ログイン中...",
-    "error": "ログインに失敗しました。ユーザー名またはパスワードが正しくありません。"
+    "error": "ログインに失敗しました。ユーザー名またはパスワードが正しくありません。",
+    "devAccounts": "開発環境用アカウント:",
+    "adminLabel": "管理者",
+    "viewerLabel": "閲覧者"
   },
   "navigation": {
     "logout": "ログアウト"
@@ -19,7 +22,10 @@
       "id": "ID",
       "code": "コード",
       "content": "コンテンツ",
-      "actions": "操作"
+      "actions": "操作",
+      "sortBy": "{field}でソート",
+      "sortByAsc": "{field}でソート（昇順）",
+      "sortByDesc": "{field}でソート（降順）"
     },
     "form": {
       "codeLabel": "コード",

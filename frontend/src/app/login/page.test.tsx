@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from './page';
 import * as useAuthModule from '@/hooks/useAuth';
-import { LocaleProvider } from '@/contexts/LocaleContext';
+import { createLocaleWrapper } from '../../../tests/unit/helpers/localeTestHelper';
 import type { ReactNode } from 'react';
 
 // Mock useRouter
@@ -26,10 +26,12 @@ const createWrapper = () => {
     },
   });
 
+  const LocaleWrapper = createLocaleWrapper('ja');
+
   const Wrapper = ({ children }: { children: ReactNode }) => (
-    <LocaleProvider>
+    <LocaleWrapper>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </LocaleProvider>
+    </LocaleWrapper>
   );
   Wrapper.displayName = 'TestWrapper';
 
