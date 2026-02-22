@@ -102,6 +102,8 @@ Read .epic/[最新の Epic ディレクトリ]/story*/tasklist.md
 - Storybook 作成タスクが含まれているか
 - Context を実装する場合、`| undefined` 型パターンの確認が計画されているか
 - `pnpm type-check` の実行が計画されているか
+- **UIテキスト変更（ラベル・見出し・ボタン・テーブルヘッダー等）を含む Story に、既存 e2e テストの文字列セレクター確認・更新タスクが含まれているか**
+  - 含まれていない場合は 🔴 必須修正として報告する
 
 #### 5. ADR 観点
 
@@ -151,6 +153,8 @@ git status
 - **Orval 生成ファイル（`src/lib/api/generated/`）を直接編集していないか**
 - **`useRouter` 等 Next.js Hook を使うコンポーネントのテストで `vi.mock('next/navigation', ...)` が設定されているか**
 - **React Query Hook のテストで `QueryClientProvider` でラップされているか**
+- **UIテキストを変更した場合、`tests/e2e/` 内の文字列セレクター（`getByRole({ name })`・`getByLabel`・`getByText` 等）を更新しているか**
+  - 更新していない場合は 🔴 必須修正として報告する
 
 #### 3. テスト網羅性
 
