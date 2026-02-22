@@ -13,9 +13,9 @@ test.describe('Messages Responsive Behavior', () => {
 
       // Verify table headers are visible
       await expect(page.getByRole('columnheader', { name: /id/i })).toBeVisible();
-      await expect(page.getByRole('columnheader', { name: /code/i })).toBeVisible();
-      await expect(page.getByRole('columnheader', { name: /content/i })).toBeVisible();
-      await expect(page.getByRole('columnheader', { name: /actions/i })).toBeVisible();
+      await expect(page.getByRole('columnheader', { name: /コード/i })).toBeVisible();
+      await expect(page.getByRole('columnheader', { name: /コンテンツ/i })).toBeVisible();
+      await expect(page.getByRole('columnheader', { name: /操作/i })).toBeVisible();
     });
   });
 
@@ -155,8 +155,8 @@ test.describe('Messages Responsive Behavior', () => {
 
       // Form fields should be visible and usable (scope to modal to avoid conflicts)
       const modal = page.getByTestId('message-modal');
-      const codeInput = modal.getByLabel(/code/i);
-      const contentInput = modal.getByLabel(/content/i);
+      const codeInput = modal.getByLabel(/コード/i);
+      const contentInput = modal.getByLabel(/コンテンツ/i);
 
       await expect(codeInput).toBeVisible();
       await expect(contentInput).toBeVisible();

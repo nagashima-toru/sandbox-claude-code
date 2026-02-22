@@ -18,7 +18,7 @@ test.describe('Messages CRUD Operations', () => {
 
   test('should display messages list', async ({ page }) => {
     // Check if the page header is visible
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
   });
 
   test('should create a new message', async ({ page }) => {

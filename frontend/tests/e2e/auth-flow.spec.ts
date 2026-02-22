@@ -24,7 +24,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Verify user is on the home page
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible({
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible({
       timeout: 10000,
     });
   });
@@ -70,10 +70,10 @@ test.describe('Authentication Flow', () => {
     await setupAuthenticatedSession(page);
 
     // Verify user is on the home page
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
 
     // Click logout button
-    const logoutButton = page.getByRole('button', { name: /logout/i });
+    const logoutButton = page.getByRole('button', { name: /ログアウト/i });
     await expect(logoutButton).toBeVisible();
     await logoutButton.click();
 
@@ -89,14 +89,14 @@ test.describe('Authentication Flow', () => {
     await setupAuthenticatedSession(page);
 
     // Verify user is on the home page
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
 
     // Reload the page
     await page.reload();
     await page.waitForLoadState('networkidle');
 
     // Verify user is still authenticated (not redirected to login)
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible({
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible({
       timeout: 10000,
     });
     expect(page.url()).not.toContain('/login');
@@ -107,7 +107,7 @@ test.describe('Authentication Flow', () => {
     await setupAuthenticatedSession(page);
 
     // Verify user is on the home page
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
 
     // Wait for some time to let access token potentially expire (mock scenario)
     // In real scenario, this would need backend cooperation or time manipulation
@@ -119,7 +119,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForTimeout(600); // Wait for debounce
 
     // Verify the page still works (token refresh happened in background if needed)
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
     expect(page.url()).not.toContain('/login');
   });
 
