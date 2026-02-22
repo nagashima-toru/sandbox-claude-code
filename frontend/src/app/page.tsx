@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/common/PageHeader';
 import MessageTable from '@/components/messages/MessageTable';
 import MessageModal from '@/components/messages/MessageModal';
@@ -23,6 +24,8 @@ import { ROLES } from '@/lib/constants/roles';
  * Manages modal states for creating, editing, and deleting messages.
  */
 export default function Home() {
+  const t = useTranslations('messages');
+  const tNav = useTranslations('navigation');
   const router = useRouter();
   const { logout } = useAuth();
   const { canCreate, isReadOnly } = usePermission();
@@ -135,13 +138,13 @@ export default function Home() {
     <main data-testid="messages-page" className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <PageHeader
-          title="Message Management"
-          description="Manage all your messages in one place"
+          title={t('pageTitle')}
+          description={t('pageDescription')}
           action={
             <RoleBasedComponent allowedRoles={[ROLES.ADMIN]}>
               <Button onClick={handleCreateClick} data-testid="create-message-button">
                 <Plus className="h-4 w-4 mr-2" />
-                New Message
+                {t('newMessage')}
               </Button>
             </RoleBasedComponent>
           }
@@ -150,7 +153,7 @@ export default function Home() {
               <LanguageSwitcher />
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                {tNav('logout')}
               </Button>
             </div>
           }

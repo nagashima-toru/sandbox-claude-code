@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { MessageTableHeader } from '@/components/messages/MessageTableHeader';
+import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 
 describe('MessageTableHeader', () => {
   it('すべてのカラムヘッダーが表示される', () => {
@@ -10,13 +11,14 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     expect(screen.getByText('ID')).toBeInTheDocument();
-    expect(screen.getByText('Code')).toBeInTheDocument();
-    expect(screen.getByText('Content')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getByText('コード')).toBeInTheDocument();
+    expect(screen.getByText('コンテンツ')).toBeInTheDocument();
+    expect(screen.getByText('操作')).toBeInTheDocument();
   });
 
   it('IDカラムクリックで onSort が呼ばれる', async () => {
@@ -26,10 +28,11 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="code" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
-    const idButton = screen.getByRole('button', { name: /sort by id/i });
+    const idButton = screen.getByRole('button', { name: /IDでソート/ });
     await user.click(idButton);
 
     expect(onSort).toHaveBeenCalledWith('id');
@@ -43,10 +46,11 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
-    const codeButton = screen.getByRole('button', { name: /sort by code/i });
+    const codeButton = screen.getByRole('button', { name: /コードでソート/ });
     await user.click(codeButton);
 
     expect(onSort).toHaveBeenCalledWith('code');
@@ -60,10 +64,11 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
-    const contentButton = screen.getByRole('button', { name: /sort by content/i });
+    const contentButton = screen.getByRole('button', { name: /コンテンツでソート/ });
     await user.click(contentButton);
 
     expect(onSort).toHaveBeenCalledWith('content');
@@ -76,12 +81,13 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="code" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
-    const idButton = screen.getByRole('button', { name: /sort by id/i });
-    const codeButton = screen.getByRole('button', { name: /sort by code/i });
-    const contentButton = screen.getByRole('button', { name: /sort by content/i });
+    const idButton = screen.getByRole('button', { name: /IDでソート/ });
+    const codeButton = screen.getByRole('button', { name: /コードでソート/ });
+    const contentButton = screen.getByRole('button', { name: /コンテンツでソート/ });
 
     expect(idButton).toHaveAttribute('aria-pressed', 'false');
     expect(codeButton).toHaveAttribute('aria-pressed', 'true');
@@ -94,11 +100,12 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const idButton = screen.getByRole('button', {
-      name: /sort by id, currently ascending/i,
+      name: /IDでソート（昇順）/,
     });
     expect(idButton).toBeInTheDocument();
   });
@@ -109,11 +116,12 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="code" sortDirection="desc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
     const codeButton = screen.getByRole('button', {
-      name: /sort by code, currently descending/i,
+      name: /コードでソート（降順）/,
     });
     expect(codeButton).toBeInTheDocument();
   });
@@ -124,11 +132,12 @@ describe('MessageTableHeader', () => {
     render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: createLocaleWrapper() }
     );
 
-    const codeButton = screen.getByRole('button', { name: 'Sort by Code' });
-    const contentButton = screen.getByRole('button', { name: 'Sort by Content' });
+    const codeButton = screen.getByRole('button', { name: 'コードでソート' });
+    const contentButton = screen.getByRole('button', { name: 'コンテンツでソート' });
 
     expect(codeButton).toBeInTheDocument();
     expect(contentButton).toBeInTheDocument();
@@ -136,16 +145,16 @@ describe('MessageTableHeader', () => {
 
   it('sortFieldとsortDirectionを変更すると表示が更新される', () => {
     const onSort = vi.fn();
+    const Wrapper = createLocaleWrapper();
     const { rerender } = render(
       <table>
         <MessageTableHeader sortField="id" sortDirection="asc" onSort={onSort} />
-      </table>
+      </table>,
+      { wrapper: Wrapper }
     );
 
     // 初期状態: ID昇順
-    expect(
-      screen.getByRole('button', { name: /sort by id, currently ascending/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /IDでソート（昇順）/ })).toBeInTheDocument();
 
     // 再レンダリング: Code降順
     rerender(
@@ -154,9 +163,7 @@ describe('MessageTableHeader', () => {
       </table>
     );
 
-    expect(
-      screen.getByRole('button', { name: /sort by code, currently descending/i })
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sort by ID' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /コードでソート（降順）/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'IDでソート' })).toBeInTheDocument();
   });
 });

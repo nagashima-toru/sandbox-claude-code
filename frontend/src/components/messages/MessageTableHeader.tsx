@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
@@ -14,6 +15,7 @@ interface MessageTableHeaderProps {
 }
 
 export function MessageTableHeader({ sortField, sortDirection, onSort }: MessageTableHeaderProps) {
+  const t = useTranslations('messages.table');
   const getSortIcon = useCallback(
     (field: SortField) => {
       if (sortField !== field) {
@@ -61,7 +63,7 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
             aria-label={getSortLabel('code', 'Code')}
             aria-pressed={sortField === 'code'}
           >
-            Code
+            {t('code')}
             {getSortIcon('code')}
           </button>
         </TableHead>
@@ -72,11 +74,11 @@ export function MessageTableHeader({ sortField, sortDirection, onSort }: Message
             aria-label={getSortLabel('content', 'Content')}
             aria-pressed={sortField === 'content'}
           >
-            Content
+            {t('content')}
             {getSortIcon('content')}
           </button>
         </TableHead>
-        <TableHead className="w-[150px] text-right">Actions</TableHead>
+        <TableHead className="w-[150px] text-right">{t('actions')}</TableHead>
       </TableRow>
     </TableHeader>
   );
