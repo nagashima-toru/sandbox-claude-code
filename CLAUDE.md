@@ -24,8 +24,10 @@ Claude Code 向けプロジェクトガイド。
 sandbox-claude-code/
 ├── backend/     # Spring Boot API (Java 25, Maven)
 ├── frontend/    # Next.js App (TypeScript, pnpm)
+├── specs/       # OpenAPI specs, acceptance criteria, contracts
 ├── docs/        # Documentation
-└── scripts/     # Utility scripts
+├── scripts/     # Utility scripts
+└── .epic/       # Epic implementation plans
 ```
 
 ## 開発プロセス（SDD）
@@ -44,3 +46,4 @@ PR 作成前: `./scripts/ci-check-local.sh`
 ## Epic Documents
 
 `.epic/[YYYYMMDD]-[issue-N]-[タイトル]/` に管理。詳細は各スキルを参照。
+
