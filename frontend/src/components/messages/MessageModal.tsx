@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ export default function MessageModal({
   error,
   isReadOnly = false,
 }: MessageModalProps) {
+  const t = useTranslations('messages');
   const { canCreate } = usePermission();
 
   const handleCancel = () => {
@@ -45,13 +47,17 @@ export default function MessageModal({
   }
 
   const title =
-    mode === 'create' ? 'Create New Message' : isReadOnly ? 'View Message' : 'Edit Message';
+    mode === 'create'
+      ? t('modal.createTitle')
+      : isReadOnly
+        ? t('form.viewTitle')
+        : t('modal.editTitle');
   const description =
     mode === 'create'
-      ? 'Fill in the details to create a new message.'
+      ? t('form.createDescription')
       : isReadOnly
-        ? 'Message details (read-only)'
-        : 'Update the message details below.';
+        ? t('form.viewDescription')
+        : t('form.editDescription');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

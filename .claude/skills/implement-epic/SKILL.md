@@ -478,7 +478,19 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
    ```
 
-2. **overview.md の更新**
+2. **tasklist.md の全チェックボックス確認**（overview.md 更新前に必須）
+
+   overview.md に ✅ を付ける前に、tasklist.md の全チェックボックスが `[x]` になっていることを確認する：
+
+   ```bash
+   grep "^- \[ \]" .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
+   ```
+
+   - 出力が空（未チェックが0件）であることを確認する
+   - 未チェックが残っている場合は、該当タスクの完了条件を満たしてから `[x]` に更新してコミットする
+   - **この確認なしに overview.md を更新しない**
+
+3. **overview.md の更新**
    - `.epic/[日付]-[issue番号]-[epic名]/overview.md` の該当 Story に ✅ マーク
 
 2. **Story 全体のテスト実行**（必須）
@@ -535,6 +547,7 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    - [ ] tasklist.md の完了条件チェックボックスが全て `[x]` になっている
    - [ ] tasklist.md の進捗セクション（完了日時・実績時間・メモ）が更新されている
    - [ ] tasklist.md の変更がコミットされている
+   - [ ] tasklist.md に未チェック（`[ ]`）の項目が残っていないことを確認した（`grep "^- \[ \]" tasklist.md` が空）
    - [ ] overview.md に ✅ マークを追加している
    - [ ] **既存のテストが全て通過することを確認**（影響を受けるテストを修正した場合）
 

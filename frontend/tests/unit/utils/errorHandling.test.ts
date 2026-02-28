@@ -1,9 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { getApiErrorMessage } from '@/lib/utils/errorHandling';
+
+// Mock t function that returns the key itself for predictable assertions
+const mockT = vi.fn((key: string) => key);
 
 describe('getApiErrorMessage', () => {
   it('null または undefined を返す（error が null の場合）', () => {
-    expect(getApiErrorMessage(null)).toBeNull();
+    expect(getApiErrorMessage(null, mockT)).toBeNull();
   });
 
   it('409 Conflict エラーメッセージを返す', () => {
@@ -14,9 +17,7 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe(
-      'A message with this code already exists. Please use a different code.'
-    );
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.conflict');
   });
 
   it('404 Not Found エラーメッセージを返す', () => {
@@ -27,7 +28,7 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe('Message not found. It may have been deleted.');
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.notFound');
   });
 
   it('400 Bad Request エラーメッセージを返す（カスタムメッセージあり）', () => {
@@ -40,7 +41,7 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe('Invalid code format');
+    expect(getApiErrorMessage(error, mockT)).toBe('Invalid code format');
   });
 
   it('400 Bad Request エラーメッセージを返す（カスタムメッセージなし）', () => {
@@ -51,7 +52,7 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe('Invalid input. Please check your data.');
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.badRequest');
   });
 
   it('500 Server Error エラーメッセージを返す', () => {
@@ -62,7 +63,7 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe('Server error. Please try again later.');
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.serverError');
   });
 
   it('ECONNABORTED エラーメッセージを返す', () => {
@@ -71,9 +72,7 @@ describe('getApiErrorMessage', () => {
       message: 'timeout of 1000ms exceeded',
     };
 
-    expect(getApiErrorMessage(error)).toBe(
-      'Network error. Please check your connection and try again.'
-    );
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.networkError');
   });
 
   it('ERR_NETWORK エラーメッセージを返す', () => {
@@ -82,9 +81,7 @@ describe('getApiErrorMessage', () => {
       message: 'Network Error',
     };
 
-    expect(getApiErrorMessage(error)).toBe(
-      'Network error. Please check your connection and try again.'
-    );
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.networkError');
   });
 
   it('カスタムメッセージを持つエラーオブジェクトからメッセージを抽出する', () => {
@@ -96,7 +93,7 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe('Custom error message');
+    expect(getApiErrorMessage(error, mockT)).toBe('Custom error message');
   });
 
   it('response.data.message がない場合、error.message を使用する', () => {
@@ -104,24 +101,24 @@ describe('getApiErrorMessage', () => {
       message: 'Something went wrong',
     };
 
-    expect(getApiErrorMessage(error)).toBe('Something went wrong');
+    expect(getApiErrorMessage(error, mockT)).toBe('Something went wrong');
   });
 
-  it('不明なエラーの場合、デフォルトメッセージを返す', () => {
+  it('不明なエラーの場合、unexpected キーを返す', () => {
     const error = {
       some: 'unknown error',
     };
 
-    expect(getApiErrorMessage(error)).toBe('An unexpected error occurred. Please try again.');
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.unexpected');
   });
 
-  it('文字列エラーの場合、デフォルトメッセージを返す', () => {
+  it('文字列エラーの場合、unexpected キーを返す', () => {
     const error = 'Some error string';
 
-    expect(getApiErrorMessage(error)).toBe('An unexpected error occurred. Please try again.');
+    expect(getApiErrorMessage(error, mockT)).toBe('messages.errors.unexpected');
   });
 
-  it('その他のステータスコードの場合、カスタムメッセージまたはデフォルトメッセージを返す', () => {
+  it('その他のステータスコードの場合、カスタムメッセージまたは unexpected キーを返す', () => {
     const error = {
       response: {
         status: 403,
@@ -131,6 +128,6 @@ describe('getApiErrorMessage', () => {
       },
     };
 
-    expect(getApiErrorMessage(error)).toBe('Forbidden');
+    expect(getApiErrorMessage(error, mockT)).toBe('Forbidden');
   });
 });

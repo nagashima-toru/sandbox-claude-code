@@ -50,7 +50,7 @@ test.describe('Authenticated Operations', () => {
     // Already on home page from setupAuthenticatedSession
 
     // Verify home page is accessible
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
 
     // Verify search functionality works
     const searchInput = page.getByTestId('search-input');
@@ -116,16 +116,16 @@ test.describe('Authenticated Operations', () => {
     }
 
     // Verify user is still authenticated
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
     expect(page.url()).not.toContain('/login');
   });
 
   test('should handle logout and prevent further operations', async ({ page }) => {
     // Verify user is authenticated
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
 
     // Logout
-    const logoutButton = page.getByRole('button', { name: /logout/i });
+    const logoutButton = page.getByRole('button', { name: /ログアウト/i });
     await expect(logoutButton).toBeVisible();
     await logoutButton.click();
 
@@ -142,11 +142,11 @@ test.describe('Authenticated Operations', () => {
 
   test('should display user role information if available', async ({ page }) => {
     // Verify user is authenticated
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /メッセージ管理/i })).toBeVisible();
 
     // Check if there's any user info displayed (implementation-dependent)
     // This test is flexible based on actual UI implementation
-    const logoutButton = page.getByRole('button', { name: /logout/i });
+    const logoutButton = page.getByRole('button', { name: /ログアウト/i });
     await expect(logoutButton).toBeVisible();
   });
 });

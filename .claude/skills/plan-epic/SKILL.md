@@ -539,6 +539,11 @@ EOF
 
 4. **依存関係の明確化**: Story 間の依存関係を overview.md に明記
 
+5. **e2e テスト影響の考慮**: UIテキスト・表示内容を変更する Story では e2e テスト更新を必須タスクとして含める
+   - ラベル・ボタン・見出し・テーブルヘッダー等のテキストを変更する場合、`tests/e2e/` 内で文字列セレクター（`getByRole({ name })`・`getByLabel`・`getByText` 等）を使っている箇所を必ず確認・更新する
+   - 根本対策として `data-testid` セレクターへの移行も検討し、ロケール変更への耐性を高める
+   - e2e テスト更新は「次の Story で対応」とせず、テキスト変更と同じ Story に含める
+
 **分割例（認証・認可機能）**:
 
 1. Story 1: ユーザー管理基盤（User エンティティ、リポジトリ、DB）
@@ -569,6 +574,8 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 **受け入れ基準**:
 - [ ] [受け入れ条件1]
 - [ ] [受け入れ条件2]
+- [ ] `pnpm test` と `pnpm type-check` が通過する
+- [ ] （UIテキスト変更を含む場合）既存 e2e テストの文字列セレクターが更新されている
 
 ---
 
@@ -629,6 +636,22 @@ N.4  コンポーネント + Storybook + pnpm type-check
 N.5  コンポーネントテスト（MSW モック）
 N.6  E2E テスト（クリティカルフローのみ）
 ```
+
+**Frontend UIテキスト変更パターン（ラベル・見出し・ボタン等の表示テキストを変更する Story）**:
+
+```
+N.1  翻訳リソースの追加・変更（messages/ja.json, messages/en.json 等）
+N.2  コンポーネントのテキスト置き換え（翻訳キー参照への変換）
+N.3  影響するコンポーネントテスト（Vitest）の修正
+N.4  既存 e2e テストの文字列セレクター確認・更新  ← 必須
+     - `grep -r "変更前テキスト" tests/e2e/` で影響箇所を特定
+     - getByRole({ name }), getByLabel, getByText 等のテキスト指定を更新
+     - 可能であれば data-testid セレクターへの移行を併施
+     - pnpm test:e2e でローカル確認（バックエンド起動が必要な場合はスキップ可、CI で確認）
+```
+
+> **⚠️ 注意**: e2eテスト更新タスク（N.4）は「次の Story で対応」と分離しないこと。
+> UIテキスト変更を含む Story の受け入れ基準には必ず「既存 e2e テストの文字列セレクターが更新されている」を含める。
 
 これらのパターンは `backend/docs/BEST_PRACTICES.md` §6 および `frontend/docs/BEST_PRACTICES.md` §7 でも参照できます。
 

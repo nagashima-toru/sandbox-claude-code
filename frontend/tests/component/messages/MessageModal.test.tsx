@@ -4,6 +4,7 @@ import MessageModal from '@/components/messages/MessageModal';
 import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
 import { AuthContext } from '@/contexts/AuthContext';
 import { ROLES } from '@/lib/constants/roles';
+import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 
 // Mock MessageForm component
 vi.mock('@/components/messages/MessageForm', () => ({
@@ -34,20 +35,23 @@ vi.mock('@/components/messages/MessageForm', () => ({
 }));
 
 const createWrapper = (user: UserResponse | null = { username: 'admin', role: ROLES.ADMIN }) => {
+  const LocaleWrapper = createLocaleWrapper();
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading: false,
-        error: null,
-        refetch: () => {},
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <LocaleWrapper>
+      <AuthContext.Provider
+        value={{
+          user,
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    </LocaleWrapper>
   );
 
-  Wrapper.displayName = 'AuthContextWrapper';
+  Wrapper.displayName = 'TestWrapper';
 
   return Wrapper;
 };
@@ -67,16 +71,16 @@ describe('MessageModal', () => {
     const Wrapper = createWrapper();
     render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
 
-    expect(screen.getByText('Create New Message')).toBeInTheDocument();
-    expect(screen.getByText('Fill in the details to create a new message.')).toBeInTheDocument();
+    expect(screen.getByText('メッセージ作成')).toBeInTheDocument();
+    expect(screen.getByText('新しいメッセージの詳細を入力してください。')).toBeInTheDocument();
   });
 
   it('edit モードで正しいタイトルと説明を表示する', () => {
     const Wrapper = createWrapper();
     render(<MessageModal {...defaultProps} mode="edit" />, { wrapper: Wrapper });
 
-    expect(screen.getByText('Edit Message')).toBeInTheDocument();
-    expect(screen.getByText('Update the message details below.')).toBeInTheDocument();
+    expect(screen.getByText('メッセージ編集')).toBeInTheDocument();
+    expect(screen.getByText('メッセージの詳細を更新してください。')).toBeInTheDocument();
   });
 
   it('MessageForm に initialData を渡す', () => {
@@ -155,7 +159,7 @@ describe('MessageModal', () => {
       render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
 
       expect(screen.getByTestId('message-modal')).toBeInTheDocument();
-      expect(screen.getByText('Create New Message')).toBeInTheDocument();
+      expect(screen.getByText('メッセージ作成')).toBeInTheDocument();
     });
 
     it('VIEWER ロールの場合、create モードでモーダルが表示されない', () => {
@@ -163,7 +167,7 @@ describe('MessageModal', () => {
       render(<MessageModal {...defaultProps} mode="create" />, { wrapper: Wrapper });
 
       expect(screen.queryByTestId('message-modal')).not.toBeInTheDocument();
-      expect(screen.queryByText('Create New Message')).not.toBeInTheDocument();
+      expect(screen.queryByText('メッセージ作成')).not.toBeInTheDocument();
     });
 
     it('VIEWER ロールの場合でも、edit モードではモーダルが表示される', () => {
@@ -181,29 +185,29 @@ describe('MessageModal', () => {
       });
 
       expect(screen.getByTestId('message-modal')).toBeInTheDocument();
-      expect(screen.getByText('Edit Message')).toBeInTheDocument();
+      expect(screen.getByText('メッセージ編集')).toBeInTheDocument();
     });
   });
 
   describe('読み取り専用モード', () => {
-    it('isReadOnly が true の場合、タイトルが "View Message" になる', () => {
+    it('isReadOnly が true の場合、タイトルが "メッセージ詳細" になる', () => {
       const Wrapper = createWrapper();
       render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
         wrapper: Wrapper,
       });
 
-      expect(screen.getByText('View Message')).toBeInTheDocument();
-      expect(screen.queryByText('Edit Message')).not.toBeInTheDocument();
+      expect(screen.getByText('メッセージ詳細')).toBeInTheDocument();
+      expect(screen.queryByText('メッセージ編集')).not.toBeInTheDocument();
     });
 
-    it('isReadOnly が true の場合、説明が "Message details (read-only)" になる', () => {
+    it('isReadOnly が true の場合、説明が "メッセージ詳細（閲覧のみ）" になる', () => {
       const Wrapper = createWrapper();
       render(<MessageModal {...defaultProps} mode="edit" isReadOnly={true} />, {
         wrapper: Wrapper,
       });
 
-      expect(screen.getByText('Message details (read-only)')).toBeInTheDocument();
-      expect(screen.queryByText('Update the message details below.')).not.toBeInTheDocument();
+      expect(screen.getByText('メッセージ詳細（閲覧のみ）')).toBeInTheDocument();
+      expect(screen.queryByText('メッセージの詳細を更新してください。')).not.toBeInTheDocument();
     });
 
     it('isReadOnly が true の場合、MessageForm に disabled={true} が渡される', () => {
@@ -230,7 +234,7 @@ describe('MessageModal', () => {
       const Wrapper = createWrapper();
       render(<MessageModal {...defaultProps} mode="edit" />, { wrapper: Wrapper });
 
-      expect(screen.getByText('Edit Message')).toBeInTheDocument();
+      expect(screen.getByText('メッセージ編集')).toBeInTheDocument();
       const formDisabled = screen.getByTestId('form-disabled');
       expect(formDisabled).toHaveTextContent('false');
     });

@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { getApiErrorMessage } from '@/lib/utils/errorHandling';
 
 interface DeleteConfirmDialogProps {
@@ -22,7 +23,7 @@ interface DeleteConfirmDialogProps {
   error?: unknown;
 }
 
-export default function DeleteConfirmDialog({
+export function DeleteConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
@@ -30,11 +31,14 @@ export default function DeleteConfirmDialog({
   isDeleting = false,
   error,
 }: DeleteConfirmDialogProps) {
+  const t = useTranslations('messages.deleteDialog');
+  const tRoot = useTranslations();
+
   const handleCancel = () => {
     onOpenChange(false);
   };
 
-  const errorMessage = getApiErrorMessage(error);
+  const errorMessage = getApiErrorMessage(error, tRoot);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,11 +46,9 @@ export default function DeleteConfirmDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            Delete Message
+            {t('title')}
           </DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete this message? This action cannot be undone.
-          </DialogDescription>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         {errorMessage && (
@@ -58,13 +60,13 @@ export default function DeleteConfirmDialog({
         {message && (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 space-y-2">
             <div>
-              <span className="text-sm font-medium text-muted-foreground">Code:</span>
+              <span className="text-sm font-medium text-muted-foreground">{t('codeLabel')}</span>
               <div className="mt-1">
                 <code className="bg-background px-2 py-1 rounded text-sm">{message.code}</code>
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-muted-foreground">Content:</span>
+              <span className="text-sm font-medium text-muted-foreground">{t('contentLabel')}</span>
               <p className="mt-1 text-sm">{message.content}</p>
             </div>
           </div>
@@ -77,7 +79,7 @@ export default function DeleteConfirmDialog({
             disabled={isDeleting}
             data-testid="delete-cancel-button"
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             variant="destructive"
@@ -85,10 +87,12 @@ export default function DeleteConfirmDialog({
             disabled={isDeleting}
             data-testid="delete-confirm-button"
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? t('deleting') : t('delete')}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
+export default DeleteConfirmDialog;
