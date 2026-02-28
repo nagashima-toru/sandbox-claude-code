@@ -629,6 +629,31 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    - テンプレートは GitHub が自動的に表示するので、PR 作成後にブラウザで編集する
    - CI チェックが通るまで待ってからレビュー依頼する
 
+   **Story: #[Issue番号] フォーマットの注意**:
+
+   以下は**正解**:
+
+   ```
+   Story: #133
+   Closes #133
+   Fixes #133
+   Resolves #133
+   ```
+
+   以下は**不正解**（Implementation Check が失敗する）:
+
+   ```
+   関連 Issue: #133  ❌
+   Issue #133        ❌
+   Ref: #133         ❌
+   ```
+
+   PR body を修正しても既存 CI は再トリガーされない。修正後は空コミットで再実行:
+
+   ```bash
+   git commit --allow-empty -m "chore: trigger CI" && git push
+   ```
+
 8. **PR URL の確認**
    - PR が正しく作成されたことを確認
    - URL をユーザーに報告

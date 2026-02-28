@@ -1,10 +1,21 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Claude Code 向けプロジェクトガイド。
 
-## Project Overview
+## Working Agreement
 
-This is a sandbox repository for experimenting with Claude Code.
+**警告: このルールに違反した場合は切腹（即時作業停止・ユーザーへの報告・原因究明）とする。**
+
+- **Language**: 説明は日本語。コードコメントは英語
+- **Autonomy**: 計画承認後は自律実装。エラーは自己修正
+- **Plan Mode**: 複数ファイル変更・新機能・アーキテクチャ変更では必ず使用
+- **Testing**: TDD。テストは漏れなくダブりなく（MECE）書く
+- **Documents**: 簡潔に書く。冗長な説明・重複は省く
+- **Design**: シンプルに実装する。最小限の複雑さで要件を満たす
+- **Security**: OWASP Top 10 を意識する
+- **Code Quality**: Spotless/Prettier 自動フォーマットを前提とする
+- **CI**: PR 作成前に `./scripts/ci-check-local.sh` を必ず実行
+- **Retrospective**: 作業を常に振り返ること。そして改善すること
 
 ## Project Structure
 
@@ -13,420 +24,47 @@ sandbox-claude-code/
 ├── backend/     # Spring Boot API (Java 25, Maven)
 ├── frontend/    # Next.js App (TypeScript, pnpm)
 ├── docs/        # Documentation
-├── scripts/     # Utility scripts
-└── nginx.conf   # Reverse proxy configuration
+└── scripts/     # Utility scripts
 ```
 
-## Quick Start
+## 開発プロセス（SDD）
 
-### Scripts (推奨)
+1. `/create-epic-issue` → 2-4. `/create-spec-pr` → 5. レビュー（手動） → 6. `/update-spec-approved`
+→ 7. `/plan-epic` → 8. 計画レビュー（手動） → 9-12. `/implement-epic` → 13. deploy 前確認（手動）
 
-```bash
-# Docker environments
-./scripts/docker-dev.sh         # Development mode (hot reload)
-./scripts/docker-prod.sh        # Production test mode
+詳細: [docs/development/SDD.md](docs/development/SDD.md)
 
-# Frontend development
-./scripts/generate-api.sh       # Generate API client from OpenAPI
-./scripts/storybook.sh          # Start Storybook (port 6006)
+## スキル一覧
 
-# Multi-environment development
-./scripts/setup-worktree-env.sh # Configure worktree environment
+### Human-Only
 
-# CI verification
-./scripts/ci-check-local.sh     # Run all CI checks locally
-```
+| スキル | 用途 |
+|--------|------|
+| `/create-epic-issue` | Epic Issue 作成 |
+| `/create-spec-pr` | 仕様 PR 作成 |
+| `/update-spec-approved` | Issue 更新 + ラベル付与 |
+| `/plan-epic` | 実装計画策定 |
+| `/implement-epic` | Story 実装 |
+| `/setup-worktree` | Worktree 環境構築 |
 
-### Direct Commands (代替方法)
+### Agent-Callable（Task ツール経由で呼び出すこと）
 
-```bash
-# Backend (port 8080)
-cd backend && ./mvnw spring-boot:run
+| スキル | 用途 |
+|--------|------|
+| `/review-implementation` | 実装品質レビュー |
+| `/epic-status` | Epic 進捗確認 |
+| `/generate-api` | API クライアント生成 |
+| `/test-coverage` | カバレッジレポート |
+| `/retrospective` | 振り返り |
+| `/run-docker` | Docker 環境管理 |
+| `/run-storybook` | Storybook 起動 |
 
-# Frontend (port 3000)
-cd frontend && pnpm install && pnpm dev
+## Git
 
-# Docker (直接実行)
-docker compose up                        # Development mode
-docker compose -f docker-compose.yml up  # Production mode
-```
+ブランチ: `master → feature/issue-[N]-[epic-name] → ...-story[M]`
 
-## Development Environment
-
-- **IDE**: IntelliJ IDEA
-- **Java**: JDK 25
-- **Node.js**: See frontend/.nvmrc
-- **Package Manager**: pnpm (frontend), Maven (backend)
-
-## 開発作業全体のプロセス（SDD: 仕様駆動開発）
-
-1. **Epic Issue 作成**（簡易版）
-2. 要求仕様の理解
-3. 現在の実装調査
-4. **仕様 PR 作成**（OpenAPI + 受け入れ条件）
-5. 仕様 PR レビュー・マージ
-6. **Issue に仕様を明記** + spec-approved ラベル付与
-7. **実装計画策定**（.epic/ 作成）
-8. 計画レビュー
-9. 実装/単体テスト実施
-10. 実装/単体テスト review 実施 & 指摘修正
-11. 結合テスト実施
-12. 結合テスト review 実施 & 指摘修正
-13. deploy 前確認
-
-**重要**:
-
-- 仕様が確定してから実装計画を立てる（手戻りを防ぐ）
-- **仕様PRには実装を含まない**: ステップ4の仕様PRではOpenAPI仕様と受け入れ条件のみを追加し、実装コード（バックエンド・フロントエンド）は含めない。実装はステップ9以降で行う。
-- **実装計画策定時の注意**: ステップ7で実装計画を立てる際、仕様PRで追加されたAPIエンドポイントは未実装であることを前提とし、バックエンド実装とフロントエンド実装の両方をStoryに含める必要がある。
-
-### カスタムスキルとの対応
-
-SDDワークフローを効率化するため、各ステップに対応するカスタムスキルを提供しています。
-
-| ステップ | 内容 | スキル | 実行方法 | 備考 |
-|---------|------|---------|---------|------|
-| 1 | Epic Issue 作成 | `/create-epic-issue` | `/create-epic-issue [タイトル]` | GitHub に Epic Issue を作成 |
-| 2-4 | 要求理解+実装調査+仕様PR | `/create-spec-pr` | `/create-spec-pr [Issue番号]` | OpenAPI + 受け入れ条件を作成 |
-| 5 | 仕様 PR レビュー・マージ | - | 手動 | レビュアーによる承認 |
-| 6 | Issue更新 + spec-approved | `/update-spec-approved` | `/update-spec-approved [Issue番号] [PR番号]` | Issue に仕様を明記しラベル付与 |
-| 7 | 実装計画策定 + セルフレビュー | `/plan-epic` | `/plan-epic [Issue番号]` | .epic/ 作成と自動品質チェック |
-| 8 | 計画レビュー | - | 手動 | 人による最終確認 |
-| 9-12 | 実装/テスト | `/implement-epic` | `/implement-epic [Issue番号]` | Story実装と PR 作成 |
-| - | Epic進捗確認 | `/epic-status` | `/epic-status [Issue番号]` | いつでも実行可能 |
-| - | 品質レビュー | `/review-implementation` | `/review-implementation [plan\|story]` | plan-epic/implement-epic から自動呼び出し |
-| 13 | deploy 前確認 | - | 手動 | 最終チェックリスト確認 |
-
-**スキルの特徴**:
-
-- `/create-spec-pr`: ステップ2（要求理解）、3（実装調査）、4（仕様PR作成）を一括実行
-- `/plan-epic`: ステップ7で計画を作成後、自動的に `/review-implementation plan` を呼び出し
-- `/implement-epic`: Story 完了後に自動的に `/review-implementation story` を呼び出し
-- `/review-implementation`: `backend/docs/BEST_PRACTICES.md` と `frontend/docs/BEST_PRACTICES.md` を参照した明確な観点でレビューを実施
-- ステップ8（計画レビュー）は人が行うが、ステップ7の自動レビューで品質を担保
-
-**使用例**:
-
-```bash
-# 1. Epic Issue作成
-/create-epic-issue 認証・認可機能
-
-# 2-4. 仕様PR作成（要求理解・実装調査・PR作成を自動実行）
-/create-spec-pr 88
-
-# 5. 仕様PRレビュー・マージ（手動）
-
-# 6. Issue更新
-/update-spec-approved 88 102
-
-# 7. 実装計画策定（自動セルフレビュー含む）
-/plan-epic 88
-
-# 8. 計画レビュー（手動）
-
-# 9-12. Epic実装
-/implement-epic 88
-
-# 進捗確認（いつでも）
-/epic-status 88
-```
-
-### Epic 管理スキルの使い分け
-
-Epic の状態に応じて、適切なスキルを使用してください。
-
-| スキル | 用途 | 完了済み Epic への対応 | 使用タイミング |
-|--------|------|----------------------|--------------|
-| `/epic-status` | 進捗確認 | ✅ 対応（完了状況を表示） | Epic 開始前・実装中・完了後 |
-| `/implement-epic` | 実装開始・継続 | ✅ 対応（完了検出と代替提案） | Epic 実装中（未完了 Story がある場合） |
-| `/retrospective` | 振り返り | ✅ 対応（Epic 全体の総括が可能） | Story 完了時・Epic 完了時 |
-
-**推奨フロー**:
-
-1. **Epic 開始前**:
-
-   ```bash
-   /epic-status 88  # 状況確認
-   ```
-
-   - 未実装の Story があることを確認
-   - 次に実装すべき Story を特定
-
-2. **Epic 実装中**:
-
-   ```bash
-   /implement-epic 88  # Story 実装
-   ```
-
-   - 未完了 Story がある場合、自動的に次の Story を実装
-   - 完了済み Epic の場合、代替アクション（振り返り等）を提案
-
-3. **Epic 完了後**:
-
-   ```bash
-   /retrospective Epic #88  # 全体振り返り
-   ```
-
-   - Epic 全体の学びと改善点を記録
-   - 各 Story の振り返りを総括
-
-**注意事項**:
-
-- **完了済み Epic に `/implement-epic` を実行した場合**: スキルが自動的に完了を検出し、振り返りや別 Epic の実装を提案します
-- **Epic 状態の確認**: 迷ったらまず `/epic-status` で状況確認
-- **振り返りの重要性**: Story 完了時・Epic 完了時は必ず `/retrospective` で学びを記録
+PR 作成前: `./scripts/ci-check-local.sh`
 
 ## Epic Documents
 
-開発作業の計画は `.epic/` ディレクトリで管理します。
-
-```
-.epic/[YYYYMMDD]-[issue-N]-[epicタイトル]/
-├── requirements.md  # 機能要求
-├── design.md        # 技術設計
-├── overview.md      # Epic 管理（エントリーポイント）
-└── story[N]-[Story名]/
-    └── tasklist.md  # Story タスク
-```
-
-**例**: `.epic/20260203-88-auth/`
-
-Epic Documents の詳細については各スキル（`/plan-epic`, `/implement-epic`, `/epic-status`）のガイドを参照。
-
-## Git Workflow
-
-Epic-based development uses the following branch strategy:
-
-```
-master
-  └── feature/issue-[N]-[epic-name]
-       ├── feature/issue-[N]-[epic-name]-story1
-       └── ...
-```
-
-### Story PR Format Requirements
-
-**CRITICAL**: When creating a Story PR (Story branch → Epic base branch), the PR body **MUST** include the Issue number in one of the following formats:
-
-```markdown
-Story: #[Issue番号]
-```
-
-or
-
-```markdown
-Closes #[Issue番号]
-```
-
-**Example (Correct)**:
-
-```markdown
-Story: #133
-
-## Story 概要
-Story 8: E2Eテストと最終確認
-...
-```
-
-**Example (Incorrect)**:
-
-```markdown
-関連 Issue: #133  ❌ Implementation Check will fail
-Issue #133        ❌ Implementation Check will fail
-Ref: #133         ❌ Implementation Check will fail
-```
-
-**Why This Matters**:
-
-- The Implementation Check workflow uses regex to extract the Issue number from the PR body
-- Only `Story: #xxx` or `Closes #xxx` (and variants like `Fixes`, `Resolves`) are recognized
-- If the format is incorrect, the Implementation Check will fail and block the PR
-
-**Important Notes**:
-
-- Editing the PR body after creation does NOT re-trigger existing CI runs
-- To re-trigger CI after fixing the PR body, push an empty commit: `git commit --allow-empty -m "chore: trigger CI" && git push`
-- Always use `/implement-epic` skill or `./scripts/create-story-pr.sh` script to ensure correct formatting
-
-## Code Formatting
-
-Code is automatically formatted after editing:
-
-- **Backend**: Spotless with Google Java Format
-- **Frontend**: Prettier + ESLint
-- **Documentation**: markdownlint-cli2
-
-See [backend/CLAUDE.md](backend/CLAUDE.md) and [frontend/CLAUDE.md](frontend/CLAUDE.md) for manual formatting commands.
-
-## Docker
-
-Run `docker compose up` for development mode (hot reload), or `docker compose -f docker-compose.yml up` for production mode. Use `/run-docker` skill for details.
-
-## Local CI Verification
-
-Run `./scripts/ci-check-local.sh` before creating PRs. Architecture checks: `cd backend && ./mvnw verify`.
-
-## Key Conventions
-
-### Code Style
-
-- **Backend**: Clean Architecture, JUnit tests for all classes
-- **Frontend**: Functional components, named exports, co-located tests/stories
-
-### File Naming
-
-| Type | Convention | Example |
-|------|------------|---------|
-| React Component | PascalCase | `MessageTable.tsx` |
-| Hook | camelCase + use | `useMessages.ts` |
-| Story | + .stories | `MessageTable.stories.tsx` |
-| Test | + .test | `MessageTable.test.tsx` |
-
-### Git
-
-- Branch: `feature/`, `bugfix/`, `hotfix/`
-- Run CI check before PR: `./scripts/ci-check-local.sh`
-
-### .gitignore ルール
-
-| Scope | File | Add when |
-|-------|------|----------|
-| IDE/OS/cross-project | `.gitignore` (root) | Affects both backend and frontend |
-| Java/Maven/Spring | `backend/.gitignore` | Only backend directory |
-| Node.js/Next.js/pnpm | `frontend/.gitignore` | Only frontend directory |
-
-### 仕様 PR の空実装ルール
-
-仕様 PR で OpenAPI エンドポイントを追加する場合、Epic ブランチのビルドエラーを防ぐためスタブ実装（`throw new UnsupportedOperationException("Not implemented yet - Story N")`）を含めること。
-
-### Working Directory
-
-**重要**: 常にプロジェクトルート (`/Users/.../sandbox-claude-code`) で作業を開始する
-
-**ルール**:
-
-1. **基本は常にルートディレクトリ**: git コマンド、スクリプト実行は基本的にルートから実行
-2. **サブディレクトリでの作業時**: 必ず作業後にルートに戻る
-
-   ```bash
-   # ❌ 悪い例
-   cd frontend
-   pnpm test
-   git add src/...  # パスが間違う
-
-   # ✅ 良い例
-   cd frontend && pnpm test && cd ..
-   git add frontend/src/...
-   ```
-
-3. **pwd で現在位置を常に確認**: コマンド実行前に `pwd` で位置を確認する習慣をつける
-4. **作業完了後は必ずルートに戻る**: `cd ..` でルートディレクトリに戻る
-
-### Test Coverage
-
-**目標**: 新規実装時はカバレッジ 90% 以上を目標とする
-
-**カバレッジ確認**:
-
-```bash
-# Frontend
-cd frontend && pnpm test:coverage
-
-# Backend
-cd backend && ./mvnw test jacoco:report
-```
-
-**カバレッジ比較** (before/after):
-
-```bash
-./scripts/coverage-diff.sh frontend/coverage/coverage-before.json frontend/coverage/coverage-summary.json
-```
-
-## Working Agreement
-
-This section defines the working agreement between developers and Claude Code for this project.
-
-### Communication Style
-
-- **Detail Level**: Moderate explanation (explain what was done and why briefly)
-- **Confirmation Frequency**: Only for critical decisions (destructive operations, architecture changes, security-related changes)
-- **Language**: Primarily Japanese (explanations in Japanese, code comments in English, technical terms can be in English)
-
-### Work Approach
-
-- **Autonomy**: High (implement autonomously after plan approval, self-correct errors, report only when stuck)
-- **Plan Mode**: Use proactively (always plan for multi-file changes, new features, architecture changes)
-- **Error Handling**: Self-correction (investigate and fix common errors independently, consult only for complex cases or specification decisions)
-- **Testing**: TDD (Test-Driven Development)
-
-### Development Process
-
-- **Git Workflow**: Automatic (create necessary branches after plan approval, commit at each story completion)
-- **Documentation**: Detailed before implementation (create .epic/ documents first, finalize API specs before implementation)
-- **PR Creation**: After implementation completion (create PR after implementation, tests pass, and CI checks pass)
-- **CI Checks**: Before PR creation (always run `./scripts/ci-check-local.sh` before creating PR)
-
-### Quality Standards
-
-- **Code Quality**: Strict compliance (strictly follow CLAUDE.md conventions, assume Spotless/Prettier auto-formatting)
-- **Security**: High level (be aware of OWASP Top 10, actively prevent SQL injection, XSS, command injection, etc.)
-- **Test Quality**: High coverage (unit tests for all classes, add integration tests for critical features)
-- **Performance**: Basic consideration (avoid obvious bottlenecks, but don't over-optimize)
-
-## Documentation Index
-
-### 人間向け知識ドキュメント (docs/)
-
-| Document | Description | Audience |
-|----------|-------------|----------|
-| [Architecture Overview](docs/architecture/README.md) | System architecture | Architects |
-| [C4 Context](docs/architecture/c4-context.md) | System context diagram | Architects |
-| [C4 Container](docs/architecture/c4-container.md) | Container architecture | Architects |
-| [API Design](docs/architecture/api/README.md) | API design guidelines | Backend/Frontend |
-| [Error Handling](docs/architecture/api/error-handling.md) | RFC 7807 error handling | Backend/Frontend |
-| [ADR-0001](docs/adr/0001-use-openapi-first.md) | OpenAPI-First decision | Architects |
-| [テスト戦略（全体）](docs/quality/TEST_STRATEGY.md) | System-wide test strategy | All developers |
-| [Security](docs/quality/SECURITY.md) | Security checks & Dependabot | All developers |
-| [Test Strategy (Backend)](backend/docs/TEST_STRATEGY.md) | Backend testing guidelines | Backend |
-| [Test Strategy (Frontend)](frontend/docs/TEST_STRATEGY.md) | Frontend testing guidelines | Frontend |
-
-### AI 操作スキル (.claude/skills/)
-
-スキルには **Human-Only（ユーザー専用）** と **Agent-Callable（エージェント対応）** の2種類があります。
-
-**エージェント（Task ツール）からは Human-Only スキルを呼び出してはいけません。**
-Agent-Callable スキルを呼び出す場合は Skill ツールではなく **Task ツール（サブエージェント）** を使用すること。
-
-#### Human-Only スキル
-
-| Skill | Description | SDDステップ |
-|-------|-------------|-----------|
-| `/create-epic-issue` | Create GitHub Epic Issue | Step 1 |
-| `/create-spec-pr` | Create OpenAPI spec + acceptance criteria | Step 2-4 |
-| `/update-spec-approved` | Update Issue + add spec-approved label | Step 6 |
-| `/plan-epic` | Generate implementation plan in .epic/ | Step 7 |
-| `/implement-epic` | Execute Story implementation workflow | Step 9-12 |
-| `/setup-worktree` | Set up git worktree environment | - |
-
-#### Agent-Callable スキル
-
-| Skill | Description | 呼び出し元 |
-|-------|-------------|-----------|
-| `/review-implementation` | Review plan or Story implementation quality | plan-epic Step 10、implement-epic Phase 3 Step 5（Task 経由） |
-| `/epic-status` | Check Epic progress status | ユーザー・エージェント |
-| `/generate-api` | Regenerate TypeScript API client | ユーザー・エージェント |
-| `/test-coverage` | Generate test coverage reports | ユーザー・エージェント |
-| `/retrospective` | Conduct retrospective after work | ユーザー |
-| `/update-dependabot-docs` | Update docs on Dependabot PR | CI/Dependabot |
-| `/run-storybook` | Start Storybook development server | ユーザー |
-| `/run-docker` | Manage Docker dev/prod environments | ユーザー |
-
-### Subdirectory Documentation
-
-- [backend/CLAUDE.md](backend/CLAUDE.md) - Backend-specific guidance
-- [frontend/CLAUDE.md](frontend/CLAUDE.md) - Frontend-specific guidance
-
-## Repository
-
-- **Remote**: <https://github.com/nagashima-toru/sandbox-claude-code.git>
-- **Main branch**: master
+`.epic/[YYYYMMDD]-[issue-N]-[タイトル]/` に管理。詳細は各スキルを参照。
