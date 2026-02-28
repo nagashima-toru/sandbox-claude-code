@@ -147,15 +147,12 @@ AXIOS_INSTANCE.interceptors.response.use(
 
     // Handle 401 errors with token refresh
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-      // Don't retry auth endpoints
+      // Don't retry auth endpoints - let the caller handle the error
       if (
         originalRequest.url?.includes('/api/auth/login') ||
         originalRequest.url?.includes('/api/auth/refresh')
       ) {
         clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
         return Promise.reject(error);
       }
 
