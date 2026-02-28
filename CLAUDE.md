@@ -16,6 +16,7 @@ Claude Code 向けプロジェクトガイド。
 - **Code Quality**: Spotless/Prettier 自動フォーマットを前提とする
 - **CI**: PR 作成前に `./scripts/ci-check-local.sh` を必ず実行
 - **Retrospective**: 作業を常に振り返ること。そして改善すること
+- **Skills**: Human-Only スキルをエージェント（Task ツール）から呼び出し禁止。Agent-Callable は Task ツール経由で呼ぶこと
 
 ## Project Structure
 
@@ -33,31 +34,6 @@ sandbox-claude-code/
 → 7. `/plan-epic` → 8. 計画レビュー（手動） → 9-12. `/implement-epic` → 13. deploy 前確認（手動）
 
 詳細: [docs/development/SDD.md](docs/development/SDD.md)
-
-## スキル一覧
-
-### Human-Only
-
-| スキル | 用途 |
-|--------|------|
-| `/create-epic-issue` | Epic Issue 作成 |
-| `/create-spec-pr` | 仕様 PR 作成 |
-| `/update-spec-approved` | Issue 更新 + ラベル付与 |
-| `/plan-epic` | 実装計画策定 |
-| `/implement-epic` | Story 実装 |
-| `/setup-worktree` | Worktree 環境構築 |
-
-### Agent-Callable（Task ツール経由で呼び出すこと）
-
-| スキル | 用途 |
-|--------|------|
-| `/review-implementation` | 実装品質レビュー |
-| `/epic-status` | Epic 進捗確認 |
-| `/generate-api` | API クライアント生成 |
-| `/test-coverage` | カバレッジレポート |
-| `/retrospective` | 振り返り |
-| `/run-docker` | Docker 環境管理 |
-| `/run-storybook` | Storybook 起動 |
 
 ## Git
 
