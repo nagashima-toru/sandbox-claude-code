@@ -328,7 +328,26 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
       - 既存テストを変更するより、新規テストを追加する方が安全
       - 既存テストは残したまま、新しいテストケースを追加できないか検討
 
-4. **ローカルテスト**（テスト実行後は必ずルートに戻る）
+4. **テスト種別の検証**（必須チェックリスト）
+
+   実装したコードのテストを書く前に、以下を確認する:
+
+   **E2E 禁止パターンの確認**（該当する場合は Unit/Component/MockMvc に変換）:
+   - [ ] フォームバリデーション → Unit テスト（Zod スキーマ）に変換
+   - [ ] ボタンの表示/非表示（権限制御） → Unit テスト（usePermission renderHook）に変換
+   - [ ] レスポンシブレイアウト → Component テスト（matchMedia モック）に変換
+   - [ ] i18n テキスト表示 → Component テスト（LocaleContext モック）に変換
+   - [ ] localStorage 読み書き → Unit テスト（jsdom）に変換
+   - [ ] HTTP 403/401 エラー検証 → Backend MockMvc 統合テストに変換
+   - [ ] 既存 E2E と実質同一フロー → 削除または既存テストで代替
+
+   **E2E テスト数の確認**:
+   - [ ] 追加後の E2E テスト数が 30件以下であることを確認した
+         ```bash
+         grep -rE "^(test|it)\(" frontend/tests/e2e/*.spec.ts 2>/dev/null | wc -l
+         ```
+
+4.5. **ローカルテスト**（テスト実行後は必ずルートに戻る）
 
    **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
 

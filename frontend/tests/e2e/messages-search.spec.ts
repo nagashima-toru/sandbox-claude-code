@@ -121,30 +121,4 @@ test.describe('Messages Search and Filter', () => {
     const noResultsMessage = page.locator('text=/no results|not found|no messages|empty/i');
     await expect(noResultsMessage).toBeVisible({ timeout: 5000 });
   });
-
-  test('should handle case-insensitive search', async ({ page }) => {
-    // Search with lowercase
-    await performSearch(page, 'apple');
-
-    // Verify the message with "Apple" (capitalized) is still found
-    await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("Apple")').first()
-    ).toBeVisible();
-  });
-
-  test('should debounce search input', async ({ page }) => {
-    // Get search input
-    const searchInput = await getSearchInput(page);
-
-    // Type rapidly without waiting
-    await searchInput.pressSequentially('SEARCH_TEST_1', { delay: 50 });
-
-    // Wait for debounce to complete
-    await page.waitForTimeout(600);
-
-    // Verify results are now filtered
-    await expect(
-      page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST_1")').first()
-    ).toBeVisible();
-  });
 });

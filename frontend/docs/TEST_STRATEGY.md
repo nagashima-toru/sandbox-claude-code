@@ -135,10 +135,45 @@ vi.mock('next/navigation', () => ({
 
 ### 3.5 E2E Tests（Playwright）
 
-**対象**: 認証フロー・権限制御・主要 CRUD フローのブラウザ操作
+**対象**: バックエンド・フロントエンド・ブラウザの3層が同時に関与するクリティカルフローのみ
+
+#### E2E テスト追加判断フロー
+
+```
+新機能のテストを書く前に、以下の質問に答えてください:
+
+Q1: バックエンド API とフロントエンドの両方が同時に関与するか？
+ └ No → Unit/Component テストで対応
+
+Q2: Component テストや Backend 統合テストで代替できないか？
+ └ Yes (代替できる) → 代替テストを書く（E2E ではない）
+
+Q3: 既存の E2E テストと実質同一のフローか？
+ └ Yes → 既存テストに吸収する
+
+Q4: 追加後も上限（30件）に収まるか？
+ └ No → 他の E2E を削減してから追加する
+
+全て通過した場合のみ E2E テストを追加する
+```
+
+#### E2E にしてはいけないケース（禁止パターン）
+
+| 検証内容                                         | E2E にしてはいけない理由        | 代替テスト種別                          |
+| ------------------------------------------------ | ------------------------------- | --------------------------------------- |
+| フォームバリデーション（空欄・文字数・パターン） | Zod スキーマで完結する          | Unit テスト                             |
+| ボタンの表示/非表示（`usePermission` フック）    | フック単体で検証可能            | Unit テスト（`renderHook`）             |
+| レスポンシブレイアウト（カード↔テーブル切替）    | CSS 検証はブラウザ不要          | Component テスト（`matchMedia` モック） |
+| i18n テキスト表示（日本語/英語の切替）           | LocaleContext モックで検証可能  | Component テスト                        |
+| localStorage の読み書き                          | jsdom で十分                    | Unit テスト                             |
+| debounce の動作                                  | `vi.useFakeTimers()` で制御可能 | Unit テスト                             |
+| HTTP エラーレスポンス形式（403/401）             | Backend 責務・Playwright 不要   | Backend MockMvc 統合テスト              |
+| 既存 E2E テストと実質同一フロー                  | 重複・メンテコスト増            | 既存テストで代替                        |
+
+#### E2E テストの例
 
 ```typescript
-// tests/e2e/auth.spec.ts
+// ✅ 良い例: 認証フロー（3層関与・代替不可）
 test('ログインに成功してメッセージ一覧を表示する', async ({ page }) => {
   await page.goto('/login');
   await page.getByTestId('login-username-input').fill('admin');
@@ -148,10 +183,11 @@ test('ログインに成功してメッセージ一覧を表示する', async ({
   await expect(page.getByTestId('search-input')).toBeVisible();
 });
 
-test('VIEWER は作成ボタンを表示しない', async ({ page }) => {
-  await login(page, 'viewer', 'viewer123');
-  await expect(page.getByTestId('create-button')).not.toBeVisible();
-});
+// ❌ 悪い例: フォームバリデーション（→ Unit テストへ移行）
+// test('空欄のまま送信するとエラーが表示される', ...)
+
+// ❌ 悪い例: 権限ボタン表示（→ Unit テストへ移行）
+// test('VIEWER は作成ボタンを表示しない', ...)
 ```
 
 **実行**:
@@ -166,7 +202,9 @@ cd backend && ./mvnw spring-boot:run &
 cd frontend && pnpm test:e2e
 ```
 
-**カバレッジ目標**: クリティカルフローの 100%（テスト数は最小限）
+**上限**: 30テスト以下（CI 5分以内）
+
+**カバレッジ目標**: クリティカルフロー（認証・CRUD・権限）の 100%（テスト数は最小限）
 
 ## 4. テストツールとフレームワーク
 
@@ -274,9 +312,18 @@ function createWrapper() {
 
 ### E2E
 
+E2E 追加前に、以下のチェックリストで判断する:
+
+- [ ] バックエンドとフロントエンドの両方が同時に関与するフローか？
+- [ ] Component テストや Backend 統合テストで代替できないか？
+- [ ] 既存 E2E テストと実質同一のフローではないか？
+- [ ] 追加後も上限（30件）に収まるか？
+
+上記を全て満たす場合のみ追加:
+
 - [ ] 認証が必要なフローのログインテスト
-- [ ] ADMIN/VIEWER 両ロールでの動作確認
-- [ ] 主要な CRUD フロー
+- [ ] 主要な CRUD フロー（作成・編集・削除）
+- [ ] ADMIN/VIEWER 両ロールの操作フロー
 
 ## 9. 関連ドキュメント
 

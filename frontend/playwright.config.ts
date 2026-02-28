@@ -7,16 +7,16 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 2 : undefined,
   reporter: 'html',
 
-  // Increase test timeout from default 30s to 60s
-  timeout: 60000,
+  // Test timeout: 45s (reduced from 60s for faster failure detection)
+  timeout: 45000,
 
-  // Increase expect timeout from default 5s to 15s
+  // Expect timeout: 10s (reduced from 15s)
   expect: {
-    timeout: 15000,
+    timeout: 10000,
   },
 
   // Global setup/teardown for backend services
@@ -27,13 +27,14 @@ export default defineConfig({
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    // Disable video recording in CI to reduce artifact size and improve speed
+    video: 'off',
 
-    // Increase action timeout from default 0 (no timeout) to 30s
-    actionTimeout: 30000,
+    // Action timeout: 20s (reduced from 30s)
+    actionTimeout: 20000,
 
-    // Increase navigation timeout to 30s
-    navigationTimeout: 30000,
+    // Navigation timeout: 20s (reduced from 30s)
+    navigationTimeout: 20000,
   },
 
   projects: [

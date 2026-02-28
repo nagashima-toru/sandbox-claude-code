@@ -269,6 +269,33 @@ class MessageControllerTest {
 
 **カバレッジ目標**: 80%以上
 
+#### 認証・認可テスト（重要）
+
+403/401 等の HTTP エラーレスポンスは **MockMvc で実装すること**。Playwright（E2E）で実装してはいけない。
+
+理由:
+- 認証・認可はバックエンドの責務であり、フロントエンドを介する必要がない
+- MockMvc の方が高速・安定しており、CI 負荷を削減できる
+- E2E テストでブラウザを起動して JWT トークンを取得してからリクエストする手順は不要
+
+```java
+// ✅ 正しい実装: MockMvc で 403 を検証
+@Test
+void createMessage_withViewerRole_returns403() throws Exception {
+    String viewerToken = obtainTokenFor("viewer", "viewer123");
+
+    mockMvc.perform(post("/api/messages")
+            .header("Authorization", "Bearer " + viewerToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"code\":\"TEST\",\"content\":\"Test\"}"))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.status").value(403));
+}
+
+// ❌ 禁止: Playwright から Bearer トークンを取得して API を直接呼ぶ E2E テスト
+// → Backend MockMvc に移行すること
+```
+
 ---
 
 ## 4. テストツールとフレームワーク

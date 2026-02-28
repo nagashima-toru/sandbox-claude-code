@@ -221,6 +221,7 @@ jobs:
   e2e:
     needs: [setup, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -273,6 +274,20 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./frontend
         run: pnpm exec playwright install --with-deps
+
+      - name: Check E2E test count
+        working-directory: ./frontend
+        run: |
+          E2E_COUNT=$(grep -rE "^(test|it)\(" tests/e2e/*.spec.ts 2>/dev/null | wc -l | tr -d ' ')
+          echo "E2E test count: ${E2E_COUNT}"
+          echo "## E2E Test Count: ${E2E_COUNT}" >> $GITHUB_STEP_SUMMARY
+          if [ "${E2E_COUNT}" -gt 30 ]; then
+            echo "❌ E2E test count (${E2E_COUNT}) exceeds limit of 30. Please convert some tests to Unit/Component tests." >> $GITHUB_STEP_SUMMARY
+            echo "::error::E2E test count (${E2E_COUNT}) exceeds limit of 30. See docs/quality/TEST_STRATEGY.md for guidance."
+            exit 1
+          else
+            echo "✅ E2E test count (${E2E_COUNT}) is within limit of 30." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Run E2E tests
         working-directory: ./frontend
