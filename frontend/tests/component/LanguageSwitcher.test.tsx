@@ -107,4 +107,14 @@ describe('LanguageSwitcher', () => {
       expect(button).toHaveClass('custom-class');
     });
   });
+
+  describe('サイズ', () => {
+    it('デフォルトサイズで表示される（size="sm" が適用されていない）', () => {
+      render(<LanguageSwitcher />, { wrapper: createJaWrapper() });
+      const button = screen.getByTestId('language-switcher');
+      // Default size uses h-10; sm size uses h-9
+      expect(button).toHaveClass('h-10');
+      expect(button).not.toHaveClass('h-9');
+    });
+  });
 });
