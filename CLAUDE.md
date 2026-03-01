@@ -16,6 +16,7 @@ Claude Code 向けプロジェクトガイド。
 - **Code Quality**: Spotless/Prettier 自動フォーマットを前提とする
 - **CI**: PR 作成前に `./scripts/ci-check-local.sh` を必ず実行
 - **Retrospective**: 作業を常に振り返ること。そして改善すること
+- **Traceability**: 作業を常に記録すること。トレーサビリティは命
 - **Skills**: Human-Only スキルをエージェント（Task ツール）から呼び出し禁止。Agent-Callable は Task ツール経由で呼ぶこと
 
 ## Project Structure
