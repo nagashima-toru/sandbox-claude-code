@@ -32,8 +32,10 @@ sandbox-claude-code/
 
 ## 開発プロセス（SDD）
 
-1. `/create-epic-issue` → 2-4. `/create-spec-pr` → 5. レビュー（手動） → 6. `/update-spec-approved`
+1. `/create-epic-issue` → 2-4. `/create-spec-pr`（**ティア判定**） → 5. レビュー（手動） → 6. `/update-spec-approved`
 → 7. `/plan-epic` → 8. 計画レビュー（手動） → 9-12. `/implement-epic` → 13. deploy 前確認（手動）
+
+**ティア制**: Spec PR でティア（Major/Minor/Micro）を確定。Minor/Micro は計画承認後 Claude が自律実装。
 
 詳細: [docs/development/SDD.md](docs/development/SDD.md)
 

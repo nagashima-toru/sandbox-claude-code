@@ -91,8 +91,9 @@ gh issue view [Issue番号] --json title,labels,state,body
 
 - Issue に `spec-approved` ラベルがあるか
 - Issue がオープン状態か
+- **ティアラベル** (`tier:major` / `tier:minor` / `tier:micro`) があるか
 
-**エラー時**: 上記条件を満たさない場合はエラーメッセージを表示：
+**エラー時**: `spec-approved` がない場合：
 
 ```
 ❌ Issue #88 に spec-approved ラベルが付与されていません
@@ -100,6 +101,19 @@ gh issue view [Issue番号] --json title,labels,state,body
 仕様PRをマージした後、以下のコマンドでラベルを付与してください：
 /update-spec-approved 88 [PR番号]
 ```
+
+**ティアラベルがない場合**:
+
+```
+⚠️ Issue #88 にティアラベル（tier:major / tier:minor / tier:micro）がありません
+
+/update-spec-approved 実行時にティアラベルが付与されます。
+ラベルなしで続行しますか？（Major として扱います）
+```
+
+→ AskUserQuestion で確認。ユーザーが続行を選択した場合は Major として扱い、overview.md にその旨を記録する。
+
+**ティアの確定**: ラベルから読み取ったティアを以降の処理で使用する。
 
 ### 2. 仕様情報の収集
 
@@ -684,6 +698,9 @@ N.4  既存 e2e テストの文字列セレクター確認・更新  ← 必須
 Issue: #[N]
 
 ## Epic 概要
+
+**ティア**: [Major / Minor / Micro]（[判定根拠の一言サマリー]）
+**実装方式**: [Major: Story PR × N → Epic PR / Minor/Micro: 単一 feature ブランチ → Epic PR のみ]
 
 **目的**: [Epicの目的]
 

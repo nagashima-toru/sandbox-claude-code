@@ -61,6 +61,23 @@ disable-model-invocation: true
 
 ## 実行前の必須確認
 
+### 0-Pre. ティアの確認（最初に実行）
+
+```bash
+gh issue view [Issue番号] --json labels
+```
+
+ラベルから Epic のティアを確認する:
+
+- `tier:major` → **Major フロー**（以下の通常フローに従う）
+- `tier:minor` または `tier:micro` → **「Minor/Micro 自律実装フロー」セクションに従う**
+- ティアラベルなし → AskUserQuestion でユーザーに確認（デフォルト: Major）
+
+**ティアが Minor/Micro の場合、以下の「通常フロー」は実行しない。**
+「Minor/Micro 自律実装フロー」セクションを参照すること。
+
+---
+
 ### 0. ベストプラクティスの読み込み（必須・最初に実行）
 
 実装を始める前に、品質基準を把握するために以下を読み込む：
@@ -700,6 +717,117 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    - 時間的制約がある場合
 
    **重要**: 自動化・スキル提案は必ず記録。繰り返し作業が発生した場合は、スクリプト化やスキル化を検討する。
+
+---
+
+## Minor/Micro 自律実装フロー
+
+**このセクションは `tier:minor` または `tier:micro` の Epic でのみ使用する。**
+
+Story PR を作成せず、単一 feature ブランチで全 Story を実装して Epic PR を作成する。
+
+### Step 1: 前提確認
+
+```bash
+# ベストプラクティスの読み込み（通常フローの Step 0 と同様）
+Read backend/docs/BEST_PRACTICES.md
+Read frontend/docs/BEST_PRACTICES.md
+
+# overview.md で Story 構成を確認
+Read .epic/[日付]-[issue番号]-[epic名]/overview.md
+
+# 現在のブランチ確認
+git branch --show-current
+git status
+```
+
+### Step 2: feature ブランチの作成
+
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/issue-[N]-[name]
+```
+
+**ブランチが既に存在する場合**:
+
+```bash
+git checkout feature/issue-[N]-[name]
+git pull origin feature/issue-[N]-[name]
+```
+
+### Step 3: 全 Story の順次実装
+
+overview.md の Story 順に、各 Story を同一ブランチで実装する。
+
+**各 Story の実装ループ**（Story PR は作成しない）:
+
+1. `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
+2. tasklist.md の開始日時を記録
+3. TaskCreate で各タスクを登録
+4. 通常フロー Phase 2（タスクの実装）に従い各タスクを実装
+   - Step 2-Pre（実装タイプ別事前確認）
+   - 実装
+   - Step 4（テスト種別検証）
+   - Step 4.5（ローカルテスト）
+   - コミット（`git commit -m "[type]: [説明] (#[issue番号])"`）
+5. tasklist.md の受け入れ基準・完了条件を `[x]` に更新・コミット
+6. overview.md の Story に ✅ を付ける
+7. 次の Story へ
+
+### Step 4: CI チェック
+
+全 Story 完了後に CI チェックを実行:
+
+```bash
+./scripts/ci-check-local.sh
+```
+
+失敗した場合は修正してから次に進む。
+
+### Step 5: Epic PR の作成
+
+```bash
+git push origin feature/issue-[N]-[name]
+
+gh pr create \
+  --base master \
+  --head feature/issue-[N]-[name] \
+  --template .github/PULL_REQUEST_TEMPLATE/epic.md
+```
+
+**PR description に含める内容**:
+- Epic の目的と完了した Story 一覧
+- ティア（Minor/Micro）と実装方式の説明
+- 変更ファイル一覧
+- CI 通過状況
+
+### Step 6: 結果の報告
+
+ユーザーに以下を報告:
+
+```
+✅ [Epic名]（Epic #N）の自律実装が完了しました
+
+ティア: [Minor / Micro]
+実装した Story: [N] 件
+変更ファイル: [N] 件
+
+Epic PR: #[PR番号]
+URL: [PR URL]
+
+次のステップ: PR レビュー後にマージしてください。
+```
+
+### 注意事項
+
+- **Story PR は作成しない**: Minor/Micro の自律実装では Story ブランチも Story PR も作成しない
+- **コミットは細かく**: Story ごと・タスクごとにコミットして、変更履歴を明確にする
+- **テストは各タスク後に実行**: まとめてテストしない
+- **エラーは自己修正**: テスト失敗は自律的に修正する（ユーザー確認なしで）
+- **Epic PR 作成後は待機**: ユーザーのレビューを待つ
+
+---
 
 ## エラー対応
 
