@@ -13,3 +13,6 @@ frontend/src/lib/api/generated/
 frontend/playwright-report/
 frontend/coverage/
 backend/docs/jacoco/
+
+# Serena memory files (auto-managed, not project documentation)
+.serena/memories/
