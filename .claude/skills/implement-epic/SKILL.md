@@ -78,14 +78,22 @@ gh issue view [Issue番号] --json labels
 
 ---
 
-### 0. ベストプラクティスの読み込み（必須・最初に実行）
+### 0. ベストプラクティスと仕様の読み込み（必須・最初に実行）
 
-実装を始める前に、品質基準を把握するために以下を読み込む：
+実装を始める前に、品質基準と仕様を把握するために以下を読み込む：
 
 ```bash
+# ベストプラクティスの読み込み
 Read backend/docs/BEST_PRACTICES.md   # Clean Architecture規則・テスト戦略・実装パターン・アンチパターン
 Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパターン・テスト戦略・アンチパターン
+
+# 仕様ドキュメントの読み込み
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
 ```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない（古い Epic など）場合はスキップして実装を続行する。
 
 **読み込み目的**:
 
@@ -93,9 +101,11 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
 - レイヤー別テスト種別（Pure Unit / Mockito / Testcontainers / MockMvc）と対象を確認する
 - 実装パターン（UseCase / Repository / Mapper の標準構造）を把握する
 - よくあるアンチパターン（パスワードハッシュ使い回し・`integration-test` ゴール・Context の `| undefined` 未設定など）を頭に入れる
+- **受け入れ条件の全シナリオを把握し、実装が仕様に準拠していることを確認する**
+- **OpenAPI 仕様のエンドポイント・スキーマ・エラー形式を確認し、仕様乖離を防ぐ**
 
 **この手順をスキップしてはいけない**: 読み込みなしで実装すると、アンチパターンの踏み込みや
-テストクラスの種別誤りが起きやすく、後から修正が必要になる。
+テストクラスの種別誤りが起きやすく、仕様乖離によるレビュー時の手戻りが発生しやすくなる。
 
 ---
 
@@ -733,6 +743,11 @@ Story PR を作成せず、単一 feature ブランチで全 Story を実装し�
 Read backend/docs/BEST_PRACTICES.md
 Read frontend/docs/BEST_PRACTICES.md
 
+# 仕様ドキュメントの読み込み（通常フローの Step 0 と同様）
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
+
 # overview.md で Story 構成を確認
 Read .epic/[日付]-[issue番号]-[epic名]/overview.md
 
@@ -740,6 +755,8 @@ Read .epic/[日付]-[issue番号]-[epic名]/overview.md
 git branch --show-current
 git status
 ```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない場合はスキップして次へ進む。
 
 ### Step 2: feature ブランチの作成
 
