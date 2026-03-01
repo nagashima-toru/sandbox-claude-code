@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { useGetAllMessages } from '@/lib/api/generated/message/message';
 import { MessageResponse } from '@/lib/api/generated/models';
@@ -30,6 +31,7 @@ const SEARCH_DEBOUNCE_MS = 300;
  * @param onDelete - Callback function triggered when delete button is clicked
  */
 export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
+  const t = useTranslations('messages');
   const { data, isLoading, error } = useGetAllMessages();
   const messages = useMemo(() => data?.content ?? [], [data?.content]);
   const { isReadOnly } = usePermission();
@@ -144,7 +146,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        placeholder="Search by code or content..."
+        placeholder={t('searchPlaceholder')}
         aria-label="Search messages"
       />
 
