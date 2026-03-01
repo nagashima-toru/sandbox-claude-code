@@ -43,16 +43,16 @@ function createEnWrapper(setLocale = vi.fn()) {
 
 describe('LanguageSwitcher', () => {
   describe('表示', () => {
-    it('日本語設定時に「EN」が表示される', () => {
+    it('日本語設定時に「🌐 日本語」が表示される', () => {
       render(<LanguageSwitcher />, { wrapper: createJaWrapper() });
       expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
-      expect(screen.getByText('EN')).toBeInTheDocument();
+      expect(screen.getByText('🌐 日本語')).toBeInTheDocument();
     });
 
-    it('英語設定時に「日」が表示される', () => {
+    it('英語設定時に「🌐 English」が表示される', () => {
       render(<LanguageSwitcher />, { wrapper: createEnWrapper() });
       expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
-      expect(screen.getByText('日')).toBeInTheDocument();
+      expect(screen.getByText('🌐 English')).toBeInTheDocument();
     });
 
     it('data-testid="language-switcher" で要素を取得できる', () => {
