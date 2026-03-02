@@ -30,27 +30,26 @@ export function useLocale(): LocaleContextValue {
   return context;
 }
 
-function getInitialLocale(): Locale {
-  // Guard for SSR - localStorage doesn't exist on server
-  if (typeof window === 'undefined') return 'ja';
-  try {
-    const saved = localStorage.getItem('locale');
-    if (saved === 'ja' || saved === 'en') {
-      return saved;
-    }
-    return 'ja';
-  } catch {
-    return 'ja';
-  }
-}
-
 export interface LocaleProviderProps {
   children: ReactNode;
 }
 
 export function LocaleProvider({ children }: LocaleProviderProps) {
-  // Lazy initializer reads from localStorage on client, returns 'ja' on server
-  const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
+  // Always initialize with 'ja' to match server rendering (prevents hydration mismatch)
+  const [locale, setLocaleState] = useState<Locale>('ja');
+
+  // After mount, sync with localStorage (two-pass rendering pattern to prevent SSR hydration mismatch)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('locale');
+      if (saved === 'ja' || saved === 'en') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLocaleState(saved);
+      }
+    } catch {
+      // localStorage unavailable - continue with default 'ja'
+    }
+  }, []);
 
   // Update document lang attribute when locale changes
   useEffect(() => {

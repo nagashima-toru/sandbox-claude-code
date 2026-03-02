@@ -17,7 +17,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 日本語設定時（ボタンラベルが「EN」）
+ * 日本語設定時（ボタンラベルが「🌐 日本語」）
  */
 export const Default: Story = {
   args: {},
@@ -35,7 +35,7 @@ export const Default: Story = {
 };
 
 /**
- * 英語設定時（ボタンラベルが「日」）
+ * 英語設定時（ボタンラベルが「🌐 English」）
  */
 export const English: Story = {
   args: {},

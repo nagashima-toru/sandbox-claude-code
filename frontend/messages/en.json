@@ -54,6 +54,7 @@
       "delete": "Delete",
       "cancel": "Cancel"
     },
+    "searchPlaceholder": "Search by code or content...",
     "errors": {
       "conflict": "A message with this code already exists. Please use a different code.",
       "notFound": "Message not found. It may have been deleted.",

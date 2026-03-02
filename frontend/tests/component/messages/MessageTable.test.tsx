@@ -2,12 +2,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NextIntlClientProvider } from 'next-intl';
 import MessageTable from '@/components/messages/MessageTable';
 import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
 import * as messageApi from '@/lib/api/generated/message/message';
 import { AuthContext } from '@/contexts/AuthContext';
+import { LocaleContext, type Locale } from '@/contexts/LocaleContext';
 import { ROLES } from '@/lib/constants/roles';
 import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
+import jaMessages from '../../../messages/ja.json';
+import enMessages from '../../../messages/en.json';
+
+const messagesByLocale: Record<Locale, Record<string, unknown>> = {
+  ja: jaMessages as Record<string, unknown>,
+  en: enMessages as Record<string, unknown>,
+};
 
 // Mock the API module
 vi.mock('@/lib/api/generated/message/message', () => ({
@@ -24,7 +33,10 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
-const createWrapper = (user: UserResponse | null = { username: 'admin', role: ROLES.ADMIN }) => {
+const createWrapper = (
+  user: UserResponse | null = { username: 'admin', role: ROLES.ADMIN },
+  locale: Locale = 'ja'
+) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -32,7 +44,7 @@ const createWrapper = (user: UserResponse | null = { username: 'admin', role: RO
     },
   });
 
-  const LocaleWrapper = createLocaleWrapper();
+  const LocaleWrapper = createLocaleWrapper(locale);
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <LocaleWrapper>
@@ -165,7 +177,9 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      expect(screen.getByPlaceholderText(/search by code or content/i)).toBeInTheDocument();
+      // With 'ja' locale (default), placeholder should be in Japanese
+      expect(screen.getByTestId('search-input')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('コードまたはコンテンツで検索...')).toBeInTheDocument();
     });
 
     it('ページネーションが表示される', () => {
@@ -274,7 +288,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const searchInput = screen.getByPlaceholderText(/search by code or content/i);
+      const searchInput = screen.getByTestId('search-input');
       await user.type(searchInput, 'MSG001');
 
       await waitFor(() => {
@@ -297,7 +311,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const searchInput = screen.getByPlaceholderText(/search by code or content/i);
+      const searchInput = screen.getByTestId('search-input');
       await user.type(searchInput, 'NOTFOUND');
 
       await waitFor(() => {
@@ -318,7 +332,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      const searchInput = screen.getByPlaceholderText(/search by code or content/i);
+      const searchInput = screen.getByTestId('search-input');
       await user.type(searchInput, 'First');
 
       await waitFor(() => {
@@ -326,6 +340,49 @@ describe('MessageTable', () => {
         expect(screen.queryByText('Second message')).not.toBeInTheDocument();
         expect(screen.queryByText('Third message')).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('i18n', () => {
+    it('言語切り替え後にプレースホルダーが即座に更新される', () => {
+      vi.mocked(messageApi.useGetAllMessages).mockReturnValue({
+        data: createMessagePage(mockMessages),
+        isLoading: false,
+        error: null,
+      } as any);
+
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      });
+      const adminUser: UserResponse = { username: 'admin', role: ROLES.ADMIN };
+
+      const renderWithLocale = (locale: Locale) => (
+        <LocaleContext.Provider
+          value={{ locale, setLocale: vi.fn(), messages: messagesByLocale[locale] }}
+        >
+          <NextIntlClientProvider locale={locale} messages={messagesByLocale[locale]}>
+            <QueryClientProvider client={queryClient}>
+              <AuthContext.Provider
+                value={{ user: adminUser, isLoading: false, error: null, refetch: () => {} }}
+              >
+                <MessageTable onEdit={mockOnEdit} onDelete={mockOnDelete} />
+              </AuthContext.Provider>
+            </QueryClientProvider>
+          </NextIntlClientProvider>
+        </LocaleContext.Provider>
+      );
+
+      const { rerender } = render(renderWithLocale('ja'));
+      expect(screen.getByTestId('search-input')).toHaveAttribute(
+        'placeholder',
+        'コードまたはコンテンツで検索...'
+      );
+
+      rerender(renderWithLocale('en'));
+      expect(screen.getByTestId('search-input')).toHaveAttribute(
+        'placeholder',
+        'Search by code or content...'
+      );
     });
   });
 
