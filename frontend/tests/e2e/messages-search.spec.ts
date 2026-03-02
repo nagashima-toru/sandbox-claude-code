@@ -117,8 +117,8 @@ test.describe('Messages Search and Filter', () => {
       page.locator('[data-testid^="message-row-"]:has-text("SEARCH_TEST")').first()
     ).not.toBeVisible();
 
-    // Check for "no results" or "not found" message
-    const noResultsMessage = page.locator('text=/no results|not found|no messages|empty/i');
+    // Check for "no results" message via data-testid (locale-independent)
+    const noResultsMessage = page.getByTestId('no-search-results');
     await expect(noResultsMessage).toBeVisible({ timeout: 5000 });
   });
 });

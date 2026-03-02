@@ -55,6 +55,13 @@
       "cancel": "Cancel"
     },
     "searchPlaceholder": "Search by code or content...",
+    "loading": "Loading messages...",
+    "loadError": "Failed to load messages. Please try again later.",
+    "noMessages": "No messages found.",
+    "noMessagesHint": "Create your first message to get started.",
+    "readOnlyInfo": "You are in read-only mode. Contact an administrator to make changes.",
+    "noSearchResults": "No messages match your search.",
+    "noSearchResultsHint": "Try a different search term.",
     "errors": {
       "conflict": "A message with this code already exists. Please use a different code.",
       "notFound": "Message not found. It may have been deleted.",

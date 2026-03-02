@@ -107,7 +107,7 @@ test.describe('Messages CRUD Operations', () => {
 
     // Modal should stay open due to duplicate error
     await page.waitForTimeout(1000);
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
   });
 });

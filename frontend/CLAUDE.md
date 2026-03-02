@@ -12,6 +12,12 @@ Next.js-based message management application with full CRUD functionality.
 - 新しいファイルを作成したら、対応するテストファイルも必ず作成する
 - コミット前に必ず実行: `pnpm test && pnpm lint && pnpm type-check`
 
+## E2E Testing Rules
+
+- **ロケーター**: `getByTestId` / `getByRole` / `getByLabel` を優先。`locator('text=...')` や `locator('[role=...]')` 等のCSSセレクターは使わない（`eslint-plugin-playwright` で強制）
+- **i18nテキストをハードコード禁止**: UIに表示されるロケール依存のテキストでアサートしない。代わりに `data-testid` を使う
+- **`data-testid` の命名**: コンポーネント実装時に意味のある `data-testid` を付与しておく（E2Eが書きやすくなる）
+
 ## Tech Stack
 
 - **Framework**: Next.js 16+ (App Router)

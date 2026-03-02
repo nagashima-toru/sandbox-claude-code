@@ -1,6 +1,7 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from 'eslint-plugin-storybook';
 import nextVitals from 'eslint-config-next/core-web-vitals';
+import playwright from 'eslint-plugin-playwright';
 
 const eslintConfig = [
   {
@@ -31,6 +32,15 @@ const eslintConfig = [
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
+    // E2E tests: enforce locale-independent locators
+    files: ['tests/e2e/**/*.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    plugins: { playwright },
+    rules: {
+      // Prefer getByTestId, getByRole, getByLabel over CSS/text selectors
+      'playwright/prefer-native-locators': 'error',
     },
   },
 ];

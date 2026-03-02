@@ -33,7 +33,7 @@ export async function login(page: Page, username = 'admin', password = 'admin123
   if (currentUrl.includes('/login')) {
     // Still on login page - check for error message
     const errorMessage = await page
-      .locator('[role="alert"]')
+      .getByRole('alert')
       .textContent()
       .catch(() => null);
     const consoleLog = consoleMessages.join('\n');
