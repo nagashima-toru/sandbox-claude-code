@@ -106,7 +106,7 @@ export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12" role="status" aria-live="polite">
-        <Loading size="lg" text="Loading messages..." />
+        <Loading size="lg" text={t('loading')} />
       </div>
     );
   }
@@ -114,7 +114,7 @@ export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   if (error) {
     return (
       <div role="alert">
-        <ErrorMessage message="Failed to load messages. Please try again later." variant="card" />
+        <ErrorMessage message={t('loadError')} variant="card" />
       </div>
     );
   }
@@ -122,10 +122,8 @@ export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   if (messages.length === 0) {
     return (
       <div className="text-center py-12" role="status">
-        <p className="text-muted-foreground text-lg">No messages found.</p>
-        <p className="text-muted-foreground text-sm mt-2">
-          Create your first message to get started.
-        </p>
+        <p className="text-muted-foreground text-lg">{t('noMessages')}</p>
+        <p className="text-muted-foreground text-sm mt-2">{t('noMessagesHint')}</p>
       </div>
     );
   }
@@ -139,7 +137,7 @@ export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
           data-testid="readonly-info-message"
         >
           <Info className="h-4 w-4 flex-shrink-0" />
-          <span>閲覧のみ可能です。変更するには管理者に連絡してください。</span>
+          <span>{t('readOnlyInfo')}</span>
         </div>
       )}
 
@@ -151,9 +149,14 @@ export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       />
 
       {filteredAndSortedMessages.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg" role="status" aria-live="polite">
-          <p className="text-muted-foreground text-lg">No messages match your search.</p>
-          <p className="text-muted-foreground text-sm mt-2">Try a different search term.</p>
+        <div
+          className="text-center py-12 border rounded-lg"
+          role="status"
+          aria-live="polite"
+          data-testid="no-search-results"
+        >
+          <p className="text-muted-foreground text-lg">{t('noSearchResults')}</p>
+          <p className="text-muted-foreground text-sm mt-2">{t('noSearchResultsHint')}</p>
         </div>
       ) : (
         <>

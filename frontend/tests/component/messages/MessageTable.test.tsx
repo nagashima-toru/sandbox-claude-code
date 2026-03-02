@@ -209,7 +209,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      expect(screen.getByText(/loading messages/i)).toBeInTheDocument();
+      expect(screen.getByText(/メッセージを読み込み中/)).toBeInTheDocument();
     });
 
     it('ローディング中はメッセージテーブルを表示しない', () => {
@@ -239,7 +239,7 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      expect(screen.getByText(/failed to load messages/i)).toBeInTheDocument();
+      expect(screen.getByText(/メッセージの読み込みに失敗しました/)).toBeInTheDocument();
     });
 
     it('エラー発生時はメッセージテーブルを表示しない', () => {
@@ -269,8 +269,8 @@ describe('MessageTable', () => {
         wrapper: createWrapper(),
       });
 
-      expect(screen.getByText(/no messages found/i)).toBeInTheDocument();
-      expect(screen.getByText(/create your first message to get started/i)).toBeInTheDocument();
+      expect(screen.getByText(/メッセージはありません/)).toBeInTheDocument();
+      expect(screen.getByText(/最初のメッセージを作成してください/)).toBeInTheDocument();
     });
   });
 
@@ -315,7 +315,8 @@ describe('MessageTable', () => {
       await user.type(searchInput, 'NOTFOUND');
 
       await waitFor(() => {
-        expect(screen.getByText(/no messages match your search/i)).toBeInTheDocument();
+        expect(screen.getByText(/検索条件に一致するメッセージはありません/)).toBeInTheDocument();
+        expect(screen.getByText(/別の検索語を試してください/)).toBeInTheDocument();
       });
     });
 
