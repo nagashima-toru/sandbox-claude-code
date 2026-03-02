@@ -149,7 +149,12 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
       />
 
       {filteredAndSortedMessages.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg" role="status" aria-live="polite">
+        <div
+          className="text-center py-12 border rounded-lg"
+          role="status"
+          aria-live="polite"
+          data-testid="no-search-results"
+        >
           <p className="text-muted-foreground text-lg">{t('noSearchResults')}</p>
           <p className="text-muted-foreground text-sm mt-2">{t('noSearchResultsHint')}</p>
         </div>
