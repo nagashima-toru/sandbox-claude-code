@@ -316,6 +316,7 @@ describe('MessageTable', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/検索条件に一致するメッセージはありません/)).toBeInTheDocument();
+        expect(screen.getByText(/別の検索語を試してください/)).toBeInTheDocument();
       });
     });
 
