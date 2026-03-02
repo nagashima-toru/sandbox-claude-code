@@ -1,6 +1,7 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from 'eslint-plugin-storybook';
 import nextVitals from 'eslint-config-next/core-web-vitals';
+import importPlugin from 'eslint-plugin-import';
 
 const eslintConfig = [
   {
@@ -31,6 +32,19 @@ const eslintConfig = [
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  // Enforce named exports in components, hooks, and contexts (excluding stories)
+  {
+    files: [
+      'src/components/**/*.{ts,tsx}',
+      'src/hooks/**/*.{ts,tsx}',
+      'src/contexts/**/*.{ts,tsx}',
+    ],
+    ignores: ['**/*.stories.{ts,tsx}'],
+    plugins: { import: importPlugin },
+    rules: {
+      'import/no-default-export': 'error',
     },
   },
 ];

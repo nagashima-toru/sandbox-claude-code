@@ -94,5 +94,3 @@ export function DeleteConfirmDialog({
     </Dialog>
   );
 }
-
-export default DeleteConfirmDialog;
