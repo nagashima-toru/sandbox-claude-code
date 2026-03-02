@@ -30,7 +30,7 @@ const SEARCH_DEBOUNCE_MS = 300;
  * @param onEdit - Callback function triggered when edit button is clicked
  * @param onDelete - Callback function triggered when delete button is clicked
  */
-export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
+export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   const t = useTranslations('messages');
   const { data, isLoading, error } = useGetAllMessages();
   const messages = useMemo(() => data?.content ?? [], [data?.content]);

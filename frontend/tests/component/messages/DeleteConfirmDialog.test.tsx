@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
+import { DeleteConfirmDialog } from '@/components/messages/DeleteConfirmDialog';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 

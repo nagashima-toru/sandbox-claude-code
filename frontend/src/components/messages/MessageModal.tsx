@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import MessageForm from './MessageForm';
+import { MessageForm } from './MessageForm';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { usePermission } from '@/hooks/usePermission';
@@ -24,7 +24,7 @@ interface MessageModalProps {
   isReadOnly?: boolean;
 }
 
-export default function MessageModal({
+export function MessageModal({
   open,
   onOpenChange,
   onSubmit,

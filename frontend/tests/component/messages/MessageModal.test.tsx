@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import MessageModal from '@/components/messages/MessageModal';
+import { MessageModal } from '@/components/messages/MessageModal';
 import { MessageResponse, UserResponse } from '@/lib/api/generated/models';
 import { AuthContext } from '@/contexts/AuthContext';
 import { ROLES } from '@/lib/constants/roles';
@@ -8,7 +8,7 @@ import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 
 // Mock MessageForm component
 vi.mock('@/components/messages/MessageForm', () => ({
-  default: ({
+  MessageForm: ({
     onSubmit,
     initialData,
     isSubmitting,
