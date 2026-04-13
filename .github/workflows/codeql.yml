@@ -61,7 +61,7 @@ jobs:
       # JavaScript/TypeScript のビルド設定
       - name: Setup pnpm
         if: matrix.language == 'javascript-typescript'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 9
 
