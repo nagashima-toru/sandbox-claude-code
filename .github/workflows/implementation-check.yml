@@ -19,7 +19,7 @@ jobs:
 
       - name: Get PR body
         id: pr-body
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const prBody = context.payload.pull_request.body || '';
@@ -42,7 +42,7 @@ jobs:
 
       - name: Check spec-approved label on parent Story
         if: steps.pr-body.outputs.story_number
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const issueNumber = '${{ steps.pr-body.outputs.story_number }}';
@@ -129,7 +129,7 @@ jobs:
 
       - name: Get PR body
         id: pr-body
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const prBody = context.payload.pull_request.body || '';
