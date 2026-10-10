@@ -4,7 +4,8 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## Development Rules
 
-- When creating a new Java file, always write JUnit test code for it
+- 新しい Java ファイルを作成する場合は必ず JUnit テストを書く
+- コミット前に必ず実行: `./mvnw verify`（テスト・アーキテクチャチェック・OpenAPI 生成）
 
 ## Project Overview
 

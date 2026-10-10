@@ -18,13 +18,12 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   return (
     <Button
       variant="outline"
-      size="sm"
       onClick={handleClick}
       data-testid="language-switcher"
       className={cn(className)}
       aria-label={locale === 'ja' ? 'Switch to English' : '日本語に切り替え'}
     >
-      {locale === 'ja' ? 'EN' : '日'}
+      {locale === 'ja' ? '🌐 日本語' : '🌐 English'}
     </Button>
   );
 }

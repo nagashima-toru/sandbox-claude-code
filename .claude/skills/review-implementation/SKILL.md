@@ -36,14 +36,28 @@ description: Review implementation plan or Story implementation quality using BE
 
 ## 実行フロー
 
-### Step 1: BEST_PRACTICES.md の読み込み
+### Step 1: ドキュメントの読み込み（必須）
 
 レビュー実行前に必ず以下を読み込む:
 
 ```bash
+# ベストプラクティスの読み込み
 Read backend/docs/BEST_PRACTICES.md
 Read frontend/docs/BEST_PRACTICES.md
+
+# 仕様ドキュメントの読み込み（spec-approved な Epic の場合）
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
 ```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない（古い Epic など）場合はスキップして Step 2 へ進む。
+
+**仕様読み込み目的**:
+- 実装計画（plan モード）または実装コード（story モード）が受け入れ条件の全シナリオをカバーしているか検証するため
+- 実装計画または実装コードが OpenAPI 仕様の全エンドポイントを網羅・準拠しているか検証するため
+
+**この手順をスキップしてはいけない**: 仕様ドキュメントを読み込まずにレビューすると、受け入れ条件との乖離を見落としたり、OpenAPI 仕様に準拠していないエンドポイント設計を見逃したりする可能性がある。
 
 ### Step 2: モード判定
 
@@ -80,7 +94,10 @@ Read .epic/[最新の Epic ディレクトリ]/story*/tasklist.md
 
 #### 2. 完全性観点
 
-- 仕様（OpenAPI・受け入れ条件）の全エンドポイントがカバーされているか
+- **受け入れ条件の全シナリオをカバーしているか**（Step 1 で読み込んだ `.feature` ファイルの各 Scenario に対応する実装・テストタスクが含まれているか）
+  - 含まれていない場合は 🔴 必須修正として報告する
+- **OpenAPI 仕様の全エンドポイントをカバーしているか**（Step 1 で読み込んだ `openapi.yaml` に定義された全エンドポイントが実装計画に含まれているか）
+  - 含まれていない場合は 🔴 必須修正として報告する
 - Backend 実装と Frontend 実装の両方が含まれているか
 - テスト Story（または各 Story 内のテストタスク）が含まれているか
 - DB マイグレーション（Flyway）が含まれているか（DB 変更がある場合）
@@ -104,6 +121,23 @@ Read .epic/[最新の Epic ディレクトリ]/story*/tasklist.md
 - `pnpm type-check` の実行が計画されているか
 - **UIテキスト変更（ラベル・見出し・ボタン・テーブルヘッダー等）を含む Story に、既存 e2e テストの文字列セレクター確認・更新タスクが含まれているか**
   - 含まれていない場合は 🔴 必須修正として報告する
+
+#### 5. テストピラミッド準拠観点（E2E 肥大化防止）
+
+- tasklist.md に「テスト計画」セクションが存在するか
+  - 含まれていない場合は 🟡 推奨修正として報告する
+- E2E 追加計画がある場合、以下を確認する:
+  - 正当化理由が記載されているか（3層関与・代替不可の根拠）
+  - 追加後の E2E テスト数（上限 30件）が記載されているか
+  - 含まれていない場合は 🔴 必須修正として報告する
+- 禁止パターンに該当するテストが E2E に分類されていないか:
+  - フォームバリデーション → Component テストに変換すべき → 🔴
+  - ボタン表示/非表示 → Unit テスト（usePermission）に変換すべき → 🔴
+  - レスポンシブレイアウト → Component テストに変換すべき → 🔴
+  - i18n テキスト表示 → Component テストに変換すべき → 🔴
+  - localStorage 読み書き → Unit テストに変換すべき → 🔴
+  - HTTP 403/401 検証 → Backend MockMvc に変換すべき → 🔴
+  - 既存 E2E と実質同一フロー → 削除または既存テストで代替 → 🔴
 
 #### 5. ADR 観点
 
@@ -130,6 +164,14 @@ git status
 ```
 
 ### レビュー観点
+
+#### 0. 仕様準拠チェック（Step 1 で読み込んだ仕様との照合）
+
+- **受け入れ条件を満たしているか**（Step 1 で読み込んだ `.feature` ファイルの各 Scenario が実装コードでカバーされているか）
+  - 満たしていない場合は 🔴 必須修正として報告する
+- **OpenAPI 仕様に準拠しているか**（Step 1 で読み込んだ `openapi.yaml` に定義されたエンドポイントの仕様と実装が一致しているか）
+  - リクエスト・レスポンスのスキーマ、ステータスコード、エラー形式などが仕様通りか確認する
+  - 準拠していない場合は 🔴 必須修正として報告する
 
 #### 1. Backend コード品質（BEST_PRACTICES.md 参照）
 
@@ -166,7 +208,29 @@ git status
   - Frontend Components: 80%+
 - 正常系・異常系・境界値のテストが揃っているか
 
-#### 4. セキュリティ（Backend のみ）
+#### 4. E2E テストピラミッド準拠（必須チェック）
+
+新規 E2E テストが追加されている場合、以下を確認する:
+
+- **禁止パターン違反**: 以下に該当する場合は 🔴 必須修正として報告する
+  - フォームバリデーション（空欄・文字数・パターン） → Unit テストへ
+  - ボタンの表示/非表示（usePermission フック） → Unit テストへ
+  - レスポンシブレイアウト（CSS/matchMedia） → Component テストへ
+  - i18n テキスト表示（LocaleContext モック可能） → Component テストへ
+  - localStorage 読み書き（jsdom で可能） → Unit テストへ
+  - HTTP 403/401 エラー検証 → Backend MockMvc へ
+  - 既存 E2E テストと実質同一フロー → 削除または既存テストで代替
+
+- **E2E テスト総数の報告**: 以下を必ず報告する
+  ```bash
+  grep -rE "^(test|it)\(" frontend/tests/e2e/*.spec.ts 2>/dev/null | wc -l
+  ```
+  - 30件以下: ✅ OK
+  - 30件超: 🟡 警告（削減を推奨）
+
+- **Backend の 403/401 検証**: Playwright 経由（Bearer トークン取得後 API 直接呼び出し）の場合は 🔴 必須修正（→ Backend MockMvc に移行）
+
+#### 5. セキュリティ（Backend のみ）
 
 - 認証が必要なエンドポイントに `@PreAuthorize` または Security Config が設定されているか
 - MyBatis の XML 定義で `${}` ではなく `#{}` を使用しているか（SQL インジェクション対策）

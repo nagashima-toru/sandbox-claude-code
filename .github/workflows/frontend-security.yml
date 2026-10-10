@@ -105,7 +105,7 @@ jobs:
           pnpm audit > audit-report.txt || true
 
       - name: Upload audit report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: security-audit-report
@@ -176,7 +176,7 @@ jobs:
           echo "Total packages checked: $(jq '. | length' licenses.json 2>/dev/null || echo 'N/A')" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload license report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: license-report
@@ -251,7 +251,7 @@ jobs:
           fi
 
       - name: Upload depcheck report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: depcheck-report

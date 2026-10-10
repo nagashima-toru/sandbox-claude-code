@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import MessageModal from './MessageModal';
+import { MessageModal } from './MessageModal';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
