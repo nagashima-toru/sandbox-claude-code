@@ -141,5 +141,3 @@ export function MessageForm({
     </Form>
   );
 }
-
-export default MessageForm;

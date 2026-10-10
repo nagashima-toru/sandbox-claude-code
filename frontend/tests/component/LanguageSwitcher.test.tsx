@@ -43,16 +43,16 @@ function createEnWrapper(setLocale = vi.fn()) {
 
 describe('LanguageSwitcher', () => {
   describe('表示', () => {
-    it('日本語設定時に「EN」が表示される', () => {
+    it('日本語設定時に「🌐 日本語」が表示される', () => {
       render(<LanguageSwitcher />, { wrapper: createJaWrapper() });
       expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
-      expect(screen.getByText('EN')).toBeInTheDocument();
+      expect(screen.getByText('🌐 日本語')).toBeInTheDocument();
     });
 
-    it('英語設定時に「日」が表示される', () => {
+    it('英語設定時に「🌐 English」が表示される', () => {
       render(<LanguageSwitcher />, { wrapper: createEnWrapper() });
       expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
-      expect(screen.getByText('日')).toBeInTheDocument();
+      expect(screen.getByText('🌐 English')).toBeInTheDocument();
     });
 
     it('data-testid="language-switcher" で要素を取得できる', () => {
@@ -105,6 +105,16 @@ describe('LanguageSwitcher', () => {
       render(<LanguageSwitcher className="custom-class" />, { wrapper: createJaWrapper() });
       const button = screen.getByTestId('language-switcher');
       expect(button).toHaveClass('custom-class');
+    });
+  });
+
+  describe('サイズ', () => {
+    it('デフォルトサイズで表示される（size="sm" が適用されていない）', () => {
+      render(<LanguageSwitcher />, { wrapper: createJaWrapper() });
+      const button = screen.getByTestId('language-switcher');
+      // Default size uses h-10; sm size uses h-9
+      expect(button).toHaveClass('h-10');
+      expect(button).not.toHaveClass('h-9');
     });
   });
 });

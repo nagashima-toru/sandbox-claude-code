@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import MessageForm from './MessageForm';
+import { MessageForm } from './MessageForm';
 import { MessageResponse } from '@/lib/api/generated/models';
 
 const meta = {

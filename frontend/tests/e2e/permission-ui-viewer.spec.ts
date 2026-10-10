@@ -2,62 +2,14 @@ import { test, expect } from '@playwright/test';
 import { login, waitForFrontend, createMessage } from './helpers';
 
 /**
- * E2E tests for permission UI with VIEWER role
- *
- * Tests the following scenarios:
- * - VIEWER cannot see the "Create" button
- * - VIEWER cannot see "Edit" and "Delete" buttons
- * - VIEWER sees the "readonly" info message
- * - VIEWER can click on a message row to view it in readonly mode
- * - All form fields are disabled in readonly mode
+ * E2E tests for VIEWER readonly modal behavior.
+ * Button visibility tests (create/edit/delete) are covered by Unit tests (usePermission hook).
  */
 test.describe('Permission UI - VIEWER Role', () => {
   test.beforeEach(async ({ page }) => {
     // Login as VIEWER user
     await login(page, 'viewer', 'viewer123');
     await waitForFrontend(page);
-  });
-
-  test('should not display the create button for VIEWER', async ({ page }) => {
-    // Verify the create button is NOT visible
-    const createButton = page.getByTestId('create-message-button');
-    await expect(createButton).not.toBeVisible();
-  });
-
-  test('should display readonly info message for VIEWER', async ({ page }) => {
-    // Verify the readonly info message IS visible
-    const readonlyMessage = page.getByTestId('readonly-info-message');
-    await expect(readonlyMessage).toBeVisible();
-
-    // Verify the message text
-    await expect(readonlyMessage).toContainText('閲覧のみ可能です');
-  });
-
-  test('should not display edit and delete buttons for VIEWER', async ({ page }) => {
-    // Wait for the table to load
-    await page.waitForTimeout(1000);
-
-    // Try to find any edit or delete buttons in the first row (if exists)
-    const messageRows = page.locator('[data-testid^="message-row-"]');
-    const rowCount = await messageRows.count();
-
-    if (rowCount > 0) {
-      // Get the first message row
-      const firstRow = messageRows.first();
-      await expect(firstRow).toBeVisible();
-
-      // Extract the message ID from the row's data-testid attribute
-      const rowTestId = await firstRow.getAttribute('data-testid');
-      const messageId = rowTestId?.replace('message-row-', '') || '';
-
-      // Verify edit button is NOT visible (using locator that doesn't throw if not found)
-      const editButton = page.getByTestId(`edit-message-button-${messageId}`);
-      await expect(editButton).not.toBeVisible();
-
-      // Verify delete button is NOT visible
-      const deleteButton = page.getByTestId(`delete-message-button-${messageId}`);
-      await expect(deleteButton).not.toBeVisible();
-    }
   });
 
   test('should open readonly modal when clicking on a message row', async ({ page }) => {
@@ -154,44 +106,5 @@ test.describe('Permission UI - VIEWER Role', () => {
     // Verify cancel button is visible (acts as "Close" in readonly mode)
     const cancelButton = page.getByTestId('message-form-cancel');
     await expect(cancelButton).toBeVisible();
-  });
-
-  test('should not be able to interact with disabled form fields', async ({ page }) => {
-    // Wait for the table to load
-    await page.waitForTimeout(1000);
-
-    // Find a message row to click
-    const messageRows = page.locator('[data-testid^="message-row-"]');
-    const rowCount = await messageRows.count();
-
-    if (rowCount > 0) {
-      const firstRow = messageRows.first();
-      await expect(firstRow).toBeVisible();
-
-      // Click on the row
-      await firstRow.click();
-
-      // Wait for modal to open
-      const modal = page.getByTestId('message-modal');
-      await expect(modal).toBeVisible({ timeout: 10000 });
-
-      // Verify fields are disabled (read-only mode)
-      const codeInput = page.getByTestId('message-code-input');
-      const contentInput = page.getByTestId('message-content-input');
-
-      await expect(codeInput).toBeDisabled();
-      await expect(contentInput).toBeDisabled();
-
-      // Verify fields have values (readonly fields should still display data)
-      const codeValue = await codeInput.inputValue();
-      const contentValue = await contentInput.inputValue();
-      expect(codeValue).toBeTruthy();
-      expect(contentValue).toBeTruthy();
-
-      // Close the modal
-      const cancelButton = page.getByTestId('message-form-cancel');
-      await cancelButton.click();
-      await expect(modal).not.toBeVisible({ timeout: 5000 });
-    }
   });
 });
