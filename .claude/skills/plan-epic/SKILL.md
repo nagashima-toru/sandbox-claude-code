@@ -1,9 +1,26 @@
 ---
 name: plan-epic
-description: Generate implementation plan documents in .epic/ directory and automatically review plan quality.
+description: "[Human-Only] Generate implementation plan documents in .epic/ directory and automatically review plan quality."
+disable-model-invocation: true
 ---
 
 # 実装計画策定コマンド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 複数フェーズにわたる長時間の作業を含む（Issue 調査・仕様読み込み・ドキュメント生成・レビュー）
+- ユーザーとの対話（AskUserQuestion）を前提とする（Story 分割・技術選定の確認）
+- `.epic/` ディレクトリへのファイル作成という副作用を含む
+- 誤った呼び出しで不完全な実装計画が生成される可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/plan-epic` を直接実行してください」と報告する。
+
+---
 
 ## 概要
 
@@ -43,6 +60,27 @@ description: Generate implementation plan documents in .epic/ directory and auto
 
 ## 実行フロー
 
+### 0. ベストプラクティスとテスト戦略の読み込み（必須・最初に実行）
+
+計画策定を始める前に、テスト要件を把握するために以下を読み込む：
+
+```bash
+Read backend/docs/BEST_PRACTICES.md   # §2 テスト戦略（レイヤー別テスト対応表・カバレッジ目標）
+Read frontend/docs/BEST_PRACTICES.md  # §4 テスト戦略（テスト種別対応表・カバレッジ目標）
+```
+
+**読み込み目的**:
+
+- テスト戦略のレイヤー別対応表を把握し、Story のタスクに漏れなく反映する
+- カバレッジ目標（Backend: Domain 90%+ / UseCase 85%+ / Mapper・Controller 80%+、Frontend: Utils/Hooks 90%+ / Components 80%+）を把握する
+- 標準タスクパターン（§6/§7）を確認して tasklist.md の品質を高める
+
+**この手順をスキップしてはいけない**: 読み込みなしで tasklist.md を生成すると、
+レイヤー別テスト種別の誤り（例: UseCase を統合テストにする）や
+カバレッジ目標の未記載、テストタスクの抜け漏れが発生しやすくなる。
+
+---
+
 ### 1. Issue情報の取得と前提条件チェック
 
 ```bash
@@ -53,8 +91,9 @@ gh issue view [Issue番号] --json title,labels,state,body
 
 - Issue に `spec-approved` ラベルがあるか
 - Issue がオープン状態か
+- **ティアラベル** (`tier:major` / `tier:minor` / `tier:micro`) があるか
 
-**エラー時**: 上記条件を満たさない場合はエラーメッセージを表示：
+**エラー時**: `spec-approved` がない場合：
 
 ```
 ❌ Issue #88 に spec-approved ラベルが付与されていません
@@ -62,6 +101,19 @@ gh issue view [Issue番号] --json title,labels,state,body
 仕様PRをマージした後、以下のコマンドでラベルを付与してください：
 /update-spec-approved 88 [PR番号]
 ```
+
+**ティアラベルがない場合**:
+
+```
+⚠️ Issue #88 にティアラベル（tier:major / tier:minor / tier:micro）がありません
+
+/update-spec-approved 実行時にティアラベルが付与されます。
+ラベルなしで続行しますか？（Major として扱います）
+```
+
+→ AskUserQuestion で確認。ユーザーが続行を選択した場合は Major として扱い、overview.md にその旨を記録する。
+
+**ティアの確定**: ラベルから読み取ったティアを以降の処理で使用する。
 
 ### 2. 仕様情報の収集
 
@@ -83,37 +135,90 @@ cat specs/openapi/openapi.yaml
 cat specs/acceptance/[機能名]/*.feature
 ```
 
-#### 2.3 既存実装の確認（重要）
+#### 2.3 既存実装の系統的確認（重要）
 
-仕様PRで追加されたAPIエンドポイントが既に実装されているか確認します。
+仕様PRで追加されたAPIエンドポイントが既に実装されているか、**Clean Architecture レイヤー別**に系統的に確認します。
 
-**バックエンド実装の確認**:
+**Backend 調査フロー**:
 
-```bash
-# OpenAPI仕様から追加されたエンドポイントを特定
-# 例: /api/users/me
-
-# Controller検索
-find backend/src -name "*Controller.java" -type f | xargs grep -l "users/me"
-
-# UseCase検索（エンドポイント名から推測）
-find backend/src -name "*UseCase.java" -type f | xargs grep -l "getCurrentUser"
-```
-
-**フロントエンド実装の確認**（オプション）:
+**Step A: OpenAPI 仕様から対象エンドポイントを特定**
 
 ```bash
-# API呼び出し検索
-grep -r "getCurrentUser" frontend/src/lib/api/
-
-# Orval生成ファイル確認
-ls -la frontend/src/lib/api/generated/auth/
+# 追加・変更されたエンドポイントのパス・メソッドをリストアップ
+# 例: POST /api/users, GET /api/users/me
 ```
 
-**判定**:
+**Step B: Presentation Layer（Controller）の確認**
 
-- ✅ **実装が存在する**: フロントエンド実装のみをStoryに含める
-- ❌ **実装が存在しない**: バックエンド実装とフロントエンド実装の両方をStoryに含める
+```bash
+# 対象エンドポイントを処理する Controller を検索
+find backend/src -name "*Controller.java" -type f | xargs grep -l "[エンドポイントのパス or メソッド名]"
+
+# Controller が存在する場合はファイルを Read して実装内容を確認
+```
+
+**Step C: Application Layer（UseCase）の確認**
+
+```bash
+# Controller で使用される UseCase を検索
+find backend/src -name "*UseCase.java" -type f | xargs grep -l "[関連キーワード]"
+```
+
+**Step D: Domain Layer（Model/Repository Interface）の確認**
+
+```bash
+# Domain Model と Repository Interface の存在を確認
+find backend/src/main/java -path "*/domain/model/*.java" -type f
+find backend/src/main/java -path "*/domain/repository/*.java" -type f
+```
+
+**Step E: Infrastructure Layer（Persistence/Security）の確認**
+
+```bash
+# Repository 実装と Mapper の存在を確認
+find backend/src/main/java -path "*/infrastructure/persistence/*.java" -type f
+```
+
+**Step F: テストファイルの存在確認**
+
+```bash
+# 各クラスに対応するテストファイルが存在するか確認
+find backend/src/test -name "*.java" -type f | head -20
+```
+
+**Frontend 調査フロー**:
+
+**Step G: API クライアント生成コードの確認**
+
+```bash
+# Orval 生成コードに対象 API が含まれているか確認
+ls -la frontend/src/lib/api/generated/
+grep -r "[エンドポイント関連キーワード]" frontend/src/lib/api/generated/
+```
+
+**Step H: 既存コンポーネント・Hook・Context の確認**
+
+```bash
+# 関連するコンポーネントと Hook の存在を確認
+find frontend/src -name "*.tsx" -o -name "*.ts" | xargs grep -l "[機能名]" 2>/dev/null
+```
+
+**Step I: テスト・Storybook ファイルの確認**
+
+```bash
+# テストと Storybook の存在を確認
+find frontend/tests -name "*.test.*" | head -10
+find frontend/src -name "*.stories.*" | head -10
+```
+
+**判定テーブル**:
+
+| 確認結果 | Story への含め方 |
+|---------|----------------|
+| Backend 実装が存在する + Frontend 実装が存在する | Story 不要（既存機能の修正のみ） |
+| Backend 実装が存在しない | **Backend 実装 Story を必ず追加**（Controller/UseCase/Mapper/テスト） |
+| Frontend 実装が存在しない | **Frontend 実装 Story を追加**（APIクライアント再生成/Hook/Component/Story） |
+| Backend のみ存在し Frontend がない | **Frontend 実装 Story を追加** |
 
 **注意**: OpenAPI仕様に定義されていても、実装が存在しない場合がほとんどです。必ず確認してください。
 
@@ -219,6 +324,65 @@ cat > .epic/[YYYYMMDD]-[issue-N]-[title]/requirements.md << 'EOF'
 EOF
 ```
 
+### 4.5 技術的決定の ADR 自動作成（新規ステップ）
+
+design.md 生成の前に、ADR が必要な技術的決定を特定して作成します。
+
+**ADR 作成が必要な技術的決定の判断基準**:
+
+- プロジェクト全体（他 Epic にも影響する）技術選定
+- 既存の技術スタックに新しいライブラリを追加する場合
+- アーキテクチャパターンの変更・追加
+- 代替案が複数存在し、選定理由が後から参照価値のある決定
+
+**ADR 作成フロー**:
+
+```bash
+# 既存 ADR の連番を確認
+ls docs/adr/
+# 例: 0001-use-openapi-first.md → 次は 0002
+
+# ADR スタブを作成（決定ごとに1ファイル）
+# ファイル名: docs/adr/000N-[decision-title-in-kebab-case].md
+```
+
+**ADR スタブのテンプレート**（既存の ADR-0001 の構造に準拠）:
+
+```markdown
+# ADR-000N: [決定タイトル]
+
+## ステータス
+
+**提案中** - [日付]（plan-epic で自動生成）
+
+## コンテキスト
+
+[なぜこの決定が必要か]
+
+## 決定
+
+[何を選択したか]
+
+## 代替案
+
+[検討した代替案と却下理由]
+
+## 結果
+
+[期待される効果とトレードオフ]
+
+---
+
+*この ADR は /plan-epic により自動生成されました。詳細はレビュー後に補完してください。*
+```
+
+**design.md との関係**:
+
+- design.md 内「1. 技術選定」テーブルは維持（Epic 固有の軽微な決定用）
+- プロジェクト全体に影響する重要な決定は ADR に移動し、design.md から参照リンクを追記する
+
+**判断が難しい場合**: AskUserQuestion でユーザーに確認してから ADR を作成する。
+
 ### 5. design.md の生成
 
 **目的**: どう実装するかを明確にする
@@ -236,7 +400,7 @@ Issue: #[N]
 
 | 項目 | 選定 | 理由 |
 |------|------|------|
-| [技術項目] | [選定した技術] | [理由] |
+| [技術項目] | [選定した技術] | [理由]（重要な決定は [ADR-000N](../../docs/adr/000N-xxx.md) 参照） |
 
 ### 1.2 フロントエンド
 
@@ -304,7 +468,7 @@ Issue: #[N]
 
 ### 7.1 単体テスト
 
-[単体テストの方針]
+[単体テストの方針（backend/docs/BEST_PRACTICES.md §2 に準拠）]
 
 ### 7.2 統合テスト
 
@@ -322,9 +486,31 @@ Issue: #[N]
 
 ---
 
-## 9. パフォーマンス考慮事項
+## 9. 実装対象クラス一覧
 
-[パフォーマンスチューニングの方針]
+### Backend 新規作成クラス
+
+| クラス名 | パッケージ | 種別 | 対応 Story |
+|---------|-----------|------|-----------|
+| [クラス名] | [パッケージパス] | [Model/UseCase/Repository/Mapper/Controller/Test] | Story [N] |
+
+### Backend 変更クラス
+
+| クラス名 | パッケージ | 変更内容 | 対応 Story |
+|---------|-----------|---------|-----------|
+| [クラス名] | [パッケージパス] | [変更内容] | Story [N] |
+
+### Frontend 新規作成ファイル
+
+| ファイル名 | パス | 種別 | 対応 Story |
+|----------|-----|------|-----------|
+| [ファイル名] | [パス] | [Component/Hook/Context/Story/Test] | Story [N] |
+
+### Frontend 変更ファイル
+
+| ファイル名 | パス | 変更内容 | 対応 Story |
+|----------|-----|---------|-----------|
+| [ファイル名] | [パス] | [変更内容] | Story [N] |
 ```
 
 **ファイル出力**:
@@ -361,16 +547,16 @@ EOF
 2. **テスタビリティ**: 各 Story の完了時点で全テストが通る状態にする
    - Story 内でコードを変更した場合、その Story 内でテストも修正・確認する
    - 「テストは次の Story で」という分割は避ける
-   - 例: e2e テストを修正する Story であれば、その Story 内で e2e テストの成功確認まで行う
 
 3. **レビュー可能性**: 1つの Story は 1 PR で完結する
    - PR 単位で独立してレビュー・マージできること
-   - 次の Story の開始前に前の Story がマージ済みであることが望ましい
 
 4. **依存関係の明確化**: Story 間の依存関係を overview.md に明記
-   - Story B が Story A に依存する場合、その旨を記載
-   - 依存関係がある場合は、前の Story のマージを待つことを推奨
-   - 依存関係図を明確に記述する
+
+5. **e2e テスト影響の考慮**: UIテキスト・表示内容を変更する Story では e2e テスト更新を必須タスクとして含める
+   - ラベル・ボタン・見出し・テーブルヘッダー等のテキストを変更する場合、`tests/e2e/` 内で文字列セレクター（`getByRole({ name })`・`getByLabel`・`getByText` 等）を使っている箇所を必ず確認・更新する
+   - 根本対策として `data-testid` セレクターへの移行も検討し、ロケール変更への耐性を高める
+   - e2e テスト更新は「次の Story で対応」とせず、テキスト変更と同じ Story に含める
 
 **分割例（認証・認可機能）**:
 
@@ -402,6 +588,21 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 **受け入れ基準**:
 - [ ] [受け入れ条件1]
 - [ ] [受け入れ条件2]
+- [ ] `pnpm test` と `pnpm type-check` が通過する
+- [ ] （UIテキスト変更を含む場合）既存 e2e テストの文字列セレクターが更新されている
+
+---
+
+## テスト計画
+
+| 変更内容 | テスト種別 | 理由 |
+|---------|----------|------|
+| [変更内容1] | Unit / Component / Integration / E2E | [なぜその種別か] |
+| [変更内容2] | Unit / Component / Integration / E2E | [なぜその種別か] |
+
+<!-- E2E 追加がある場合: 正当化理由・追加後の E2E テスト数（上限30件）を記載 -->
+<!-- E2E 追加理由: [Q1〜Q4 の回答] -->
+<!-- 追加後の E2E テスト数: [N]件 / 上限 30件 -->
 
 ---
 
@@ -440,6 +641,51 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 - 具体的で検証可能
 - 依存関係を考慮
 
+**Backend 標準タスクパターン（新規エンドポイント実装時）**:
+
+```
+N.1  DB マイグレーション（Flyway）
+N.2  Domain Model + 単体テスト（JUnit 5 Pure Unit）
+N.3  Repository Interface 定義（domain 層）
+N.4  MyBatis Mapper + 統合テスト（Testcontainers）
+N.5  Repository Implementation + 単体テスト（Mockito）
+N.6  UseCase + Mockito 単体テスト
+N.7  Controller + MockMvc 統合テスト
+```
+
+**Frontend 標準タスクパターン（新規機能実装時）**:
+
+```
+N.1  API クライアント再生成（pnpm generate:api）
+N.2  カスタム Hook + 単体テスト（QueryClientProvider ラップ）
+N.3  Context（必要時）+ 単体テスト（| undefined 型パターン確認）
+N.4  コンポーネント + Storybook + pnpm type-check
+N.5  コンポーネントテスト（MSW モック）
+N.6  テスト種別判定 + 実装
+     - E2E 判定フロー（Q1〜Q4）を実行し、必要な場合のみ E2E テストを追加
+     - 禁止パターン（フォームバリデーション・権限ボタン・レスポンシブ・i18n）は
+       Unit/Component テストに変換する
+     - 追加後の E2E テスト数が上限 30件以内であることを確認する
+```
+
+**Frontend UIテキスト変更パターン（ラベル・見出し・ボタン等の表示テキストを変更する Story）**:
+
+```
+N.1  翻訳リソースの追加・変更（messages/ja.json, messages/en.json 等）
+N.2  コンポーネントのテキスト置き換え（翻訳キー参照への変換）
+N.3  影響するコンポーネントテスト（Vitest）の修正
+N.4  既存 e2e テストの文字列セレクター確認・更新  ← 必須
+     - `grep -r "変更前テキスト" tests/e2e/` で影響箇所を特定
+     - getByRole({ name }), getByLabel, getByText 等のテキスト指定を更新
+     - 可能であれば data-testid セレクターへの移行を併施
+     - pnpm test:e2e でローカル確認（バックエンド起動が必要な場合はスキップ可、CI で確認）
+```
+
+> **⚠️ 注意**: e2eテスト更新タスク（N.4）は「次の Story で対応」と分離しないこと。
+> UIテキスト変更を含む Story の受け入れ基準には必ず「既存 e2e テストの文字列セレクターが更新されている」を含める。
+
+これらのパターンは `backend/docs/BEST_PRACTICES.md` §6 および `frontend/docs/BEST_PRACTICES.md` §7 でも参照できます。
+
 ### 8. overview.md の生成
 
 **目的**: Epic全体の管理（エントリーポイント）
@@ -452,6 +698,9 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 Issue: #[N]
 
 ## Epic 概要
+
+**ティア**: [Major / Minor / Micro]（[判定根拠の一言サマリー]）
+**実装方式**: [Major: Story PR × N → Epic PR / Minor/Micro: 単一 feature ブランチ → Epic PR のみ]
 
 **目的**: [Epicの目的]
 
@@ -481,11 +730,7 @@ Issue: #[N]
 
 ## 依存関係
 
-```
-
 [依存関係図]
-
-```
 
 **推奨実装順序**:
 1. Story 1 → Story 2 → ...
@@ -514,13 +759,11 @@ gh pr create --base master \
 
 ## ブランチ戦略
 
-```
 master
   └── feature/issue-[N]-[name]
        ├── feature/issue-[N]-[name]-story1
        ├── feature/issue-[N]-[name]-story2
        └── ...
-```
 
 詳細は [CLAUDE.md](../../CLAUDE.md) を参照。
 
@@ -541,10 +784,10 @@ master
 - [ ] Task 2.1: [タスク名]
 - [ ] Task 2.2: [タスク名]
 ...
-
 ```
 
 **ファイル出力**:
+
 ```bash
 cat > .epic/[YYYYMMDD]-[issue-N]-[title]/overview.md << 'EOF'
 [生成した内容]
@@ -563,186 +806,71 @@ Epic ディレクトリ: .epic/20260207-88-auth/
 ## 生成したファイル
 
 - requirements.md - 機能要求、受け入れ基準
-- design.md - 技術設計、アーキテクチャ
+- design.md - 技術設計、アーキテクチャ（実装対象クラス一覧含む）
 - overview.md - Epic全体の概要（エントリーポイント）
 - story1-user-management/tasklist.md
 - story2-jwt-auth/tasklist.md
-- story3-auth-endpoints/tasklist.md
-- story4-authorization/tasklist.md
-- story5-openapi/tasklist.md
-- story6-frontend/tasklist.md
-- story7-integration/tasklist.md
+- ...
 
-## Story 構成（全7 Story、26タスク、約16.5時間）
+## Story 構成（全N Story、Mタスク、約Xh）
 
-1. Story 1: ユーザー管理基盤（4タスク、2時間）
-2. Story 2: JWT認証基盤（5タスク、3.25時間）
-3. Story 3: 認証エンドポイント（4タスク、3.25時間）
-4. Story 4: 認可機能（3タスク、1.75時間）
-5. Story 5: OpenAPI仕様更新（2タスク、1時間）
-6. Story 6: フロントエンド対応（6タスク、3.75時間）
-7. Story 7: 結合テスト（2タスク、1.5時間）
+1. Story 1: [Story名]（Nタスク、Xh）
+...
 
 ## Next Steps
 
-**計画レビュー**（ステップ8）は自動的に実行されます（Step 10参照）
+**計画レビュー（ステップ8）は自動的に実行されます（Step 10参照）**
 
-1. **Epic ベースブランチ作成**
-   ```bash
-   git checkout master
-   git pull origin master
+1. **Epic ベースブランチ作成**（レビュー後）
+   git checkout master && git pull origin master
    git checkout -b feature/issue-88-auth
    git push origin feature/issue-88-auth
-   ```
 
 2. **実装開始**（ステップ9）
-
-   ```bash
    /implement-epic 88
-   ```
-
-   または個別Storyの実装：
-
-   ```bash
-   /implement-story 88 1
-   ```
-
 ```
 
 ---
 
-### 10. 計画のセルフレビュー
+### 10. 計画のセルフレビュー（Task サブエージェント経由）
 
-**目的**: 作成した実装計画の妥当性を自動的にチェックし、問題点を指摘する
+**重要**: ステップ9の結果表示後、Task ツールを使ってサブエージェントでレビューを実施します。
+Skill ツールを直接呼び出さないこと（メインコンテキストにレビュー処理が蓄積するため）。
 
-#### 10.1 レビュー観点
+Task ツールを呼び出す際は以下のプロンプトを使用する（`[EPIC_DIR_PATH]` は Step 3 で生成した実際のパスに置換すること）:
 
-**Story分割の妥当性**:
-```markdown
-✓ 各Storyは独立して実装・テスト可能か
-✓ 1 Story = 2-4時間程度の粒度か
-✓ Storyの責務が明確か（Single Responsibility）
-✓ Story数が適切か（多すぎず少なすぎず）
-```
-
-**Task粒度の適切性**:
-
-```markdown
-✓ 各Taskは1時間以内で完了可能か
-✓ Taskの完了条件が明確か
-✓ Taskの作業内容が具体的か
-✓ Task数が適切か（細かすぎず粗すぎず）
-```
-
-**依存関係の整合性**:
-
-```markdown
-✓ 依存関係が循環していないか
-✓ 依存するStoryが先に実装可能か
-✓ 並行実装可能なStoryが適切に分離されているか
-```
-
-**見積もり時間の妥当性**:
-
-```markdown
-✓ 各Taskの見積もりが現実的か
-✓ Story全体の見積もりが妥当か
-✓ Epic全体の見積もりが妥当か（大きすぎないか）
-```
-
-**抜け漏れチェック**:
-
-```markdown
-✓ 仕様のすべてのエンドポイントがカバーされているか
-✓ データベースマイグレーションが含まれているか
-✓ テストStoryが含まれているか
-✓ フロントエンド対応が含まれているか（必要な場合）
-✓ OpenAPI仕様更新が含まれているか
-```
-
-#### 10.2 レビュー実行
-
-生成されたファイルを読み込んでレビュー：
-
-```bash
-# requirements.md のレビュー
-cat .epic/[YYYYMMDD]-[issue-N]-[title]/requirements.md
-
-# design.md のレビュー
-cat .epic/[YYYYMMDD]-[issue-N]-[title]/design.md
-
-# overview.md のレビュー
-cat .epic/[YYYYMMDD]-[issue-N]-[title]/overview.md
-
-# 各Story の tasklist.md のレビュー
-cat .epic/[YYYYMMDD]-[issue-N]-[title]/story*/tasklist.md
-```
-
-**チェック項目**:
-
-- 仕様（OpenAPI、受け入れ条件）との整合性
-- 各Storyの独立性と依存関係
-- Task粒度と見積もり時間
-- 技術的実現可能性
-
-#### 10.3 レビュー結果の表示
-
-レビュー結果をユーザーに報告：
+- subagent_type: `"general-purpose"`
+- prompt:
 
 ```
-## 📋 計画レビュー結果
+あなたは実装計画レビュアーです。以下の Epic ドキュメントをレビューし、品質評価レポートを出力してください。
 
-### ✅ 良い点
+## レビュー対象
 
-- Story分割が適切（各2-4時間）
-- 依存関係が明確
-- テストStoryが含まれている
-- 見積もり時間が妥当（約16.5時間）
+Epic ディレクトリ: [EPIC_DIR_PATH]
+（例: .epic/20260207-88-auth/）
 
-### ⚠️ 改善提案
+## 実行手順
 
-1. **Story 3のTask数が多い**
-   - 現状: 4タスク、3.25時間
-   - 提案: Story 3を2つに分割
-     - Story 3a: ログイン・リフレッシュ（2時間）
-     - Story 3b: ログアウト（1.25時間）
+1. 以下のファイルを Read で読み込む:
+   - backend/docs/BEST_PRACTICES.md
+   - frontend/docs/BEST_PRACTICES.md
+   - [EPIC_DIR_PATH]/requirements.md
+   - [EPIC_DIR_PATH]/design.md
+   - [EPIC_DIR_PATH]/overview.md
+   - [EPIC_DIR_PATH]/story*/tasklist.md（全 Story 分）
 
-2. **データベースマイグレーションのロールバック戦略が未定義**
-   - 提案: design.md にロールバック手順を追加
+2. .claude/skills/review-implementation/SKILL.md を読み込み、
+   「plan レビュー観点」（構造的・完全性・Backend/Frontend BP・ADR）に従って評価する
 
-3. **セキュリティテストが不足**
-   - 提案: Story 7 にセキュリティテストを追加
-     - JWTトークン検証テスト
-     - 認可テスト
-
-### ℹ️ 確認事項
-
-- フロントエンドの認証状態管理ライブラリは決定済みか？
-- JWT署名鍵の管理方法は確定しているか？
-
-### 🎯 総合評価
-
-**品質**: ⭐⭐⭐⭐☆ (4/5)
-**実現可能性**: ⭐⭐⭐⭐⭐ (5/5)
-**完全性**: ⭐⭐⭐⭐☆ (4/5)
-
-**結論**: 計画は概ね良好です。改善提案を検討してください。
+3. 「出力形式」セクションの形式（✅ 🔴 🟡 🔵 ⬜ 🎯）でレポートを出力する
 ```
 
-#### 10.4 改善提案の反映
+**レビュー結果に基づく対応**:
 
-レビュー結果に基づき、必要に応じて計画を修正：
-
-**自動修正可能な場合**:
-
-- 明らかな問題（Task粒度が大きすぎる、依存関係の矛盾など）
-- 自動的に修正して再生成
-
-**ユーザー確認が必要な場合**:
-
-- 技術選定に関わる判断
-- スコープの変更
-- AskUserQuestion で確認してから修正
+- 🔴 必須修正がある場合: 自動修正または `AskUserQuestion` でユーザーに確認して修正
+- 🟡 推奨修正の場合: `AskUserQuestion` でユーザーに確認してから対応
+- 🔵 提案のみの場合: ユーザーに提示して判断を委ねる
 
 ---
 
@@ -777,7 +905,7 @@ Issue #88 のコメントに仕様ファイルのパスが記載されている�
 
 ## 注意事項
 
-- このコマンドは**計画作成後に自動的にセルフレビュー**を実行します
+- このコマンドは**計画作成後に自動的に Task サブエージェント（`review-implementation plan` 相当）でレビュー**します
 - レビュー結果に基づき、改善提案が表示されます
 - 重大な問題がある場合は、自動的に修正して再生成します
 - `.epic/` ディレクトリは `.gitignore` に含まれており、Git管理対象外です
@@ -790,8 +918,9 @@ Issue #88 のコメントに仕様ファイルのパスが記載されている�
 
 ## 参考資料
 
-- [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) - Epic構造の詳細
 - [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
+- [backend/docs/BEST_PRACTICES.md](../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
+- [frontend/docs/BEST_PRACTICES.md](../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
 - 既存Epic例: `.epic/20260203-88-auth/` - 参考実装
 
 ---
@@ -799,5 +928,6 @@ Issue #88 のコメントに仕様ファイルのパスが記載されている�
 ## 関連コマンド
 
 - `/update-spec-approved [Issue番号] [PR番号]` - Issue更新（前のステップ）
+- `/review-implementation plan` - 計画レビュー（本スキルが Task サブエージェント経由で自動実行）
 - `/implement-epic [Issue番号]` - Epic実装開始（次のステップ）
 - `/epic-status [Issue番号]` - Epic進捗確認

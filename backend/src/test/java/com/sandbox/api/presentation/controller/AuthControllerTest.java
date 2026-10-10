@@ -9,6 +9,7 @@ import com.sandbox.api.application.usecase.auth.GetCurrentUserUseCase;
 import com.sandbox.api.application.usecase.auth.LoginUseCase;
 import com.sandbox.api.application.usecase.auth.LogoutUseCase;
 import com.sandbox.api.application.usecase.auth.RefreshTokenUseCase;
+import com.sandbox.api.domain.model.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -97,7 +98,7 @@ class AuthControllerTest {
   @Test
   void getCurrentUser_shouldReturnUserResponse() {
     // Arrange
-    UserResponse mockResponse = new UserResponse("testuser", "ADMIN");
+    UserResponse mockResponse = new UserResponse("testuser", Role.ADMIN);
     when(getCurrentUserUseCase.execute()).thenReturn(mockResponse);
 
     // Act

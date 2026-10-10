@@ -1,9 +1,26 @@
 ---
 name: create-spec-pr
-description: Understand requirements, investigate current implementation, and create OpenAPI specification and acceptance criteria.
+description: "[Human-Only] Understand requirements, investigate current implementation, and create OpenAPI specification and acceptance criteria."
+disable-model-invocation: true
 ---
 
 # 仕様 PR 作成コマンド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 複数フェーズ（要求理解・実装調査・仕様PR作成）にわたる長時間の作業を含む
+- ユーザーとの対話（AskUserQuestion）を前提とする
+- Git ブランチ作成・コミット・GitHub PR 作成などの副作用を含む
+- 誤った呼び出しで意図しないブランチや PR が作成される可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/create-spec-pr` を直接実行してください」と報告する。
+
+---
 
 ## 概要
 
@@ -391,7 +408,47 @@ git push origin spec/issue-[N]-[name]
 
 ---
 
-### Step 9: 仕様PRの作成
+### Step 9: ティア判定
+
+仕様 PR を作成する前に、この Epic のティアを判定して PR description に含める。
+
+**判定基準**:
+
+| ティア | 条件（いずれか1つでも該当すれば上位ティア） |
+|--------|----------------------------------------|
+| **Major** | API スキーマ変更（OpenAPI エンドポイント追加・変更）、DB スキーマ変更（テーブル追加・カラム変更）、新ドメイン追加、外部サービス連携変更 |
+| **Minor** | 既存機能の変更・機能追加（API 変更なし）、複数ファイルにまたがる実装変更 |
+| **Micro** | docs・tests・configs・スキル（.claude/）のみの変更。コードの動作に影響なし |
+
+**判定プロセス**:
+
+1. Step 5（OpenAPI 変更内容）と Step 3（影響範囲）の調査結果を参照する
+2. 上位ティアの条件を上から順にチェックし、最初に該当したティアを選択
+3. 判定根拠を明文化する
+
+**ティア判定結果のフォーマット**（PR description に含める）:
+
+```markdown
+## ティア判定
+
+**判定結果**: [Major / Minor / Micro]
+
+**判定根拠**:
+- [条件1: 該当/非該当 - 理由]
+- [条件2: 該当/非該当 - 理由]
+- ...
+
+**計画承認後の実装方式**:
+- Major の場合: Story PR × N → Epic PR（現行通り）
+- Minor/Micro の場合: 単一 feature ブランチ → Epic PR のみ（自律実装）
+
+> レビュー時にティアを承認してください。変更がある場合はコメントで指示をお願いします。
+> 承認後 `/update-spec-approved` 実行時にティアを伝えてください。
+```
+
+---
+
+### Step 10: 仕様PRの作成
 
 ```bash
 gh pr create \
@@ -409,12 +466,13 @@ GitHub CLIのインタラクティブエディタが開くので、以下を入�
 - **変更ファイル**: 変更したファイルのリスト
 - **シナリオ数**: 正常系/異常系の件数
 - **Breaking Changes**: あり/なし
+- **ティア判定**: Step 9 の結果をそのまま含める
 
 ---
 
-### Step 10: 結果の表示
+### Step 12: 結果の表示
 
-要求理解、実装調査の結果、およびPR URLをユーザーに表示：
+要求理解、実装調査の結果、PR URL、およびティア判定をユーザーに表示：
 
 ```
 ✅ 仕様 PR を作成しました
@@ -535,7 +593,6 @@ URL: https://github.com/nagashima-toru/sandbox-claude-code/pull/102
 
 ## 参考資料
 
-- [Spec PR Guide](../../docs/development/SPEC_PR_GUIDE.md) - 仕様PR作成の詳細ガイド
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [Gherkin Reference](https://cucumber.io/docs/gherkin/reference/)
 - [RFC 7807 - Problem Details](https://tools.ietf.org/html/rfc7807)

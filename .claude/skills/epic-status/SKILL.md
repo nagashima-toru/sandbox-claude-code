@@ -330,22 +330,50 @@ gh pr create --base master \
 
 ## 進捗の更新タイミング
 
-Epic Documentsの進捗を最新に保つため、以下のタイミングで更新してください：
+Epic Documents の進捗を最新に保つため、以下のタイミングで更新してください。
 
-**Task完了時**:
-- `tasklist.md` のチェックボックスを更新
+**Task 開始・完了時**:
 
-**Story完了時**:
-- `tasklist.md` の進捗セクションを更新
-- `overview.md` の該当Storyにチェック
+- `tasklist.md` の該当タスクのチェックボックスを更新
 
-詳細は [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) の「更新タイミング」セクションを参照。
+**Story 完了時（PR 作成直後）**:
+
+1. **`tasklist.md` の進捗セクション**を更新:
+
+   ```markdown
+   ## 進捗
+
+   - 開始日時: 2026-02-04 00:06
+   - 完了日時: 2026-02-04 00:15
+   - 実績時間: 約10分
+   - メモ: 全タスク完了。テスト22件全て成功。PR #104 作成済み。
+   ```
+
+2. **`tasklist.md` の完了条件**にチェック:
+
+   ```markdown
+   **完了条件**:
+   - [x] User クラスが作成されている
+   - [x] Role enum が定義されている
+   - [x] 単体テストが作成されている
+   ```
+
+3. **`overview.md` の該当 Story のタスク**にチェック:
+
+   ```markdown
+   ### Story 1: ユーザー管理基盤 ✅
+   - [x] Task 1.1: ユーザードメインモデルの作成
+   - [x] Task 1.2: ユーザーリポジトリインターフェースの作成
+   - [x] Task 1.3: ユーザーテーブルの Flyway マイグレーション作成
+   - [x] Task 1.4: MyBatis Mapper と Repository 実装の作成
+   ```
+
+**Note**: `.epic/` ディレクトリは `.gitignore` に含まれるため、Git でコミット不要。
 
 ---
 
 ## 参考資料
 
-- [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) - Epic構造と更新タイミング
 - [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
 
 ---

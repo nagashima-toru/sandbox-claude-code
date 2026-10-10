@@ -1,9 +1,25 @@
 ---
 name: update-spec-approved
-description: Update Issue with approved specification details and add spec-approved label after merging spec PR.
+description: "[Human-Only] Update Issue with approved specification details and add spec-approved label after merging spec PR."
+disable-model-invocation: true
 ---
 
 # Issue更新と承認コマンド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 仕様PRのマージという外部状態変更を前提とする（マージ済みであることの確認が必要）
+- GitHub Issue の更新・ラベル付与という副作用を含む
+- 誤った呼び出しでレビュー未完の仕様が承認済みになる可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/update-spec-approved` を直接実行してください」と報告する。
+
+---
 
 ## 概要
 
@@ -144,7 +160,38 @@ cat specs/openapi/openapi.yaml
 gh issue comment [Issue番号] --body "[上記のMarkdown]"
 ```
 
-### 4. spec-approved ラベルを付与
+### 4. ティアラベルの付与
+
+Spec PR で Claude が提案し、レビューで承認されたティアをラベルとして付与する。
+
+**AskUserQuestion でティアを確認**:
+
+```
+Spec PR で確定したティアを教えてください。
+
+- Major: API/DB スキーマ変更・新ドメイン・外部連携変更
+- Minor: 既存機能変更・機能追加（API 変更なし）
+- Micro: docs・tests・configs・スキルのみ変更
+```
+
+**ラベル付与**:
+
+```bash
+# ティアに応じていずれか1つを実行
+gh issue edit [Issue番号] --add-label "tier:major"
+gh issue edit [Issue番号] --add-label "tier:minor"
+gh issue edit [Issue番号] --add-label "tier:micro"
+```
+
+**ラベルが存在しない場合は事前に作成**:
+
+```bash
+gh label create "tier:major" --color "d73a4a" --description "Major: API/DB schema changes"
+gh label create "tier:minor" --color "0075ca" --description "Minor: feature changes without API changes"
+gh label create "tier:micro" --color "cfd3d7" --description "Micro: docs/tests/configs only"
+```
+
+### 5. spec-approved ラベルを付与
 
 ```bash
 gh issue edit [Issue番号] --add-label "spec-approved"
@@ -156,9 +203,9 @@ gh issue edit [Issue番号] --add-label "spec-approved"
 gh issue view [Issue番号] --json labels
 ```
 
-### 5. 結果の表示
+### 7. 結果の表示
 
-Issue更新結果とNext Stepsをユーザーに表示：
+Issue更新結果（ティア情報を含む）とNext Stepsをユーザーに表示：
 
 ```
 ✅ Issue #88 を更新しました
@@ -278,8 +325,6 @@ PR番号を確認してください
 
 ## 参考資料
 
-- [Spec PR Guide](../../docs/development/SPEC_PR_GUIDE.md) - 仕様PR作成と承認の流れ
-- [Epic Documents](../../docs/development/EPIC_DOCUMENTS.md) - Epic構造
 - [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
 
 ---

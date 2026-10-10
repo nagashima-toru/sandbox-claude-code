@@ -2,6 +2,7 @@ package com.sandbox.api.presentation.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sandbox.api.domain.model.Role;
 import org.junit.jupiter.api.Test;
 
 class AuthMapperTest {
@@ -57,7 +58,7 @@ class AuthMapperTest {
   void toGenerated_shouldConvertUserResponse() {
     // Arrange
     com.sandbox.api.application.dto.UserResponse internal =
-        new com.sandbox.api.application.dto.UserResponse("testuser", "ADMIN");
+        new com.sandbox.api.application.dto.UserResponse("testuser", Role.ADMIN);
 
     // Act
     var generated = AuthMapper.toGenerated(internal);

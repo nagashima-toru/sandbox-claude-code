@@ -45,7 +45,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -82,7 +82,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -116,7 +116,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -168,7 +168,7 @@ jobs:
           fi
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
@@ -201,7 +201,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -210,7 +210,7 @@ jobs:
         run: pnpm build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: nextjs-build
           path: |
@@ -221,6 +221,7 @@ jobs:
   e2e:
     needs: [setup, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -265,7 +266,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download generated API
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.setup.outputs.api-artifact-name }}
           path: frontend/src/lib/api/generated
@@ -273,6 +274,20 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./frontend
         run: pnpm exec playwright install --with-deps
+
+      - name: Check E2E test count
+        working-directory: ./frontend
+        run: |
+          E2E_COUNT=$(grep -rE "^(test|it)\(" tests/e2e/*.spec.ts 2>/dev/null | wc -l | tr -d ' ')
+          echo "E2E test count: ${E2E_COUNT}"
+          echo "## E2E Test Count: ${E2E_COUNT}" >> $GITHUB_STEP_SUMMARY
+          if [ "${E2E_COUNT}" -gt 30 ]; then
+            echo "❌ E2E test count (${E2E_COUNT}) exceeds limit of 30. Please convert some tests to Unit/Component tests." >> $GITHUB_STEP_SUMMARY
+            echo "::error::E2E test count (${E2E_COUNT}) exceeds limit of 30. See docs/quality/TEST_STRATEGY.md for guidance."
+            exit 1
+          else
+            echo "✅ E2E test count (${E2E_COUNT}) is within limit of 30." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Run E2E tests
         working-directory: ./frontend
@@ -285,7 +300,7 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example down -v
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report
@@ -293,7 +308,7 @@ jobs:
           retention-days: 30
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-screenshots
@@ -305,7 +320,7 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.tmpfs.yml -f docker-compose.e2e.yml --env-file .env.e2e.example logs > backend-e2e-logs.txt
 
       - name: Upload backend logs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: backend-e2e-logs

@@ -53,18 +53,19 @@ public class AuthMapper {
   }
 
   /**
-   * Converts internal UserResponse to generated UserResponse.
+   * Converts internal UserResponse to OpenAPI generated UserResponse.
    *
-   * @param internal internal user response DTO
-   * @return generated user response
+   * @param internal the internal UserResponse
+   * @return generated UserResponse
    */
   public static com.sandbox.api.presentation.generated.model.UserResponse toGenerated(
       com.sandbox.api.application.dto.UserResponse internal) {
-    var generated = new com.sandbox.api.presentation.generated.model.UserResponse();
-    generated.setUsername(internal.username());
+    com.sandbox.api.presentation.generated.model.UserResponse generated =
+        new com.sandbox.api.presentation.generated.model.UserResponse();
+    generated.setUsername(internal.getUsername());
     generated.setRole(
         com.sandbox.api.presentation.generated.model.UserResponse.RoleEnum.fromValue(
-            internal.role()));
+            internal.getRole().name()));
     return generated;
   }
 }

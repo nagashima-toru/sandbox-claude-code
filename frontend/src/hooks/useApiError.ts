@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { getApiErrorMessage } from '@/lib/utils/errorHandling';
 
 interface UseApiErrorReturn {
@@ -22,22 +23,29 @@ interface UseApiErrorReturn {
  * });
  */
 export function useApiError(): UseApiErrorReturn {
+  const t = useTranslations();
   const [error, setErrorState] = useState<string | null>(null);
 
-  const setError = useCallback((err: unknown) => {
-    const message = getApiErrorMessage(err);
-    setErrorState(message);
-  }, []);
+  const setError = useCallback(
+    (err: unknown) => {
+      const message = getApiErrorMessage(err, t);
+      setErrorState(message);
+    },
+    [t]
+  );
 
   const clearError = useCallback(() => {
     setErrorState(null);
   }, []);
 
-  const handleError = useCallback((err: unknown): string => {
-    const message = getApiErrorMessage(err) ?? 'An unexpected error occurred';
-    setErrorState(message);
-    return message;
-  }, []);
+  const handleError = useCallback(
+    (err: unknown): string => {
+      const message = getApiErrorMessage(err, t) ?? 'An unexpected error occurred';
+      setErrorState(message);
+      return message;
+    },
+    [t]
+  );
 
   return {
     error,

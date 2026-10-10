@@ -4,8 +4,14 @@ import { FullConfig } from '@playwright/test';
 async function globalTeardown(_config: FullConfig) {
   console.log('🛑 Global teardown: Stopping backend services...');
 
+  // Skip backend teardown in CI (GitHub Actions manages it with Docker Compose)
+  if (process.env.CI === 'true') {
+    console.log('ℹ️  CI environment detected, skipping backend teardown (managed by workflow)');
+    return;
+  }
+
   try {
-    execSync('bash ./scripts/stop-backend-e2e.sh', {
+    execSync('bash ../scripts/stop-backend-e2e.sh', {
       stdio: 'inherit',
       cwd: process.cwd(),
     });

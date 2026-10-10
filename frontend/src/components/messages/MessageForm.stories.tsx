@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import MessageForm from './MessageForm';
+import { MessageForm } from './MessageForm';
 import { MessageResponse } from '@/lib/api/generated/models';
 
 const meta = {
@@ -76,5 +76,15 @@ export const ValidationError: Story = {
     if (submitButton) {
       submitButton.click();
     }
+  },
+};
+
+export const ReadOnly: Story = {
+  args: {
+    onSubmit: (data) => console.log('Submit:', data),
+    onCancel: () => console.log('Cancel'),
+    initialData: mockInitialData,
+    isSubmitting: false,
+    disabled: true,
   },
 };
