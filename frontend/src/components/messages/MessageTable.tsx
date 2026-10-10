@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Info } from 'lucide-react';
 import { useGetAllMessages } from '@/lib/api/generated/message/message';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { Loading } from '@/components/common/Loading';
@@ -11,6 +13,7 @@ import { Pagination } from './Pagination';
 import { MessageTableHeader, SortField, SortDirection } from './MessageTableHeader';
 import { MessageTableRow, MessageCard } from './MessageTableRow';
 import { useDebounce } from '@/hooks/useDebounce';
+import { usePermission } from '@/hooks/usePermission';
 
 interface MessageTableProps {
   onEdit?: (message: MessageResponse) => void;
@@ -27,9 +30,11 @@ const SEARCH_DEBOUNCE_MS = 300;
  * @param onEdit - Callback function triggered when edit button is clicked
  * @param onDelete - Callback function triggered when delete button is clicked
  */
-export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
+export function MessageTable({ onEdit, onDelete }: MessageTableProps) {
+  const t = useTranslations('messages');
   const { data, isLoading, error } = useGetAllMessages();
   const messages = useMemo(() => data?.content ?? [], [data?.content]);
+  const { isReadOnly } = usePermission();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [sortField, setSortField] = useState<SortField>('id');
@@ -101,7 +106,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12" role="status" aria-live="polite">
-        <Loading size="lg" text="Loading messages..." />
+        <Loading size="lg" text={t('loading')} />
       </div>
     );
   }
@@ -109,7 +114,7 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   if (error) {
     return (
       <div role="alert">
-        <ErrorMessage message="Failed to load messages. Please try again later." variant="card" />
+        <ErrorMessage message={t('loadError')} variant="card" />
       </div>
     );
   }
@@ -117,27 +122,41 @@ export default function MessageTable({ onEdit, onDelete }: MessageTableProps) {
   if (messages.length === 0) {
     return (
       <div className="text-center py-12" role="status">
-        <p className="text-muted-foreground text-lg">No messages found.</p>
-        <p className="text-muted-foreground text-sm mt-2">
-          Create your first message to get started.
-        </p>
+        <p className="text-muted-foreground text-lg">{t('noMessages')}</p>
+        <p className="text-muted-foreground text-sm mt-2">{t('noMessagesHint')}</p>
       </div>
     );
   }
 
   return (
     <div data-testid="message-table" className="space-y-4">
+      {isReadOnly && (
+        <div
+          className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+          role="status"
+          data-testid="readonly-info-message"
+        >
+          <Info className="h-4 w-4 flex-shrink-0" />
+          <span>{t('readOnlyInfo')}</span>
+        </div>
+      )}
+
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        placeholder="Search by code or content..."
+        placeholder={t('searchPlaceholder')}
         aria-label="Search messages"
       />
 
       {filteredAndSortedMessages.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg" role="status" aria-live="polite">
-          <p className="text-muted-foreground text-lg">No messages match your search.</p>
-          <p className="text-muted-foreground text-sm mt-2">Try a different search term.</p>
+        <div
+          className="text-center py-12 border rounded-lg"
+          role="status"
+          aria-live="polite"
+          data-testid="no-search-results"
+        >
+          <p className="text-muted-foreground text-lg">{t('noSearchResults')}</p>
+          <p className="text-muted-foreground text-sm mt-2">{t('noSearchResultsHint')}</p>
         </div>
       ) : (
         <>

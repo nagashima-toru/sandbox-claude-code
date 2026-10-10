@@ -6,9 +6,13 @@ function hasProperty<K extends PropertyKey>(obj: unknown, key: K): obj is Record
 }
 
 /**
- * Extract user-friendly error message from API error
+ * Extract user-friendly error message from API error.
+ * Returns translation keys via the provided t function.
+ *
+ * @param error - The error object from API call
+ * @param t - Translation function (e.g. from useTranslations())
  */
-export function getApiErrorMessage(error: unknown): string | null {
+export function getApiErrorMessage(error: unknown, t: (key: string) => string): string | null {
   if (!error) return null;
 
   // Type guard for axios-like error structure
@@ -23,21 +27,21 @@ export function getApiErrorMessage(error: unknown): string | null {
   const message = response?.data?.message || errorMessage;
 
   if (status === 409) {
-    return 'A message with this code already exists. Please use a different code.';
+    return t('messages.errors.conflict');
   }
   if (status === 404) {
-    return 'Message not found. It may have been deleted.';
+    return t('messages.errors.notFound');
   }
   if (status === 400) {
-    return message || 'Invalid input. Please check your data.';
+    return message || t('messages.errors.badRequest');
   }
   if (status === 500) {
-    return 'Server error. Please try again later.';
+    return t('messages.errors.serverError');
   }
   const code = hasProperty(error, 'code') ? (error.code as string | undefined) : undefined;
   if (code === 'ECONNABORTED' || code === 'ERR_NETWORK') {
-    return 'Network error. Please check your connection and try again.';
+    return t('messages.errors.networkError');
   }
 
-  return message || 'An unexpected error occurred. Please try again.';
+  return message || t('messages.errors.unexpected');
 }

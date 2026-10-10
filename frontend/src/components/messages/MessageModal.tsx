@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -7,9 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import MessageForm from './MessageForm';
+import { MessageForm } from './MessageForm';
 import { MessageFormData } from '@/lib/validations/message';
 import { MessageResponse } from '@/lib/api/generated/models';
+import { usePermission } from '@/hooks/usePermission';
 
 interface MessageModalProps {
   open: boolean;
@@ -19,9 +21,10 @@ interface MessageModalProps {
   isSubmitting?: boolean;
   mode: 'create' | 'edit';
   error?: unknown;
+  isReadOnly?: boolean;
 }
 
-export default function MessageModal({
+export function MessageModal({
   open,
   onOpenChange,
   onSubmit,
@@ -29,21 +32,39 @@ export default function MessageModal({
   isSubmitting = false,
   mode,
   error,
+  isReadOnly = false,
 }: MessageModalProps) {
+  const t = useTranslations('messages');
+  const { canCreate } = usePermission();
+
   const handleCancel = () => {
     onOpenChange(false);
   };
+
+  // VIEWER ロールの場合、作成モードでモーダルを表示しない
+  if (mode === 'create' && !canCreate) {
+    return null;
+  }
+
+  const title =
+    mode === 'create'
+      ? t('modal.createTitle')
+      : isReadOnly
+        ? t('form.viewTitle')
+        : t('modal.editTitle');
+  const description =
+    mode === 'create'
+      ? t('form.createDescription')
+      : isReadOnly
+        ? t('form.viewDescription')
+        : t('form.editDescription');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]" data-testid="message-modal">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Create New Message' : 'Edit Message'}</DialogTitle>
-          <DialogDescription>
-            {mode === 'create'
-              ? 'Fill in the details to create a new message.'
-              : 'Update the message details below.'}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <MessageForm
           onSubmit={onSubmit}
@@ -51,6 +72,7 @@ export default function MessageModal({
           isSubmitting={isSubmitting}
           onCancel={handleCancel}
           error={error}
+          disabled={isReadOnly}
         />
       </DialogContent>
     </Dialog>

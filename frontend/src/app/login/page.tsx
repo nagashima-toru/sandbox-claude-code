@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading } = useAuth();
+  const t = useTranslations('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +24,7 @@ export default function LoginPage() {
       await login(username, password);
       router.push('/');
     } catch (err) {
-      setError('ログインに失敗しました。ユーザー名またはパスワードが正しくありません。');
+      setError(t('error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -32,10 +35,13 @@ export default function LoginPage() {
       data-testid="login-page"
       className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12"
     >
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold">ログイン</h1>
-          <p className="mt-2 text-gray-600">メッセージ管理システムにログインしてください</p>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="mt-2 text-gray-600">{t('subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -47,7 +53,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              ユーザー名
+              {t('username')}
             </label>
             <input
               id="username"
@@ -65,7 +71,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              パスワード
+              {t('password')}
             </label>
             <input
               id="password"
@@ -87,17 +93,17 @@ export default function LoginPage() {
             data-testid="login-submit-button"
             className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'ログイン中...' : 'ログイン'}
+            {isSubmitting ? t('submitting') : t('submit')}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>開発環境用アカウント:</p>
+          <p>{t('devAccounts')}</p>
           <p className="mt-1">
-            <strong>管理者:</strong> admin / admin123
+            <strong>{t('adminLabel')}:</strong> admin / admin123
           </p>
           <p>
-            <strong>閲覧者:</strong> viewer / viewer123
+            <strong>{t('viewerLabel')}:</strong> viewer / viewer123
           </p>
         </div>
       </div>

@@ -1,0 +1,888 @@
+---
+name: implement-epic
+description: "[Human-Only] Execute Story implementation workflow including task management, testing, and PR creation for Epic realization."
+disable-model-invocation: true
+---
+
+# Epic 実装ガイド
+
+## ⛔ エージェント呼び出し禁止
+
+このスキルは **ユーザーが直接実行するスキル** です。
+他のスキルやエージェント（Task ツール）から呼び出してはいけません。
+
+**禁止理由**:
+- 複数フェーズ・複数 Story にわたる長時間の作業を含む
+- ユーザーとの対話（AskUserQuestion）を前提とする（Epic・Story 選択・実装方針確認）
+- Git ブランチ作成・コミット・プッシュ・GitHub PR 作成などの副作用を含む
+- 誤った呼び出しでリポジトリ状態や GitHub 状態が壊れる可能性がある
+
+**エージェントがこのスキルを実行しようとした場合**:
+即座に停止し、ユーザーに「このスキルはユーザー専用です。`/implement-epic` を直接実行してください」と報告する。
+
+---
+
+## Epic の選択
+
+### 引数あり: 指定された Epic を実装
+
+コマンド実行時に Epic 名（例: `88`, `issue-88`, `88-auth`）が渡された場合：
+
+1. `.epic/` ディレクトリから該当する Epic を検索
+2. 見つかった Epic の実装を開始
+
+### 引数なし: Epic を選択
+
+引数が渡されない場合：
+
+1. `.epic/` ディレクトリ内の全 Epic をスキャン
+2. 各 Epic の `overview.md` から以下を取得：
+   - Issue 番号
+   - Epic タイトル
+   - 完了/未完了の Story 数
+   - Epic の完了状態（全 Story に ✅ マークがあるか）
+3. AskUserQuestion で選択肢を表示：
+
+   ```
+   実装する Epic を選択してください
+
+   選択肢:
+   - Epic #88: 認証・認可機能 (Story 7/7 完了) ✅ 完了済み
+   - Epic #92: 新機能XYZ (Story 0/5 完了)
+   - Epic #112: data-testid 導入 (Story 2/3 完了)
+   ```
+
+   **表示形式**:
+   - 未完了 Epic: `Epic #[N]: [タイトル] (Story [完了数]/[総数] 完了)`
+   - 完了済み Epic: `Epic #[N]: [タイトル] (Story [総数]/[総数] 完了) ✅ 完了済み`
+
+4. ユーザーが選択した Epic で処理を開始
+5. **完了済み Epic を選択した場合**: 「実行前の必須確認」セクションの完了済み Epic 処理フローに従う
+
+## 実行前の必須確認
+
+### 0-Pre. ティアの確認（最初に実行）
+
+```bash
+gh issue view [Issue番号] --json labels
+```
+
+ラベルから Epic のティアを確認する:
+
+- `tier:major` → **Major フロー**（以下の通常フローに従う）
+- `tier:minor` または `tier:micro` → **「Minor/Micro 自律実装フロー」セクションに従う**
+- ティアラベルなし → AskUserQuestion でユーザーに確認（デフォルト: Major）
+
+**ティアが Minor/Micro の場合、以下の「通常フロー」は実行しない。**
+「Minor/Micro 自律実装フロー」セクションを参照すること。
+
+---
+
+### 0. ベストプラクティスと仕様の読み込み（必須・最初に実行）
+
+実装を始める前に、品質基準と仕様を把握するために以下を読み込む：
+
+```bash
+# ベストプラクティスの読み込み
+Read backend/docs/BEST_PRACTICES.md   # Clean Architecture規則・テスト戦略・実装パターン・アンチパターン
+Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパターン・テスト戦略・アンチパターン
+
+# 仕様ドキュメントの読み込み
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
+```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない（古い Epic など）場合はスキップして実装を続行する。
+
+**読み込み目的**:
+
+- Clean Architecture 依存ルールを把握し、import 違反を事前に防ぐ
+- レイヤー別テスト種別（Pure Unit / Mockito / Testcontainers / MockMvc）と対象を確認する
+- 実装パターン（UseCase / Repository / Mapper の標準構造）を把握する
+- よくあるアンチパターン（パスワードハッシュ使い回し・`integration-test` ゴール・Context の `| undefined` 未設定など）を頭に入れる
+- **受け入れ条件の全シナリオを把握し、実装が仕様に準拠していることを確認する**
+- **OpenAPI 仕様のエンドポイント・スキーマ・エラー形式を確認し、仕様乖離を防ぐ**
+
+**この手順をスキップしてはいけない**: 読み込みなしで実装すると、アンチパターンの踏み込みや
+テストクラスの種別誤りが起きやすく、仕様乖離によるレビュー時の手戻りが発生しやすくなる。
+
+---
+
+1. **Epic 完了状態の確認**（最優先）
+
+   Epic が既に完了している可能性があるため、まず完了状態を確認：
+
+   ```bash
+   # overview.md の全 Story に ✅ マークがあるか確認
+   grep "^### Story" .epic/[日付]-[issue番号]-[epic名]/overview.md
+   ```
+
+   **完了済み Epic の判定基準**:
+   - 全 Story に ✅ マークが付いている
+   - Epic ベースブランチが master にマージ済み（`git log --oneline --grep="#[Issue番号]" master` で確認）
+   - 全 Story の PR がマージ済み
+
+   **完了済み Epic を検出した場合の処理**:
+
+   a. ユーザーに報告：
+
+   ```
+   Epic #[N] は既に完了しています：
+   - 全 Story ([M]/[M]) 完了
+   - Epic ベースブランチ: master にマージ済み（または存在しない）
+   - 実装済み日時: [日付]
+   ```
+
+   b. 次のアクションを提案（AskUserQuestion）：
+   - **Epic 全体の振り返りを実施** (`/retrospective Epic #[N]`) - 推奨
+   - **Epic 詳細状況を確認** (`/epic-status [N]`)
+   - **別の未完了 Epic を実装**
+   - **何もしない**
+
+   c. ユーザーの選択に応じて処理：
+   - 振り返り選択時: `/retrospective` スキルを実行
+   - 別 Epic 選択時: Epic 選択からやり直し
+   - 何もしない: スキル終了
+
+   **重要**: 完了済み Epic に対して実装を進めない。無駄な作業を避ける。
+
+2. **Epic 状況の確認**（未完了の場合）
+   - `.epic/[日付]-[issue番号]-[epic名]/overview.md` を読む
+   - 未完了の Story を特定する
+   - 次に実装すべき Story を確認する
+
+3. **現在のブランチ確認**
+
+   ```bash
+   git branch --show-current
+   git status
+   ```
+
+   - 現在 Epic ベースブランチ（例: `feature/issue-88-auth`）にいることを確認
+   - Working tree が clean であることを確認
+
+4. **作業ディレクトリ確認**（重要）
+
+   ```bash
+   pwd
+   ```
+
+   - **必ずプロジェクトルート** (`/Users/.../sandbox-claude-code`) にいることを確認
+   - ルート以外にいる場合は `cd` でルートに戻る
+   - **理由**: git コマンド、スクリプト実行は基本的にルートから実行する必要がある
+
+   **よくある問題**:
+   - `cd frontend` で移動したまま git コマンドを実行 → パスエラー
+   - `frontend/frontend` のようなネストしたディレクトリを認識してしまう
+
+   **ベストプラクティス**:
+   - frontend での作業時: `cd frontend && pnpm [command] && cd ..`
+   - 常に `pwd` で位置を確認してから git コマンドを実行
+
+## 実装フロー
+
+### Phase 1: Story の開始
+
+1. **前提条件の確認**（Story 2 以降は必須）
+
+   **1.1. 前の Story の完了確認**
+
+   ```bash
+   # overview.md で前の Story が ✅ マークされているか確認
+   grep -A 10 "Story [N-1]" .epic/[日付]-[issue番号]-[epic名]/overview.md
+   ```
+
+   - 前の Story が未完了（✅ なし）の場合は実装を中断
+   - AskUserQuestion で「Story [N-1] が未完了ですが、Story [N] を開始しますか？」と確認
+
+   **1.2. 前の Story の PR マージ確認**
+
+   ```bash
+   # 前の Story の PR がマージされているか確認
+   gh pr list --head feature/issue-[N]-[epic-name]-story[N-1] --state merged
+   ```
+
+   - マージされていない場合は警告を表示
+   - AskUserQuestion で「Story [N-1] の PR がマージされていませんが、Story [N] を開始しますか？」と確認
+   - **推奨**: 前の Story のマージを待つ（依存関係の問題を防ぐため）
+
+2. **Epic ベースブランチの最新化**（Story 2 以降、前 Story マージ済みの場合）
+
+   前の Story がマージされている場合、Epic ベースブランチを最新化する：
+
+   ```bash
+   # Epic ベースブランチに切り替え
+   git checkout feature/issue-[N]-[epic-name]
+
+   # リモートの最新を取得
+   git pull origin feature/issue-[N]-[epic-name]
+
+   # 最新化されたことを確認
+   git log --oneline -5
+   ```
+
+   - 前の Story のマージコミットが含まれていることを確認
+   - 含まれていない場合は `git pull` を再実行
+   - コンフリクトがある場合は解決してから次に進む
+
+   **重要**: この手順を省略すると、前の Story の変更が含まれない状態で Story ブランチを作成してしまい、テスト失敗や手戻りの原因となる
+
+3. **Story ディレクトリの確認**
+   - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
+   - 全タスクの内容と受け入れ条件を理解する
+   - **開始日時の記録**（未記載の場合）: tasklist.md の「進捗」セクションに開始日時を Edit ツールで記録する
+     ```
+     - 開始日時: YYYY-MM-DD
+     ```
+
+4. **Story ブランチの作成**
+
+   ```bash
+   git checkout -b feature/issue-[N]-[epic-name]-story[X]
+   ```
+
+5. **TaskCreate でタスク管理開始**
+   - tasklist.md の各タスクを TaskCreate で登録
+   - 見積もり時間も記録
+
+### Phase 2: タスクの実装
+
+**各タスクごとに以下を実行：**
+
+1. **タスク開始**
+
+   ```
+   TaskUpdate taskId=[id] status=in_progress
+   ```
+
+2. **ステップ 2-Pre: 実装タイプ別事前確認（必須）**
+
+   タスクの実装を始める前に、実装タイプに応じた事前確認チェックリストを完了させる。
+
+   **Backend 必須事前確認**:
+
+   - [ ] 実装クラスのレイヤーを特定した（domain / application / infrastructure / presentation）
+   - [ ] 同レイヤーの既存クラス実装パターンを最低1つ `Read` した
+   - [ ] 対応するテストクラスのパターンを `Read` した
+   - [ ] `import` が Clean Architecture 依存ルールに違反しないことを確認した
+   - [ ] `backend/docs/BEST_PRACTICES.md` §1〜§2 を確認した
+
+   **例**: UseCase を実装する場合
+
+   ```bash
+   # 1. 既存の UseCase パターンを確認
+   Read backend/src/main/java/.../application/usecase/GetMessageUseCase.java
+
+   # 2. 対応するテストパターンを確認
+   Read backend/src/test/java/.../application/usecase/GetMessageUseCaseTest.java
+
+   # 3. BEST_PRACTICES.md のテスト戦略を確認
+   Read backend/docs/BEST_PRACTICES.md
+   ```
+
+   **Frontend 必須事前確認**:
+
+   - [ ] 実装ファイル種別を特定した（Component / Hook / Context / Story / Test）
+   - [ ] 同種別の既存ファイルのパターンを最低1つ `Read` した
+   - [ ] Context: `| undefined` 型パターンを確認した（Context 実装時）
+   - [ ] Story: `pnpm type-check` を事前実行する準備をした（Storybook 作成時）
+   - [ ] `frontend/docs/BEST_PRACTICES.md` §1〜§3 を確認した
+
+   **例**: Context を実装する場合
+
+   ```bash
+   # 1. 既存の Context パターンを確認
+   Read frontend/src/contexts/AuthContext.tsx
+
+   # 2. 既存のテストパターンを確認
+   Read frontend/tests/unit/hooks/useAuthContext.test.tsx
+
+   # 3. BEST_PRACTICES.md の Context パターンを確認
+   Read frontend/docs/BEST_PRACTICES.md
+   ```
+
+3. **実装**
+
+   **作業ディレクトリの管理**（重要）:
+
+   - **常にプロジェクトルートディレクトリで作業を開始する**
+   - frontend または backend での作業が必要な場合のみ `cd` で移動
+   - 作業完了後は必ず `cd ..` でルートに戻る
+   - git コマンドは基本的にルートディレクトリから実行
+
+   ```bash
+   # ❌ 悪い例: frontend ディレクトリで git commit
+   cd frontend
+   git add src/...  # パスが間違う
+
+   # ✅ 良い例: ルートディレクトリから実行
+   cd frontend && pnpm format && cd ..
+   git add frontend/src/...
+   ```
+
+   **基本ガイドライン**:
+
+   - CLAUDE.md の開発ガイドラインに従う
+   - Backend: Clean Architecture、JUnit テスト必須
+   - Frontend: Functional components、named exports、テスト・Storybook 必須
+
+   **テストケース変更時の特別ルール**:
+
+   既存のテストケースを変更する場合（アサーション、期待値、テストロジックなど）：
+
+   a. **変更理由の明確化**
+      - なぜテストケースを変更する必要があるのか
+      - 仕様変更か、テストの不具合修正か、リファクタリングか
+
+   b. **ユーザーへの確認**（必須）
+
+      AskUserQuestion で以下を確認：
+
+      ```
+      「既存のテストケース [ファイル名:行番号] を変更する必要があります。
+
+      変更内容:
+      - Before: [現在のテストコード]
+      - After: [変更後のテストコード]
+
+      変更理由: [理由]
+
+      この変更を行ってよろしいですか？」
+      ```
+
+   c. **新規テスト追加の優先**
+      - 既存テストを変更するより、新規テストを追加する方が安全
+      - 既存テストは残したまま、新しいテストケースを追加できないか検討
+
+4. **テスト種別の検証**（必須チェックリスト）
+
+   実装したコードのテストを書く前に、以下を確認する:
+
+   **E2E 禁止パターンの確認**（該当する場合は Unit/Component/MockMvc に変換）:
+   - [ ] フォームバリデーション → Unit テスト（Zod スキーマ）に変換
+   - [ ] ボタンの表示/非表示（権限制御） → Unit テスト（usePermission renderHook）に変換
+   - [ ] レスポンシブレイアウト → Component テスト（matchMedia モック）に変換
+   - [ ] i18n テキスト表示 → Component テスト（LocaleContext モック）に変換
+   - [ ] localStorage 読み書き → Unit テスト（jsdom）に変換
+   - [ ] HTTP 403/401 エラー検証 → Backend MockMvc 統合テストに変換
+   - [ ] 既存 E2E と実質同一フロー → 削除または既存テストで代替
+
+   **E2E テスト数の確認**:
+   - [ ] 追加後の E2E テスト数が 30件以下であることを確認した
+         ```bash
+         grep -rE "^(test|it)\(" frontend/tests/e2e/*.spec.ts 2>/dev/null | wc -l
+         ```
+
+4.5. **ローカルテスト**（テスト実行後は必ずルートに戻る）
+
+   **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
+
+   **Backend テスト実行と完了条件**:
+
+   ```bash
+   # 単体テスト + アーキテクチャテスト
+   cd backend && ./mvnw test && cd ..
+
+   # 統合テスト（必須: integration-test ゴールは禁止）
+   cd backend && ./mvnw verify && cd ..
+   ```
+
+   **Backend 完了条件チェックリスト**:
+   - [ ] 新規クラスに対応するテストクラスが存在する
+   - [ ] テスト構造が AAA パターンに従っている
+   - [ ] `./mvnw test` が成功している
+   - [ ] `./mvnw verify` が成功している（ArchitectureTest 含む）
+   - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §2 参照）
+   - [ ] `import` が Clean Architecture 依存ルールに違反していない
+
+   **Frontend テスト実行と完了条件**:
+
+   ```bash
+   # 単体テスト + コンポーネントテスト
+   cd frontend && pnpm test && cd ..
+
+   # 型チェック（Storybook 作成時は必須）
+   cd frontend && pnpm type-check && cd ..
+
+   # E2E テスト（E2E テストを修正した場合）
+   cd frontend && pnpm test:e2e && cd ..
+   ```
+
+   **Frontend 完了条件チェックリスト**:
+   - [ ] named export になっている
+   - [ ] Context 型に `| undefined` が含まれている（Context 実装時）
+   - [ ] 新規コンポーネントに Storybook が作成されている
+   - [ ] `pnpm type-check` が成功している
+   - [ ] `pnpm test` が成功している
+   - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §4 参照）
+
+   **統合テスト失敗時のトラブルシューティング**:
+
+   | 症状 | 原因の可能性 | 確認方法 | 解決策 |
+   |------|-------------|---------|--------|
+   | ログイン認証が失敗 | 古いパスワードハッシュが残っている | ログを確認: "Failed login attempt" | `ON CONFLICT DO UPDATE` を使用 |
+   | ランダムに認証失敗 | パスワードハッシュを使い回している | setUp() のコードを確認 | 各ユーザーで個別に `passwordEncoder.encode()` を呼び出す |
+   | 前回のテストデータが残る | トランザクションロールバックが無効 | `@Transactional` の有無を確認 | テストクラスに `@Transactional` を追加 |
+   | ポート競合エラー | `integration-test` ゴールを使用 | コマンド履歴を確認 | `./mvnw verify` を使用 |
+
+   詳細は `backend/docs/BEST_PRACTICES.md` §5（よくあるアンチパターン）を参照。
+
+5. **セルフレビューの実施と記録**
+   - 実装内容を確認
+   - 重要な指摘事項を抽出
+   - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/self-review-task[N].[M].md` に記録
+   - 必要に応じて修正を実施
+
+6. **Storybook の型チェック**（Frontend のみ、Storybook ストーリーを作成した場合）
+
+   Storybook ストーリーを作成した場合、コミット前に必ず型チェックを実行：
+
+   ```bash
+   cd frontend && pnpm type-check && cd ..
+   ```
+
+   - Storybook の Story 型（`args`, `render` など）は TypeScript で厳密にチェックされる
+   - 型エラーがある場合は pre-commit hook で失敗するため、事前確認が重要
+   - 型エラーを早期発見することで、手戻りを防ぐ
+
+   **よくある型エラー**（`frontend/docs/BEST_PRACTICES.md` §5 参照）:
+   - `args` プロパティが必要なのに `render` だけを指定している
+   - Context の型が `| undefined` を含んでいない
+   - Story の `render` 関数の引数型が合っていない
+
+7. **tasklist.md の更新**（必須）
+
+   完了したタスクの完了条件チェックボックスを Edit ツールで `[ ]` → `[x]` に変更する：
+
+   ```markdown
+   # 変更前
+   - [ ] named export パターンを使用している
+   - [ ] Props に explicit interface 定義がある
+
+   # 変更後
+   - [x] named export パターンを使用している
+   - [x] Props に explicit interface 定義がある
+   ```
+
+   **対象**: 当該タスク（Task N.M）の「完了条件」セクション内のチェックボックス全て
+
+   **注意**: このファイルは Step 9 のコミットに一緒に含める
+
+8. **タスク完了**
+
+   ```
+   TaskUpdate taskId=[id] status=completed
+   ```
+
+9. **コミット**
+
+   ```bash
+   git add [変更ファイル] .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
+   git commit -m "[type]: [タスクの説明] (#[issue番号])
+
+   [詳細な変更内容]
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   ```
+
+### Phase 3: Story の完了
+
+**全タスク完了後：**
+
+1. **tasklist.md の最終更新**（最初に実施）
+
+   全タスク完了後、tasklist.md を Edit ツールで最終更新する：
+
+   **1.1. Story の受け入れ基準チェックボックスを更新**（tasklist.md 上部の「受け入れ基準」セクション）
+
+   ```markdown
+   # 変更前
+   - [ ] `LanguageSwitcher` ボタンがログインページに表示される
+
+   # 変更後
+   - [x] `LanguageSwitcher` ボタンがログインページに表示される
+   ```
+
+   **1.2. 進捗セクションを更新**（tasklist.md 末尾の「進捗」セクション）
+
+   ```markdown
+   ## 進捗
+
+   - 開始日時: YYYY-MM-DD
+   - 完了日時: YYYY-MM-DD
+   - 実績時間: 約Xh
+   - メモ: [実装中の気づき・工夫・課題など]
+   ```
+
+   **1.3. コミット**
+
+   ```bash
+   git add .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
+   git commit -m "docs: update tasklist.md progress for Story [N] (#[issue番号])
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   ```
+
+2. **tasklist.md の全チェックボックス確認**（overview.md 更新前に必須）
+
+   overview.md に ✅ を付ける前に、tasklist.md の全チェックボックスが `[x]` になっていることを確認する：
+
+   ```bash
+   grep "^- \[ \]" .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
+   ```
+
+   - 出力が空（未チェックが0件）であることを確認する
+   - 未チェックが残っている場合は、該当タスクの完了条件を満たしてから `[x]` に更新してコミットする
+   - **この確認なしに overview.md を更新しない**
+
+3. **overview.md の更新**
+   - `.epic/[日付]-[issue番号]-[epic名]/overview.md` の該当 Story に ✅ マーク
+
+2. **Story 全体のテスト実行**（必須）
+
+   Story の全タスク完了後、push 前に必ずテストを実行する：
+
+   **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
+
+   ```bash
+   # Backend の場合
+   cd backend && ./mvnw test && cd ..
+
+   # Frontend の場合
+   cd frontend && pnpm test && cd ..
+
+   # E2E テストを修正した場合
+   cd frontend && pnpm test:e2e && cd ..
+   ```
+
+   - テスト実行後、次の git コマンドのために必ずルートディレクトリに戻る
+   - `pwd` で現在位置を確認してから次の操作に進む
+
+   **重要**: テストコードを修正した場合、必ず以下を実行：
+   - [ ] 修正したテストを実行して成功することを確認
+   - [ ] 全テストを実行してリグレッションがないことを確認
+   - [ ] テスト結果を tasklist.md に記録
+   - [ ] **テスト実行後、プロジェクトルートに戻ったことを確認**（`pwd`）
+
+   **テスト未実行での push は禁止**:
+   - テストを実行せずに push すると CI で失敗し、手戻りが発生する
+
+3. **CI チェックのローカル実行**（推奨）
+
+   push 前に CI チェックをローカルで実行することを推奨：
+
+   ```bash
+   ./scripts/ci-check-local.sh
+   ```
+
+   - 時間がかかる場合はスキップ可能だが、CI 失敗のリスクがある
+
+4. **最終確認**（Story 完了チェックリスト）
+
+   **必須項目**:
+   - [ ] **作業ディレクトリがプロジェクトルートであることを確認**（`pwd`）
+   - [ ] 全タスクが完了している（TaskList で確認）
+   - [ ] 全テストが通過している
+     - [ ] 単体テスト成功（`./mvnw test` または `pnpm test`）
+     - [ ] 統合テスト成功（該当する場合）
+     - [ ] E2Eテスト成功（該当する場合）
+   - [ ] `./mvnw verify` または `pnpm build` が成功している
+   - [ ] セルフレビューが全て記録されている
+   - [ ] tasklist.md の受け入れ基準チェックボックスが全て `[x]` になっている
+   - [ ] tasklist.md の完了条件チェックボックスが全て `[x]` になっている
+   - [ ] tasklist.md の進捗セクション（完了日時・実績時間・メモ）が更新されている
+   - [ ] tasklist.md の変更がコミットされている
+   - [ ] tasklist.md に未チェック（`[ ]`）の項目が残っていないことを確認した（`grep "^- \[ \]" tasklist.md` が空）
+   - [ ] overview.md に ✅ マークを追加している
+   - [ ] **既存のテストが全て通過することを確認**（影響を受けるテストを修正した場合）
+
+   **推奨項目**:
+   - [ ] CI チェックをローカルで実行（`./scripts/ci-check-local.sh`）
+   - [ ] コミットメッセージが適切（Co-Authored-By 含む）
+   - [ ] 変更ファイルが適切にステージングされている
+
+5. **コードレビュー（Task サブエージェント経由）**
+
+   push 前に Task ツールを使ってサブエージェントでコードレビューを実施する。
+   Skill ツールを直接呼び出さないこと（メインコンテキストにレビュー処理が蓄積するため）。
+
+   事前に変更ファイルリストを取得する:
+   ```bash
+   git diff --name-only [BASE_BRANCH]...[STORY_BRANCH]
+   ```
+
+   Task ツールを呼び出す際は以下のプロンプトを使用する（各プレースホルダーを実際の値に置換すること）:
+
+   - subagent_type: `"general-purpose"`
+   - prompt:
+
+   ```
+   あなたは Story 実装レビュアーです。以下の実装変更をレビューし、品質評価レポートを出力してください。
+
+   ## レビュー対象ファイル（以下を Read で読み込んでレビューする）
+
+   [変更ファイルリストをここに貼り付け。frontend/src/lib/api/generated/ 配下は除く]
+
+   ## 実行手順
+
+   1. 上記ファイルを Read で読み込む
+   2. 以下を Read で読み込む:
+      - backend/docs/BEST_PRACTICES.md
+      - frontend/docs/BEST_PRACTICES.md
+   3. .claude/skills/review-implementation/SKILL.md を読み込み、
+      「story レビュー観点」に従って評価する:
+      - Clean Architecture 依存ルール違反
+      - テストクラスの存在と品質（AAA パターン・命名規則）
+      - Frontend named export / Context 型 / Storybook
+      - テスト網羅性
+      - セキュリティ（Backend のみ）
+   4. 「出力形式」セクションの形式（✅ 🔴 🟡 🔵 🎯）でレポートを出力する
+   ```
+
+   **レビュー結果に基づく対応**:
+   - 🔴 必須修正: 修正してから push する
+   - 🟡 推奨修正: push 前に修正するか、後続 Story での対応を検討する
+   - 🔵 提案のみ: push して問題なし
+
+6. **ブランチのプッシュ**
+
+   ```bash
+   git push origin feature/issue-[N]-[epic-name]-story[X]
+   ```
+
+7. **PR 作成**（必須: テンプレート使用）
+
+   **CRITICAL**: 必ず `--template` オプションを使用すること。テンプレートを使わないと Implementation Check が失敗します。
+
+   ```bash
+   gh pr create --base feature/issue-[N]-[epic-name] \
+                --head feature/issue-[N]-[epic-name]-story[X] \
+                --template .github/PULL_REQUEST_TEMPLATE/story.md
+   ```
+
+   **テンプレート (`story.md`) で埋めるべき項目**:
+   - Story: #[Issue番号]
+   - Story 概要: Story [X]: [Story名]
+   - 変更内容（実装した内容を箇条書き）
+   - このPRで検証した受け入れ条件（tasklist.md のタスクリストをコピー）
+   - テスト（単体テスト、統合テスト、ローカルで動作確認のチェックボックス）
+   - 備考（補足事項があれば）
+
+   **重要な注意事項**:
+   - `--template` オプションは**必須**（Implementation Check のため）
+   - `--body` や `--body-file` は使用しない
+   - テンプレートは GitHub が自動的に表示するので、PR 作成後にブラウザで編集する
+   - CI チェックが通るまで待ってからレビュー依頼する
+
+   **Story: #[Issue番号] フォーマットの注意**:
+
+   以下は**正解**:
+
+   ```
+   Story: #133
+   Closes #133
+   Fixes #133
+   Resolves #133
+   ```
+
+   以下は**不正解**（Implementation Check が失敗する）:
+
+   ```
+   関連 Issue: #133  ❌
+   Issue #133        ❌
+   Ref: #133         ❌
+   ```
+
+   PR body を修正しても既存 CI は再トリガーされない。修正後は空コミットで再実行:
+
+   ```bash
+   git commit --allow-empty -m "chore: trigger CI" && git push
+   ```
+
+8. **PR URL の確認**
+   - PR が正しく作成されたことを確認
+   - URL をユーザーに報告
+
+9. **Story の振り返り**（推奨）
+
+   Story 実装完了後、学びや改善点を記録：
+
+   ```bash
+   /retrospective Story[X]: [Story名]
+   ```
+
+   **記録内容**:
+   - ✅ うまくいったこと
+   - 📚 学んだこと
+   - ⚠️ 改善点・課題
+   - 🤖 自動化・スキル提案（CLAUDE.md、スクリプト、新規スキル）
+   - 📋 次のアクション
+
+   **保存場所**: `.retrospectives/[epic-dir]/story[N]-[name]-[timestamp].md`
+   - Epic #88 の Story1 の場合: `.retrospectives/20260203-issue-88-auth/story1-user-registration-20260208-150000.md`
+
+   **スキップ条件**:
+   - 非常にシンプルな Story（1タスク、30分未満）
+   - 時間的制約がある場合
+
+   **重要**: 自動化・スキル提案は必ず記録。繰り返し作業が発生した場合は、スクリプト化やスキル化を検討する。
+
+---
+
+## Minor/Micro 自律実装フロー
+
+**このセクションは `tier:minor` または `tier:micro` の Epic でのみ使用する。**
+
+Story PR を作成せず、単一 feature ブランチで全 Story を実装して Epic PR を作成する。
+
+### Step 1: 前提確認
+
+```bash
+# ベストプラクティスの読み込み（通常フローの Step 0 と同様）
+Read backend/docs/BEST_PRACTICES.md
+Read frontend/docs/BEST_PRACTICES.md
+
+# 仕様ドキュメントの読み込み（通常フローの Step 0 と同様）
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
+
+# overview.md で Story 構成を確認
+Read .epic/[日付]-[issue番号]-[epic名]/overview.md
+
+# 現在のブランチ確認
+git branch --show-current
+git status
+```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない場合はスキップして次へ進む。
+
+### Step 2: feature ブランチの作成
+
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/issue-[N]-[name]
+```
+
+**ブランチが既に存在する場合**:
+
+```bash
+git checkout feature/issue-[N]-[name]
+git pull origin feature/issue-[N]-[name]
+```
+
+### Step 3: 全 Story の順次実装
+
+overview.md の Story 順に、各 Story を同一ブランチで実装する。
+
+**各 Story の実装ループ**（Story PR は作成しない）:
+
+1. `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
+2. tasklist.md の開始日時を記録
+3. TaskCreate で各タスクを登録
+4. 通常フロー Phase 2（タスクの実装）に従い各タスクを実装
+   - Step 2-Pre（実装タイプ別事前確認）
+   - 実装
+   - Step 4（テスト種別検証）
+   - Step 4.5（ローカルテスト）
+   - コミット（`git commit -m "[type]: [説明] (#[issue番号])"`）
+5. tasklist.md の受け入れ基準・完了条件を `[x]` に更新・コミット
+6. overview.md の Story に ✅ を付ける
+7. 次の Story へ
+
+### Step 4: CI チェック
+
+全 Story 完了後に CI チェックを実行:
+
+```bash
+./scripts/ci-check-local.sh
+```
+
+失敗した場合は修正してから次に進む。
+
+### Step 5: Epic PR の作成
+
+```bash
+git push origin feature/issue-[N]-[name]
+
+gh pr create \
+  --base master \
+  --head feature/issue-[N]-[name] \
+  --template .github/PULL_REQUEST_TEMPLATE/epic.md
+```
+
+**PR description に含める内容**:
+- Epic の目的と完了した Story 一覧
+- ティア（Minor/Micro）と実装方式の説明
+- 変更ファイル一覧
+- CI 通過状況
+
+### Step 6: 結果の報告
+
+ユーザーに以下を報告:
+
+```
+✅ [Epic名]（Epic #N）の自律実装が完了しました
+
+ティア: [Minor / Micro]
+実装した Story: [N] 件
+変更ファイル: [N] 件
+
+Epic PR: #[PR番号]
+URL: [PR URL]
+
+次のステップ: PR レビュー後にマージしてください。
+```
+
+### 注意事項
+
+- **Story PR は作成しない**: Minor/Micro の自律実装では Story ブランチも Story PR も作成しない
+- **コミットは細かく**: Story ごと・タスクごとにコミットして、変更履歴を明確にする
+- **テストは各タスク後に実行**: まとめてテストしない
+- **エラーは自己修正**: テスト失敗は自律的に修正する（ユーザー確認なしで）
+- **Epic PR 作成後は待機**: ユーザーのレビューを待つ
+
+---
+
+## エラー対応
+
+### テスト失敗時
+
+1. エラーログを確認
+2. 原因を特定して修正（`backend/docs/BEST_PRACTICES.md` §5 のアンチパターンも確認）
+3. 再度テスト実行
+4. 失敗が続く場合は AskUserQuestion で相談
+
+### CI チェック失敗時
+
+1. `./scripts/ci-check-local.sh --yes` を実行
+2. 失敗箇所を特定して修正
+3. 再度コミット・プッシュ
+
+### コンフリクト発生時
+
+1. ベースブランチの最新を取得
+2. リベースまたはマージで解決
+3. テストを再実行
+
+## チェックリスト
+
+各 Story 完了時に以下を確認：
+
+- [ ] 全タスクのコミットが完了
+- [ ] セルフレビューが全て記録済み
+- [ ] tasklist.md の全チェックボックスが `[x]` になっている（受け入れ基準・完了条件）
+- [ ] tasklist.md の進捗セクションが更新されている（完了日時・実績時間・メモ）
+- [ ] overview.md が更新済み
+- [ ] 全テストが通過
+- [ ] Task サブエージェント（`review-implementation story` 相当）でコードレビュー実施済み
+- [ ] PR がテンプレートで作成済み
+
+## 参考資料
+
+- [backend/docs/BEST_PRACTICES.md](../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
+- [frontend/docs/BEST_PRACTICES.md](../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
+- [backend/docs/TEST_STRATEGY.md](../../backend/docs/TEST_STRATEGY.md) - バックエンドテスト戦略
+- [frontend/docs/TEST_STRATEGY.md](../../frontend/docs/TEST_STRATEGY.md) - フロントエンドテスト戦略
