@@ -232,6 +232,11 @@ describe('LoginPage', () => {
       await user.click(loginButton);
 
       expect(screen.getByRole('button', { name: 'ログイン中...' })).toBeDisabled();
+
+      // Wait for the pending submit to settle so its state update doesn't run after teardown
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith('/');
+      });
     });
 
     it('送信中は入力フィールドが無効化される', async () => {
@@ -250,6 +255,11 @@ describe('LoginPage', () => {
 
       expect(usernameInput).toBeDisabled();
       expect(passwordInput).toBeDisabled();
+
+      // Wait for the pending submit to settle so its state update doesn't run after teardown
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith('/');
+      });
     });
   });
 });
