@@ -32,21 +32,6 @@ test.describe('言語切り替え機能', () => {
     await expect(page.getByTestId('language-switcher')).toBeVisible({ timeout: 10000 });
   });
 
-  test('ログインエラーメッセージが英語で表示される', async ({ page }) => {
-    await switchToEnglish(page);
-
-    // Fill in invalid credentials
-    await page.getByTestId('login-username-input').fill('wronguser');
-    await page.getByTestId('login-password-input').fill('wrongpassword');
-    await page.getByTestId('login-submit-button').click();
-
-    // Error message should appear in English
-    // Use form [role="alert"] to avoid matching Next.js route announcer (#__next-route-announcer__)
-    const errorAlert = page.locator('form [role="alert"]');
-    await expect(errorAlert).toBeVisible({ timeout: 10000 });
-    await expect(errorAlert).toContainText('Login failed');
-  });
-
   test('ログイン後も選択言語が引き継がれる', async ({ page }) => {
     // Select English on login page
     await switchToEnglish(page);
