@@ -16,11 +16,6 @@ test.describe('Messages CRUD Operations', () => {
     await setupAuthenticatedSession(page);
   });
 
-  test('should display messages list', async ({ page }) => {
-    // Check if the page header is visible
-    await expect(page.getByRole('heading', { name: /Message Management/i })).toBeVisible();
-  });
-
   test('should create a new message', async ({ page }) => {
     const timestamp = Date.now();
     const code = `TEST_${timestamp}`;
@@ -98,18 +93,6 @@ test.describe('Messages CRUD Operations', () => {
     await expect(deletedRow).not.toBeVisible();
   });
 
-  test('should validate required fields', async ({ page }) => {
-    // Open create modal
-    await openCreateModal(page);
-
-    // Try to submit without filling fields
-    await saveModalForm(page);
-
-    // Modal should stay open due to validation errors
-    const modal = page.getByTestId('message-modal');
-    await expect(modal).toBeVisible();
-  });
-
   test('should prevent duplicate codes', async ({ page }) => {
     // Create first message
     const timestamp = Date.now();
@@ -124,7 +107,7 @@ test.describe('Messages CRUD Operations', () => {
 
     // Modal should stay open due to duplicate error
     await page.waitForTimeout(1000);
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
   });
 });

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from './page';
 import * as useAuthModule from '@/hooks/useAuth';
+import { createLocaleWrapper } from '../../../tests/unit/helpers/localeTestHelper';
 import type { ReactNode } from 'react';
 
 // Mock useRouter
@@ -17,7 +18,7 @@ vi.mock('next/navigation', () => ({
 // Mock useAuth
 vi.mock('@/hooks/useAuth');
 
-const createWrapper = () => {
+const createWrapper = (locale: 'ja' | 'en' = 'ja') => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -25,10 +26,14 @@ const createWrapper = () => {
     },
   });
 
+  const LocaleWrapper = createLocaleWrapper(locale);
+
   const Wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <LocaleWrapper>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </LocaleWrapper>
   );
-  Wrapper.displayName = 'TestWrapper';
+  Wrapper.displayName = `TestWrapper(${locale})`;
 
   return Wrapper;
 };
@@ -146,6 +151,36 @@ describe('LoginPage', () => {
         expect(
           screen.getByText('ログインに失敗しました。ユーザー名またはパスワードが正しくありません。')
         ).toBeInTheDocument();
+      });
+    });
+
+    it('英語設定時にログイン失敗エラーメッセージが英語で表示される', async () => {
+      const user = userEvent.setup();
+      mockLogin.mockRejectedValue(new Error('Unauthorized'));
+
+      render(<LoginPage />, { wrapper: createWrapper('en') });
+
+      await user.type(screen.getByTestId('login-username-input'), 'admin');
+      await user.type(screen.getByTestId('login-password-input'), 'wrongpassword');
+      await user.click(screen.getByTestId('login-submit-button'));
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('Login failed');
+      });
+    });
+
+    it('日本語設定時にログイン失敗エラーメッセージが日本語で表示される', async () => {
+      const user = userEvent.setup();
+      mockLogin.mockRejectedValue(new Error('Unauthorized'));
+
+      render(<LoginPage />, { wrapper: createWrapper() });
+
+      await user.type(screen.getByTestId('login-username-input'), 'admin');
+      await user.type(screen.getByTestId('login-password-input'), 'wrongpassword');
+      await user.click(screen.getByTestId('login-submit-button'));
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('ログインに失敗しました');
       });
     });
 
