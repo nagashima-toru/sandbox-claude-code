@@ -160,7 +160,38 @@ cat specs/openapi/openapi.yaml
 gh issue comment [Issue番号] --body "[上記のMarkdown]"
 ```
 
-### 4. spec-approved ラベルを付与
+### 4. ティアラベルの付与
+
+Spec PR で Claude が提案し、レビューで承認されたティアをラベルとして付与する。
+
+**AskUserQuestion でティアを確認**:
+
+```
+Spec PR で確定したティアを教えてください。
+
+- Major: API/DB スキーマ変更・新ドメイン・外部連携変更
+- Minor: 既存機能変更・機能追加（API 変更なし）
+- Micro: docs・tests・configs・スキルのみ変更
+```
+
+**ラベル付与**:
+
+```bash
+# ティアに応じていずれか1つを実行
+gh issue edit [Issue番号] --add-label "tier:major"
+gh issue edit [Issue番号] --add-label "tier:minor"
+gh issue edit [Issue番号] --add-label "tier:micro"
+```
+
+**ラベルが存在しない場合は事前に作成**:
+
+```bash
+gh label create "tier:major" --color "d73a4a" --description "Major: API/DB schema changes"
+gh label create "tier:minor" --color "0075ca" --description "Minor: feature changes without API changes"
+gh label create "tier:micro" --color "cfd3d7" --description "Micro: docs/tests/configs only"
+```
+
+### 5. spec-approved ラベルを付与
 
 ```bash
 gh issue edit [Issue番号] --add-label "spec-approved"
@@ -172,9 +203,9 @@ gh issue edit [Issue番号] --add-label "spec-approved"
 gh issue view [Issue番号] --json labels
 ```
 
-### 5. 結果の表示
+### 7. 結果の表示
 
-Issue更新結果とNext Stepsをユーザーに表示：
+Issue更新結果（ティア情報を含む）とNext Stepsをユーザーに表示：
 
 ```
 ✅ Issue #88 を更新しました

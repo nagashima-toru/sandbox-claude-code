@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import MessageForm from '@/components/messages/MessageForm';
+import { MessageForm } from '@/components/messages/MessageForm';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { createLocaleWrapper } from '../../unit/helpers/localeTestHelper';
 

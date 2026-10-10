@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import DeleteConfirmDialog from './DeleteConfirmDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { MessageResponse } from '@/lib/api/generated/models';
 import { useState } from 'react';
 

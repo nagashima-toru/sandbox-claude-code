@@ -91,8 +91,9 @@ gh issue view [Issue番号] --json title,labels,state,body
 
 - Issue に `spec-approved` ラベルがあるか
 - Issue がオープン状態か
+- **ティアラベル** (`tier:major` / `tier:minor` / `tier:micro`) があるか
 
-**エラー時**: 上記条件を満たさない場合はエラーメッセージを表示：
+**エラー時**: `spec-approved` がない場合：
 
 ```
 ❌ Issue #88 に spec-approved ラベルが付与されていません
@@ -100,6 +101,19 @@ gh issue view [Issue番号] --json title,labels,state,body
 仕様PRをマージした後、以下のコマンドでラベルを付与してください：
 /update-spec-approved 88 [PR番号]
 ```
+
+**ティアラベルがない場合**:
+
+```
+⚠️ Issue #88 にティアラベル（tier:major / tier:minor / tier:micro）がありません
+
+/update-spec-approved 実行時にティアラベルが付与されます。
+ラベルなしで続行しますか？（Major として扱います）
+```
+
+→ AskUserQuestion で確認。ユーザーが続行を選択した場合は Major として扱い、overview.md にその旨を記録する。
+
+**ティアの確定**: ラベルから読み取ったティアを以降の処理で使用する。
 
 ### 2. 仕様情報の収集
 
@@ -579,6 +593,19 @@ mkdir -p .epic/[YYYYMMDD]-[issue-N]-[title]/story[N]-[name]/
 
 ---
 
+## テスト計画
+
+| 変更内容 | テスト種別 | 理由 |
+|---------|----------|------|
+| [変更内容1] | Unit / Component / Integration / E2E | [なぜその種別か] |
+| [変更内容2] | Unit / Component / Integration / E2E | [なぜその種別か] |
+
+<!-- E2E 追加がある場合: 正当化理由・追加後の E2E テスト数（上限30件）を記載 -->
+<!-- E2E 追加理由: [Q1〜Q4 の回答] -->
+<!-- 追加後の E2E テスト数: [N]件 / 上限 30件 -->
+
+---
+
 ## タスクリスト
 
 ### Task [N].1: [タスク名]
@@ -634,7 +661,11 @@ N.2  カスタム Hook + 単体テスト（QueryClientProvider ラップ）
 N.3  Context（必要時）+ 単体テスト（| undefined 型パターン確認）
 N.4  コンポーネント + Storybook + pnpm type-check
 N.5  コンポーネントテスト（MSW モック）
-N.6  E2E テスト（クリティカルフローのみ）
+N.6  テスト種別判定 + 実装
+     - E2E 判定フロー（Q1〜Q4）を実行し、必要な場合のみ E2E テストを追加
+     - 禁止パターン（フォームバリデーション・権限ボタン・レスポンシブ・i18n）は
+       Unit/Component テストに変換する
+     - 追加後の E2E テスト数が上限 30件以内であることを確認する
 ```
 
 **Frontend UIテキスト変更パターン（ラベル・見出し・ボタン等の表示テキストを変更する Story）**:
@@ -667,6 +698,9 @@ N.4  既存 e2e テストの文字列セレクター確認・更新  ← 必須
 Issue: #[N]
 
 ## Epic 概要
+
+**ティア**: [Major / Minor / Micro]（[判定根拠の一言サマリー]）
+**実装方式**: [Major: Story PR × N → Epic PR / Minor/Micro: 単一 feature ブランチ → Epic PR のみ]
 
 **目的**: [Epicの目的]
 
