@@ -3,9 +3,9 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/common/PageHeader';
-import MessageTable from '@/components/messages/MessageTable';
-import MessageModal from '@/components/messages/MessageModal';
-import DeleteConfirmDialog from '@/components/messages/DeleteConfirmDialog';
+import { MessageTable } from '@/components/messages/MessageTable';
+import { MessageModal } from '@/components/messages/MessageModal';
+import { DeleteConfirmDialog } from '@/components/messages/DeleteConfirmDialog';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { RoleBasedComponent } from '@/components/common/RoleBasedComponent';
 import { Button } from '@/components/ui/button';

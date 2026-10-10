@@ -61,14 +61,39 @@ disable-model-invocation: true
 
 ## 実行前の必須確認
 
-### 0. ベストプラクティスの読み込み（必須・最初に実行）
-
-実装を始める前に、品質基準を把握するために以下を読み込む：
+### 0-Pre. ティアの確認（最初に実行）
 
 ```bash
+gh issue view [Issue番号] --json labels
+```
+
+ラベルから Epic のティアを確認する:
+
+- `tier:major` → **Major フロー**（以下の通常フローに従う）
+- `tier:minor` または `tier:micro` → **「Minor/Micro 自律実装フロー」セクションに従う**
+- ティアラベルなし → AskUserQuestion でユーザーに確認（デフォルト: Major）
+
+**ティアが Minor/Micro の場合、以下の「通常フロー」は実行しない。**
+「Minor/Micro 自律実装フロー」セクションを参照すること。
+
+---
+
+### 0. ベストプラクティスと仕様の読み込み（必須・最初に実行）
+
+実装を始める前に、品質基準と仕様を把握するために以下を読み込む：
+
+```bash
+# ベストプラクティスの読み込み
 Read backend/docs/BEST_PRACTICES.md   # Clean Architecture規則・テスト戦略・実装パターン・アンチパターン
 Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパターン・テスト戦略・アンチパターン
+
+# 仕様ドキュメントの読み込み
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
 ```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない（古い Epic など）場合はスキップして実装を続行する。
 
 **読み込み目的**:
 
@@ -76,9 +101,11 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
 - レイヤー別テスト種別（Pure Unit / Mockito / Testcontainers / MockMvc）と対象を確認する
 - 実装パターン（UseCase / Repository / Mapper の標準構造）を把握する
 - よくあるアンチパターン（パスワードハッシュ使い回し・`integration-test` ゴール・Context の `| undefined` 未設定など）を頭に入れる
+- **受け入れ条件の全シナリオを把握し、実装が仕様に準拠していることを確認する**
+- **OpenAPI 仕様のエンドポイント・スキーマ・エラー形式を確認し、仕様乖離を防ぐ**
 
 **この手順をスキップしてはいけない**: 読み込みなしで実装すると、アンチパターンの踏み込みや
-テストクラスの種別誤りが起きやすく、後から修正が必要になる。
+テストクラスの種別誤りが起きやすく、仕様乖離によるレビュー時の手戻りが発生しやすくなる。
 
 ---
 
@@ -328,7 +355,26 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
       - 既存テストを変更するより、新規テストを追加する方が安全
       - 既存テストは残したまま、新しいテストケースを追加できないか検討
 
-4. **ローカルテスト**（テスト実行後は必ずルートに戻る）
+4. **テスト種別の検証**（必須チェックリスト）
+
+   実装したコードのテストを書く前に、以下を確認する:
+
+   **E2E 禁止パターンの確認**（該当する場合は Unit/Component/MockMvc に変換）:
+   - [ ] フォームバリデーション → Unit テスト（Zod スキーマ）に変換
+   - [ ] ボタンの表示/非表示（権限制御） → Unit テスト（usePermission renderHook）に変換
+   - [ ] レスポンシブレイアウト → Component テスト（matchMedia モック）に変換
+   - [ ] i18n テキスト表示 → Component テスト（LocaleContext モック）に変換
+   - [ ] localStorage 読み書き → Unit テスト（jsdom）に変換
+   - [ ] HTTP 403/401 エラー検証 → Backend MockMvc 統合テストに変換
+   - [ ] 既存 E2E と実質同一フロー → 削除または既存テストで代替
+
+   **E2E テスト数の確認**:
+   - [ ] 追加後の E2E テスト数が 30件以下であることを確認した
+         ```bash
+         grep -rE "^(test|it)\(" frontend/tests/e2e/*.spec.ts 2>/dev/null | wc -l
+         ```
+
+4.5. **ローカルテスト**（テスト実行後は必ずルートに戻る）
 
    **重要**: テスト実行後は必ず `cd ..` でプロジェクトルートに戻る
 
@@ -629,6 +675,31 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    - テンプレートは GitHub が自動的に表示するので、PR 作成後にブラウザで編集する
    - CI チェックが通るまで待ってからレビュー依頼する
 
+   **Story: #[Issue番号] フォーマットの注意**:
+
+   以下は**正解**:
+
+   ```
+   Story: #133
+   Closes #133
+   Fixes #133
+   Resolves #133
+   ```
+
+   以下は**不正解**（Implementation Check が失敗する）:
+
+   ```
+   関連 Issue: #133  ❌
+   Issue #133        ❌
+   Ref: #133         ❌
+   ```
+
+   PR body を修正しても既存 CI は再トリガーされない。修正後は空コミットで再実行:
+
+   ```bash
+   git commit --allow-empty -m "chore: trigger CI" && git push
+   ```
+
 8. **PR URL の確認**
    - PR が正しく作成されたことを確認
    - URL をユーザーに報告
@@ -656,6 +727,124 @@ Read frontend/docs/BEST_PRACTICES.md  # コンポーネント設計・Hookパタ
    - 時間的制約がある場合
 
    **重要**: 自動化・スキル提案は必ず記録。繰り返し作業が発生した場合は、スクリプト化やスキル化を検討する。
+
+---
+
+## Minor/Micro 自律実装フロー
+
+**このセクションは `tier:minor` または `tier:micro` の Epic でのみ使用する。**
+
+Story PR を作成せず、単一 feature ブランチで全 Story を実装して Epic PR を作成する。
+
+### Step 1: 前提確認
+
+```bash
+# ベストプラクティスの読み込み（通常フローの Step 0 と同様）
+Read backend/docs/BEST_PRACTICES.md
+Read frontend/docs/BEST_PRACTICES.md
+
+# 仕様ドキュメントの読み込み（通常フローの Step 0 と同様）
+ls specs/acceptance/   # Epic に対応するディレクトリを特定
+Read specs/acceptance/[機能名]/*.feature  # 受け入れ条件
+Read specs/openapi/openapi.yaml           # OpenAPI 仕様
+
+# overview.md で Story 構成を確認
+Read .epic/[日付]-[issue番号]-[epic名]/overview.md
+
+# 現在のブランチ確認
+git branch --show-current
+git status
+```
+
+**ファイルが存在しない場合**: 仕様ファイルが見つからない場合はスキップして次へ進む。
+
+### Step 2: feature ブランチの作成
+
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/issue-[N]-[name]
+```
+
+**ブランチが既に存在する場合**:
+
+```bash
+git checkout feature/issue-[N]-[name]
+git pull origin feature/issue-[N]-[name]
+```
+
+### Step 3: 全 Story の順次実装
+
+overview.md の Story 順に、各 Story を同一ブランチで実装する。
+
+**各 Story の実装ループ**（Story PR は作成しない）:
+
+1. `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
+2. tasklist.md の開始日時を記録
+3. TaskCreate で各タスクを登録
+4. 通常フロー Phase 2（タスクの実装）に従い各タスクを実装
+   - Step 2-Pre（実装タイプ別事前確認）
+   - 実装
+   - Step 4（テスト種別検証）
+   - Step 4.5（ローカルテスト）
+   - コミット（`git commit -m "[type]: [説明] (#[issue番号])"`）
+5. tasklist.md の受け入れ基準・完了条件を `[x]` に更新・コミット
+6. overview.md の Story に ✅ を付ける
+7. 次の Story へ
+
+### Step 4: CI チェック
+
+全 Story 完了後に CI チェックを実行:
+
+```bash
+./scripts/ci-check-local.sh
+```
+
+失敗した場合は修正してから次に進む。
+
+### Step 5: Epic PR の作成
+
+```bash
+git push origin feature/issue-[N]-[name]
+
+gh pr create \
+  --base master \
+  --head feature/issue-[N]-[name] \
+  --template .github/PULL_REQUEST_TEMPLATE/epic.md
+```
+
+**PR description に含める内容**:
+- Epic の目的と完了した Story 一覧
+- ティア（Minor/Micro）と実装方式の説明
+- 変更ファイル一覧
+- CI 通過状況
+
+### Step 6: 結果の報告
+
+ユーザーに以下を報告:
+
+```
+✅ [Epic名]（Epic #N）の自律実装が完了しました
+
+ティア: [Minor / Micro]
+実装した Story: [N] 件
+変更ファイル: [N] 件
+
+Epic PR: #[PR番号]
+URL: [PR URL]
+
+次のステップ: PR レビュー後にマージしてください。
+```
+
+### 注意事項
+
+- **Story PR は作成しない**: Minor/Micro の自律実装では Story ブランチも Story PR も作成しない
+- **コミットは細かく**: Story ごと・タスクごとにコミットして、変更履歴を明確にする
+- **テストは各タスク後に実行**: まとめてテストしない
+- **エラーは自己修正**: テスト失敗は自律的に修正する（ユーザー確認なしで）
+- **Epic PR 作成後は待機**: ユーザーのレビューを待つ
+
+---
 
 ## エラー対応
 
