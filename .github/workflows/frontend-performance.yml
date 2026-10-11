@@ -62,8 +62,8 @@ jobs:
             echo "### Build completed successfully" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
 
-            # Calculate total size of .next directory
-            TOTAL_SIZE=$(du -sh .next | cut -f1)
+            # Calculate total size of .next directory (excluding build cache)
+            TOTAL_SIZE=$(du -sh --exclude='.next/cache' .next | cut -f1)
             echo "**Total build size:** $TOTAL_SIZE" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
 
@@ -74,7 +74,7 @@ jobs:
             echo "| ---- | ---- |" >> $GITHUB_STEP_SUMMARY
 
             # Find top 10 largest files
-            find .next -type f -exec du -h {} + | sort -rh | head -10 | while read size path; do
+            find .next -path .next/cache -prune -o -type f -exec du -h {} + | sort -rh | head -10 | while read size path; do
               filename=$(basename "$path")
               echo "| \`$filename\` | $size |" >> $GITHUB_STEP_SUMMARY
             done
@@ -105,7 +105,7 @@ jobs:
             if (fs.existsSync(manifestPath)) {
               // Calculate total size
               const { execSync } = require('child_process');
-              const totalSize = execSync('du -sh frontend/.next', { encoding: 'utf-8' }).split('\t')[0];
+              const totalSize = execSync("du -sh --exclude='frontend/.next/cache' frontend/.next", { encoding: 'utf-8' }).split('\t')[0];
 
               comment += `**Total build size:** ${totalSize}\n\n`;
               comment += '### Bundle Analysis\n\n';
@@ -117,7 +117,7 @@ jobs:
 
               // List top 10 largest files
               const files = execSync(
-                'find frontend/.next -type f -exec du -h {} + | sort -rh | head -10',
+                'find frontend/.next -path frontend/.next/cache -prune -o -type f -exec du -h {} + | sort -rh | head -10',
                 { encoding: 'utf-8' }
               ).trim().split('\n');
 
@@ -172,7 +172,7 @@ jobs:
       - name: Check bundle size thresholds
         run: |
           # Calculate total size in MB
-          TOTAL_SIZE_MB=$(du -sm .next | cut -f1)
+          TOTAL_SIZE_MB=$(du -sm --exclude='.next/cache' .next | cut -f1)
           THRESHOLD_MB=50
 
           echo "Total build size: ${TOTAL_SIZE_MB}MB"
