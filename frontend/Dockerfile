@@ -1,5 +1,5 @@
 # Base stage with pnpm
-FROM node:20.18-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
 
 # Install git (required for prepare script in package.json)

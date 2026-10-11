@@ -10,7 +10,7 @@ Next.js-based message management application with full CRUD functionality.
 
 ### Prerequisites
 
-- Node.js 20+ (recommended: use volta or nvm)
+- Node.js 24+ (recommended: use volta or nvm)
 - pnpm (package manager)
 - Backend API running on port 8080
 

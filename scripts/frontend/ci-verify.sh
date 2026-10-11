@@ -113,14 +113,14 @@ print_header "1. Environment Validation"
 print_info "Checking Node.js version..."
 if command -v node &> /dev/null; then
   NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-  if [ "$NODE_VERSION" = "20" ]; then
-    print_success "Node.js 20 detected"
+  if [ "$NODE_VERSION" = "24" ]; then
+    print_success "Node.js 24 detected"
   else
-    print_warning "Node.js 20 recommended, but Node $NODE_VERSION detected"
-    print_info "CI uses Node 20. Consider using nvm to switch versions."
+    print_warning "Node.js 24 recommended, but Node $NODE_VERSION detected"
+    print_info "CI uses Node 24. Consider using nvm to switch versions."
   fi
 else
-  print_error "Node.js not found. Please install Node.js 20"
+  print_error "Node.js not found. Please install Node.js 24"
   exit 99
 fi
 

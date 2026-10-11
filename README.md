@@ -106,7 +106,7 @@ See [CLAUDE.md](CLAUDE.md#docker-deployment) for more details.
 
 ## Development
 
-This project is configured for IntelliJ IDEA with Java 25 and Node.js 20+.
+This project is configured for IntelliJ IDEA with Java 25 and Node.js 24+.
 
 ## Repository
 
