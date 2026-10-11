@@ -136,7 +136,7 @@
 
 **技術スタック**:
 
-- **Runtime**: Node.js 20+
+- **Runtime**: Node.js 24+
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 3
