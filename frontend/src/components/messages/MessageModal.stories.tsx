@@ -12,6 +12,21 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  // Default to ADMIN; stories can override with their own AuthContext.Provider
+  decorators: [
+    (Story) => (
+      <AuthContext.Provider
+        value={{
+          user: { username: 'admin', role: ROLES.ADMIN },
+          isLoading: false,
+          error: null,
+          refetch: () => {},
+        }}
+      >
+        <Story />
+      </AuthContext.Provider>
+    ),
+  ],
 } satisfies Meta<typeof MessageModal>;
 
 export default meta;

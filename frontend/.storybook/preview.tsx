@@ -1,9 +1,11 @@
 import type { Preview } from '@storybook/nextjs-vite';
 import { withThemeByClassName } from '@storybook/addon-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NextIntlClientProvider } from 'next-intl';
 import React from 'react';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { handlers } from '../src/mocks/handlers';
+import jaMessages from '../messages/ja.json';
 
 // Import Tailwind CSS
 import '../src/app/globals.css';
@@ -54,7 +56,10 @@ const preview: Preview = {
     }),
     (Story) => (
       <QueryClientProvider client={queryClient}>
-        <Story />
+        {/* Default locale matches src/i18n/request.ts; stories can override with their own provider */}
+        <NextIntlClientProvider locale="ja" messages={jaMessages}>
+          <Story />
+        </NextIntlClientProvider>
       </QueryClientProvider>
     ),
   ],
