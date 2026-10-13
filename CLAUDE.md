@@ -48,7 +48,10 @@ PR 作成前: `./scripts/ci-check-local.sh`
 
 ## Package Manager
 
-**pnpm は 9 系を使う**（`npm install -g pnpm@9`）。CI・Dockerfile が pnpm 9 のため、他のメジャーで `pnpm install` すると `pnpm-lock.yaml` が CI で通らない形式に書き換わる（#226）。`patches/` 等を追加したら `frontend/Dockerfile` の COPY 対象も確認する。
+- **pnpm のバージョンは `frontend/package.json` の `packageManager`（pnpm 9）に従う**。CI・Dockerfile もここを読む
+- pnpm 10 以降は `frontend/` 内で自動的にこのバージョンに切り替わる
+- 別のメジャーで `pnpm install` すると `pnpm-lock.yaml` が CI で通らない形式に書き換わる（#226）
+- `patches/` 等を追加したら `frontend/Dockerfile` の COPY 対象も確認する
 
 ## Epic Documents
 

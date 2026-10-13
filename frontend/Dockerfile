@@ -5,8 +5,9 @@ WORKDIR /app
 # Install git (required for prepare script in package.json)
 RUN apk add --no-cache git
 
-# Install pnpm (pinned to match CI; newer majors ignore the package.json "pnpm" field)
-RUN npm install -g pnpm@9
+# Install the pnpm version pinned by package.json "packageManager" (same as CI)
+COPY package.json ./
+RUN npm install -g "$(node -p "require('./package.json').packageManager")"
 
 # Dependencies stage
 FROM base AS deps

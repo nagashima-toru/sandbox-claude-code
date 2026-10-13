@@ -24,7 +24,7 @@ Next.js-based message management application with full CRUD functionality.
 - **Language**: TypeScript
 - **UI Library**: shadcn/ui
 - **Styling**: Tailwind CSS v4
-- **Package Manager**: pnpm 9（他のメジャーは lockfile を壊すため不可。ルート CLAUDE.md 参照）
+- **Package Manager**: pnpm（バージョンは `package.json` の `packageManager` で固定。ルート CLAUDE.md 参照）
 - **API Code Generation**: Orval (OpenAPI → TypeScript + React Query hooks)
 - **HTTP Client**: axios
 - **State Management**: TanStack Query (React Query)
