@@ -46,6 +46,10 @@ sandbox-claude-code/
 
 PR 作成前: `./scripts/ci-check-local.sh`
 
+## Package Manager
+
+**pnpm は 9 系を使う**（`npm install -g pnpm@9`）。CI・Dockerfile が pnpm 9 のため、他のメジャーで `pnpm install` すると `pnpm-lock.yaml` が CI で通らない形式に書き換わる（#226）。`patches/` 等を追加したら `frontend/Dockerfile` の COPY 対象も確認する。
+
 ## Epic Documents
 
 `.epic/[YYYYMMDD]-[issue-N]-[タイトル]/` に管理。詳細は各スキルを参照。
