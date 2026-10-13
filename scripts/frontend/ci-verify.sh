@@ -124,20 +124,22 @@ else
   exit 99
 fi
 
-# Check pnpm
+# Check pnpm (must match package.json "packageManager", which CI and Dockerfile use)
 print_info "Checking pnpm..."
+PNPM_EXPECTED=$(node -p "require('./package.json').packageManager.split('@')[1]")
 if command -v pnpm &> /dev/null; then
-  PNPM_MAJOR=$(pnpm --version | cut -d. -f1)
-  if [ "$PNPM_MAJOR" != "9" ]; then
-    # Other majors rewrite pnpm-lock.yaml in a format CI (pnpm 9) rejects (#226)
-    print_error "pnpm $(pnpm --version) detected. CI and Dockerfile use pnpm 9"
-    print_info "  npm install -g pnpm@9"
+  # pnpm 10+ switches to the packageManager version here (cwd is frontend/)
+  PNPM_ACTUAL=$(pnpm --version)
+  if [ "$PNPM_ACTUAL" != "$PNPM_EXPECTED" ]; then
+    # Other versions can rewrite pnpm-lock.yaml in a format CI rejects (#226)
+    print_error "pnpm $PNPM_ACTUAL detected, but package.json requires $PNPM_EXPECTED"
+    print_info "  corepack enable  (or: npm install -g pnpm@$PNPM_EXPECTED)"
     exit 99
   fi
-  print_success "pnpm $(pnpm --version) is installed"
+  print_success "pnpm $PNPM_ACTUAL is installed"
 else
-  print_error "pnpm not found. Please install pnpm 9"
-  print_info "  npm install -g pnpm@9"
+  print_error "pnpm not found. Please install pnpm $PNPM_EXPECTED"
+  print_info "  corepack enable  (or: npm install -g pnpm@$PNPM_EXPECTED)"
   exit 99
 fi
 
