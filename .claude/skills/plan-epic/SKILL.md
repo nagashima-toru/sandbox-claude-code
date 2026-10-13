@@ -920,9 +920,9 @@ Issue #88 のコメントに仕様ファイルのパスが記載されている�
 
 ## 参考資料
 
-- [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
-- [backend/docs/BEST_PRACTICES.md](../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
-- [frontend/docs/BEST_PRACTICES.md](../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
+- [CLAUDE.md](../../../CLAUDE.md) - 開発プロセス全体
+- [backend/docs/BEST_PRACTICES.md](../../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
+- [frontend/docs/BEST_PRACTICES.md](../../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
 - 既存Epic例: `.epic/20260203-88-auth/` - 参考実装
 
 ---

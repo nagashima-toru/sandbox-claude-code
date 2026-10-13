@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:md": "cd .. && markdownlint-cli2 '**/*.md' '#node_modules' '#frontend/node_modules'",
+    "lint:md": "cd .. && markdownlint-cli2 '**/*.md' '#node_modules' '#frontend/node_modules' && python3 scripts/check-doc-links.py",
     "lint:md:fix": "cd .. && markdownlint-cli2 --fix '**/*.md' '#node_modules' '#frontend/node_modules'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
