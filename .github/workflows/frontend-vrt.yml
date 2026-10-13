@@ -46,6 +46,11 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
 
+      # Container runs as a different user than the checkout owner; the
+      # 'prepare' script runs git, which refuses the repo without this
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -66,7 +71,6 @@ jobs:
       - name: Commit baselines
         if: ${{ inputs.update }}
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add tests/vrt/__screenshots__
