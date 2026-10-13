@@ -413,6 +413,7 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
    - [ ] named export になっている
    - [ ] Context 型に `| undefined` が含まれている（Context 実装時）
    - [ ] 新規コンポーネントに Storybook が作成されている
+   - [ ] 画面を実装した場合、`specs/ui/` の承認済み画面 Story（`tags: ['screen']`）に本実装を接続し、`Frontend VRT` が green（差分 0）。ベースラインは更新しない（デザイン変更は Spec PR 経由、ADR-0002）
    - [ ] `pnpm type-check` が成功している
    - [ ] `pnpm test` が成功している
    - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §4 参照）
