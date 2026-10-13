@@ -466,7 +466,7 @@ services:
 - [C4 Context 図](./c4-context.md) - システム全体像
 - [アーキテクチャ概要](./README.md) - 原則とスタック
 - [Test Strategy](../../backend/docs/TEST_STRATEGY.md) - テスト戦略
-- [Docker Deployment](../DOCKER_DEPLOYMENT.md) - デプロイ詳細
+- [Docker 環境（`/run-docker` スキル）](../../.claude/skills/run-docker/SKILL.md) - デプロイ詳細
 
 ---
 

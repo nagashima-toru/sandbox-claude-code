@@ -127,7 +127,14 @@ fi
 # Check pnpm
 print_info "Checking pnpm..."
 if command -v pnpm &> /dev/null; then
-  print_success "pnpm is installed"
+  PNPM_MAJOR=$(pnpm --version | cut -d. -f1)
+  if [ "$PNPM_MAJOR" != "9" ]; then
+    # Other majors rewrite pnpm-lock.yaml in a format CI (pnpm 9) rejects (#226)
+    print_error "pnpm $(pnpm --version) detected. CI and Dockerfile use pnpm 9"
+    print_info "  npm install -g pnpm@9"
+    exit 99
+  fi
+  print_success "pnpm $(pnpm --version) is installed"
 else
   print_error "pnpm not found. Please install pnpm 9"
   print_info "  npm install -g pnpm@9"

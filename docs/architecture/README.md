@@ -231,9 +231,9 @@ sandbox-claude-code/
 
 ### プロジェクトドキュメント
 
-- [Docker Deployment](../environment/DOCKER_DEPLOYMENT.md)
-- [Git Worktree](../environment/GIT_WORKTREE.md)
-- [Local CI Verification](../quality/LOCAL_CI_VERIFICATION.md)
+- [Docker 環境（`/run-docker` スキル）](../../.claude/skills/run-docker/SKILL.md)
+- [Git Worktree（`/setup-worktree` スキル）](../../.claude/skills/setup-worktree/SKILL.md)
+- ローカル CI 検証: `./scripts/ci-check-local.sh --help`
 - [Test Strategy](../../backend/docs/TEST_STRATEGY.md)
 
 ## メンテナンス
