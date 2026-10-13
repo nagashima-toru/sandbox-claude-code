@@ -27,6 +27,10 @@ jobs:
     container: mcr.microsoft.com/playwright:v1.64.0-noble
     permissions:
       contents: write
+    env:
+      # Recommended by Playwright for container jobs. The default /github/home
+      # is rejected by SWC as a native binding cache root (ERR_SWC_NATIVE_CACHE)
+      HOME: /root
     defaults:
       run:
         working-directory: frontend
