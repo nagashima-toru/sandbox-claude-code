@@ -255,7 +255,7 @@ User → [Web Browser]
 
 - [C4 Container 図](./c4-container.md) - コンテナレベルの詳細
 - [アーキテクチャ概要](./README.md) - 全体像
-- [API 設計ガイドライン](../api/README.md) - API 設計原則
+- [API 設計ガイドライン](api/README.md) - API 設計原則
 
 ---
 

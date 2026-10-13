@@ -285,8 +285,8 @@ OpenAPI 以外の API 定義言語を使用。
 
 ### 関連ドキュメント
 
-- [API 設計ガイドライン](../api/README.md)
-- [エラーハンドリング仕様](../api/error-handling.md)
+- [API 設計ガイドライン](../architecture/api/README.md)
+- [エラーハンドリング仕様](../architecture/api/error-handling.md)
 - [OpenAPI Specification](../../specs/openapi/openapi.yaml)
 - [Acceptance Criteria](../../specs/acceptance/)
 

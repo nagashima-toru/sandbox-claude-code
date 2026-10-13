@@ -37,7 +37,8 @@
 # Exit codes:
 #   0   - All checks passed
 #   1-5 - Backend checks failed (see backend/ci-verify.sh)
-#   11-40 - Frontend checks failed (see frontend/ci-verify.sh)
+#   11-40 - Frontend checks failed (see scripts/frontend/ci-verify.sh;
+#           14 = Markdown lint failure)
 #   99  - Environment validation failed
 ################################################################################
 
@@ -141,7 +142,7 @@ print_info() {
 cd "$(dirname "$0")/.." || exit 1
 
 # Show banner
-clear
+clear 2>/dev/null || true  # fails without a usable TERM (e.g. automation)
 echo ""
 echo -e "${BOLD}${CYAN}╔═══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}${CYAN}║                                                               ║${NC}"
@@ -413,6 +414,7 @@ if [ "$RUN_FRONTEND" = true ]; then
   if [ $FRONTEND_EXIT_CODE -eq 0 ]; then
     echo -e "${GREEN}✅ Frontend${NC}"
     echo "   ✓ Lint and format checks"
+    echo "   ✓ Markdown linting"
     echo "   ✓ Type checking"
     echo "   ✓ Tests with coverage (≥80% statements/functions/lines, ≥70% branches)"
     echo "   ✓ Production build"
@@ -430,6 +432,9 @@ if [ "$RUN_FRONTEND" = true ]; then
         ;;
       13)
         echo "   → TypeScript error"
+        ;;
+      14)
+        echo "   → Markdown lint failure (run 'cd frontend && pnpm lint:md:fix')"
         ;;
       21)
         echo "   → Coverage below threshold"
@@ -480,7 +485,7 @@ else
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "• Run with --verbose flag to see detailed output"
   echo "• Check specific error messages above"
-  echo "• See docs/quality/LOCAL_CI_VERIFICATION.md for detailed troubleshooting"
+  echo "• Run ./scripts/ci-check-local.sh --help for options"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 
