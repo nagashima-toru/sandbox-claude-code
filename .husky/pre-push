@@ -37,37 +37,32 @@ echo -e "${BLUE}Pre-push checks running...${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-# Detect changed files
+# Detect changed files from the commits being pushed (stdin: <local ref> <local sha> <remote ref> <remote sha>)
+# Markdown-only changes do not trigger build checks
+ZERO_SHA=0000000000000000000000000000000000000000
+CHANGED_FILES=""
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  # Branch deletion: nothing to check
+  [ "$local_sha" = "$ZERO_SHA" ] && continue
+  if [ "$remote_sha" != "$ZERO_SHA" ] && git cat-file -e "$remote_sha" 2>/dev/null; then
+    base="$remote_sha"
+  else
+    # New branch (or unknown remote commit): compare with the default branch
+    base=$(git merge-base "$local_sha" origin/master 2>/dev/null)
+  fi
+  [ -n "$base" ] || continue
+  CHANGED_FILES="$CHANGED_FILES
+$(git diff --name-only "$base" "$local_sha")"
+done
+CODE_FILES=$(printf '%s\n' "$CHANGED_FILES" | grep -v '\.md$')
+
 BACKEND_CHANGED=false
 FRONTEND_CHANGED=false
-
-# Check uncommitted changes
-if git diff --name-only HEAD | grep -q "^backend/"; then
+if printf '%s\n' "$CODE_FILES" | grep -q "^backend/"; then
   BACKEND_CHANGED=true
 fi
-
-if git diff --name-only HEAD | grep -q "^frontend/"; then
+if printf '%s\n' "$CODE_FILES" | grep -q "^frontend/"; then
   FRONTEND_CHANGED=true
-fi
-
-# Check committed but not pushed changes
-if git diff --name-only @{u} 2>/dev/null | grep -q "^backend/"; then
-  BACKEND_CHANGED=true
-fi
-
-if git diff --name-only @{u} 2>/dev/null | grep -q "^frontend/"; then
-  FRONTEND_CHANGED=true
-fi
-
-# If no upstream branch, check staged changes
-if ! git rev-parse @{u} >/dev/null 2>&1; then
-  if git diff --cached --name-only | grep -q "^backend/"; then
-    BACKEND_CHANGED=true
-  fi
-
-  if git diff --cached --name-only | grep -q "^frontend/"; then
-    FRONTEND_CHANGED=true
-  fi
 fi
 
 CHECKS_FAILED=false
