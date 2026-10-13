@@ -1,0 +1,94 @@
+name: Frontend VRT
+
+# Visual regression for screen stories (tag: 'screen'). See docs/adr/0002-design-as-requirement.md
+# Baselines are generated only here (Playwright container) so rendering is deterministic.
+# Update baselines: run this workflow manually on the Spec PR branch with update=true.
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-vrt.yml'
+  workflow_dispatch:
+    inputs:
+      update:
+        description: 'Regenerate baselines and commit them to the selected branch'
+        type: boolean
+        default: false
+
+jobs:
+  setup:
+    uses: ./.github/workflows/shared-setup.yml
+
+  vrt:
+    needs: setup
+    runs-on: ubuntu-latest
+    # Keep in sync with @playwright/test version in frontend/pnpm-lock.yaml
+    container: mcr.microsoft.com/playwright:v1.64.0-noble
+    permissions:
+      contents: write
+    env:
+      # Recommended by Playwright for container jobs. The default /github/home
+      # is rejected by SWC as a native binding cache root (ERR_SWC_NATIVE_CACHE)
+      HOME: /root
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      # Container runs as a different user than the checkout owner; the
+      # 'prepare' script runs git, which refuses the repo without this
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download generated API
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.setup.outputs.api-artifact-name }}
+          path: frontend/src/lib/api/generated
+
+      - name: Run VRT
+        if: ${{ !inputs.update }}
+        run: pnpm test:vrt
+
+      - name: Update baselines
+        if: ${{ inputs.update }}
+        run: pnpm test:vrt:update
+
+      - name: Commit baselines
+        if: ${{ inputs.update }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add tests/vrt/__screenshots__
+          if git diff --cached --quiet; then
+            echo 'No baseline changes'
+          else
+            git commit -m 'test(vrt): update screen baselines'
+            git push
+          fi
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-report
+          path: frontend/playwright-report
+          retention-days: 7

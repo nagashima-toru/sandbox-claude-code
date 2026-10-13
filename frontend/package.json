@@ -21,6 +21,8 @@
     "test:storybook": "vitest --config vitest.storybook.config.ts --run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:vrt": "playwright test --config playwright.vrt.config.ts",
+    "test:vrt:update": "playwright test --config playwright.vrt.config.ts --update-snapshots=all",
     "prepare": "cd .. && git config core.hooksPath .husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

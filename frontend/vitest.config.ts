@@ -16,6 +16,7 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
       '**/tests/e2e/**',
+      '**/tests/vrt/**',
       '**/*.stories.{ts,tsx,js,jsx}', // Exclude Storybook stories from default test runs
     ],
     coverage: {

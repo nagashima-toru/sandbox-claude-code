@@ -24,8 +24,8 @@ Spec PR のレビュー時に Epic のティアを確定する。
 1. **Epic Issue 作成**（`/create-epic-issue`）
 2. 要求仕様の理解
 3. 現在の実装調査
-4. **仕様 PR 作成**（`/create-spec-pr`）— OpenAPI + 受け入れ条件 + **ティア判定を含む**
-5. 仕様 PR レビュー・マージ（手動）— **ティアを承認**
+4. **仕様 PR 作成**（`/create-spec-pr`）— OpenAPI + 受け入れ条件 + **画面デザイン要件** + **ティア判定を含む**
+5. 仕様 PR レビュー・マージ（手動）— **ティア・デザインを承認**
 6. **Issue 更新 + spec-approved + ティアラベル付与**（`/update-spec-approved`）
 7. **実装計画策定**（`/plan-epic`）— `.epic/` 作成と自動品質チェック
 8. 計画レビュー（手動）
@@ -163,6 +163,24 @@ PR body 作成後に編集しても既存 CI は再トリガーされない。�
 ```bash
 git commit --allow-empty -m "chore: trigger CI" && git push
 ```
+
+---
+
+## 画面デザイン要件（UI 変更がある Epic のみ）
+
+デザインは Spec PR で確定する（[ADR-0002](../adr/0002-design-as-requirement.md)）。
+
+| 成果物 | 場所 |
+| --- | --- |
+| テキスト仕様 | `specs/ui/<feature>/screens.md` |
+| 画面モック | `*.stories.tsx`（`tags: ['screen']`、データは MSW） |
+| ベースライン | `frontend/tests/vrt/__screenshots__/`（CI で生成） |
+
+- **人の役割**: 方向性の選択（新しい画面のみ 2〜3 案から選ぶ）と承認
+- **Claude の役割**: `screens.md`・Story 作成、Playwright MCP で確認・自己修正
+- **ベースライン生成**: Spec PR ブランチで `Frontend VRT` ワークフローを `update=true` で手動実行
+- **実装完了条件**: VRT 差分 0（`Frontend VRT` が green）
+- **デザイン変更**: Spec PR 経由のみ。実装 PR でベースラインを更新しない
 
 ---
 

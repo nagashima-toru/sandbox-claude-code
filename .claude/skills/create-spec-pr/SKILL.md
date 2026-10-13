@@ -382,11 +382,79 @@ Feature: [機能名]
 
 ---
 
+### Step 6.5: 画面デザイン要件の作成（UI 変更がある場合のみ）
+
+デザインを要件として確定する（[ADR-0002](../../../docs/adr/0002-design-as-requirement.md)）。UI 変更がなければスキップ。
+
+#### 6.5.1 テキスト仕様を作成
+
+`specs/ui/[機能名]/screens.md`:
+
+```markdown
+# [機能名] 画面仕様
+
+## 画面一覧
+
+| 画面 | パス | 対象ロール |
+|------|------|----------|
+
+## [画面名]
+
+### レイアウト
+
+（ASCII ワイヤー）
+
+### 状態
+
+| 状態 | 対応シナリオ（.feature） | Story ID |
+|------|------------------------|----------|
+| default | | |
+| loading | | |
+| empty | | |
+| error | | |
+| [権限別] | | |
+
+### 使用コンポーネント / トークン
+
+- 部品: `components/ui/*` の既存部品（追加は shadcn MCP で検索）
+- トークン: `globals.css` の CSS 変数のみ（任意の色・px 値は禁止）
+
+### a11y / data-testid
+
+- フォーカス順、ARIA、キーボード操作
+- `data-testid` 一覧
+```
+
+**ルール**: 状態表は `.feature` のシナリオと 1:1（漏れ・重複なし）
+
+#### 6.5.2 案の比較（新しい画面・新しいレイアウトのみ）
+
+1. 2〜3 案の Story（`VariantA` / `VariantB` / ...）を作成
+2. Playwright MCP で各案のスクショを撮り、PR 本文に並べる
+3. AskUserQuestion で 1 案を選んでもらい、選ばれなかった案は削除
+
+既存画面の変更は 1 案で進める。
+
+#### 6.5.3 画面 Story を作成
+
+- 画面コンポーネントは **props 駆動の表示層** として作る（データ取得の接続は `/implement-epic`）
+- `screens.md` の 1 状態 = 1 Story。`tags: ['screen']` を付ける
+- API データは Orval 生成の MSW ハンドラー（`src/lib/api/generated/**/*.msw.ts`）を使う
+- Playwright MCP で全 Story を表示し、崩れ・a11y 違反・既存画面との不揃いを自己修正
+
+#### 6.5.4 ベースライン生成
+
+Step 8（push）の後、Spec PR ブランチで `Frontend VRT` ワークフローを `update=true` で手動実行する（CI がベースラインを commit）。
+ローカルの画像はコミットしない（OS・フォント差異のため）。
+
+---
+
 ### Step 7: ファイルのコミット
 
 ```bash
 git add specs/openapi/openapi.yaml
 git add specs/acceptance/[機能名]/*.feature
+git add specs/ui/[機能名]/ frontend/src/  # Step 6.5 を実施した場合
 git commit -m "spec: Add OpenAPI and acceptance criteria for #[N]
 
 Based on requirements analysis and implementation investigation:

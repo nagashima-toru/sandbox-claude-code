@@ -117,6 +117,7 @@ Read .epic/[最新の Epic ディレクトリ]/story*/tasklist.md
 
 - API クライアント再生成タスク（`pnpm generate:api`）が含まれているか
 - Storybook 作成タスクが含まれているか
+- 画面を含む場合、`specs/ui/<feature>/screens.md` の全状態に対応する実装・確認タスクがあるか
 - Context を実装する場合、`| undefined` 型パターンの確認が計画されているか
 - `pnpm type-check` の実行が計画されているか
 - **UIテキスト変更（ラベル・見出し・ボタン・テーブルヘッダー等）を含む Story に、既存 e2e テストの文字列セレクター確認・更新タスクが含まれているか**
@@ -192,6 +193,7 @@ git status
 - **named export になっているか**（default export は禁止）
 - **Context 型に `| undefined` が含まれているか**
 - **新規コンポーネントに Storybook が作成されているか**
+- **`tests/vrt/__screenshots__/` を実装 PR で変更していないか**（デザイン変更は Spec PR 経由、ADR-0002）
 - **Orval 生成ファイル（`src/lib/api/generated/`）を直接編集していないか**
 - **`useRouter` 等 Next.js Hook を使うコンポーネントのテストで `vi.mock('next/navigation', ...)` が設定されているか**
 - **React Query Hook のテストで `QueryClientProvider` でラップされているか**
