@@ -72,7 +72,7 @@ Infrastructure Layer (Persistence)
 ### Backend
 
 | カテゴリ | 技術 | バージョン |
-|---------|------|-----------|
+| --- | --- | --- |
 | Language | Java | 25 |
 | Framework | Spring Boot | 3.5.10 |
 | ORM | MyBatis | 3.0.4 |
@@ -84,7 +84,7 @@ Infrastructure Layer (Persistence)
 ### Frontend
 
 | カテゴリ | 技術 | バージョン |
-|---------|------|-----------|
+| --- | --- | --- |
 | Framework | Next.js | 15.x |
 | Language | TypeScript | 5.x |
 | UI Library | React | 19.x |
@@ -96,7 +96,7 @@ Infrastructure Layer (Persistence)
 ### DevOps & Tools
 
 | カテゴリ | 技術 | 用途 |
-|---------|------|------|
+| --- | --- | --- |
 | CI/CD | GitHub Actions | 自動テスト・デプロイ |
 | Container | Docker, Docker Compose | 開発・本番環境 |
 | API Documentation | Swagger UI, Redoc | API ドキュメント生成 |

@@ -20,7 +20,7 @@ gh pr view [PR番号] --json title,body,files
 ### 2. バージョン情報の真実の情報源
 
 | 技術スタック | 真実の情報源 |
-|-------------|-------------|
+| --- | --- |
 | Spring Boot | `backend/pom.xml` の `<parent><version>` |
 | Java | `backend/pom.xml` の `<java.version>` |
 | Next.js, React, TypeScript | `frontend/package.json` の `dependencies` / `devDependencies` |
@@ -32,7 +32,7 @@ gh pr view [PR番号] --json title,body,files
 **Backend（必須）**:
 
 | 依存関係 | 影響するファイル |
-|---------|-----------------|
+| --- | --- |
 | **Spring Boot** のバージョン変更（メジャー/マイナー） | `CLAUDE.md`, `backend/README.md`, `backend/CLAUDE.md` |
 | **Java** バージョン変更 | `CLAUDE.md`, `backend/README.md`, `backend/CLAUDE.md` |
 | **Docker ベースイメージ**（eclipse-temurin）のバージョン変更 | `backend/Dockerfile`, `backend/README.md` |
@@ -41,7 +41,7 @@ gh pr view [PR番号] --json title,body,files
 **Frontend（必須）**:
 
 | 依存関係 | 影響するファイル |
-|---------|-----------------|
+| --- | --- |
 | **Next.js** のバージョン変更（メジャー） | `README.md`, `frontend/CLAUDE.md` |
 | **React** のバージョン変更（メジャー） | `README.md`, `frontend/CLAUDE.md` |
 | **Node.js** バージョン変更（Docker イメージ） | `README.md`, `frontend/Dockerfile` |
@@ -85,14 +85,14 @@ git push
 ### ルートレベル
 
 | ファイル | 記載されているバージョン |
-|---------|----------------------|
+| --- | --- |
 | `CLAUDE.md` | Spring Boot, Java |
 | `README.md` | Next.js, Node.js (概要のみ) |
 
 ### Backend
 
 | ファイル | 記載されているバージョン |
-|---------|----------------------|
+| --- | --- |
 | `backend/README.md` | Spring Boot, Java, PostgreSQL |
 | `backend/CLAUDE.md` | Spring Boot, Java, PostgreSQL |
 | `backend/pom.xml` | Spring Boot (parent), Java (properties) |
@@ -101,7 +101,7 @@ git push
 ### Frontend
 
 | ファイル | 記載されているバージョン |
-|---------|----------------------|
+| --- | --- |
 | `README.md` | Next.js, TypeScript, Node.js |
 | `frontend/CLAUDE.md` | Next.js, TypeScript |
 | `frontend/package.json` | 全 npm パッケージバージョン |
@@ -110,7 +110,7 @@ git push
 ### Infrastructure
 
 | ファイル | 記載されているバージョン |
-|---------|----------------------|
+| --- | --- |
 | `docker-compose.yml` | PostgreSQL, Node.js |
 
 ## トラブルシューティング

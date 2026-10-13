@@ -49,4 +49,3 @@ PR 作成前: `./scripts/ci-check-local.sh`
 ## Epic Documents
 
 `.epic/[YYYYMMDD]-[issue-N]-[タイトル]/` に管理。詳細は各スキルを参照。
-

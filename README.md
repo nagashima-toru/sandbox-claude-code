@@ -87,7 +87,7 @@ Frontend connects to backend via `/api` (relative URL through nginx).
 **Development vs Production**:
 
 | Mode | Access Point | Frontend API URL | Reason |
-|------|--------------|------------------|---------|
+| --- | --- | --- | --- |
 | Development | <http://localhost:3000> | `http://localhost:8080` | Direct backend access for debugging |
 | Production | <http://localhost> | `/api` | Nginx reverse proxy for production-ready setup |
 

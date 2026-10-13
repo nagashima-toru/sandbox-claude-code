@@ -38,6 +38,7 @@ Read specs/openapi/openapi.yaml
 **ファイルが存在しない場合**: 仕様ファイルが見つからない（古い Epic など）場合はスキップして Step 1 へ進む。
 
 **読み込み目的**:
+
 - テスト計画が受け入れ条件の各シナリオを漏れなくカバーしているか確認するため
 - テスト計画が OpenAPI 仕様の全エンドポイントを網羅しているか確認するため
 - 仕様ドキュメントを読み込まずにテスト計画を立てると、受け入れ条件に存在しないテストケースが作成されたり、受け入れ条件に存在するシナリオが漏れる可能性がある
@@ -65,7 +66,7 @@ git diff --name-only HEAD~1 HEAD
 変更ファイルを以下のレイヤーに分類する:
 
 | レイヤー | ファイルパターン | 推奨テスト種別 |
-|---------|---------------|--------------|
+| --- | --- | --- |
 | Backend Domain | `domain/model/*.java`, `domain/repository/*.java` | Unit テスト（Pure JUnit5） |
 | Backend UseCase | `application/usecase/*.java` | Unit テスト（Mockito） |
 | Backend Mapper | `infrastructure/persistence/*.java` | 統合テスト（Testcontainers） |
@@ -80,15 +81,19 @@ git diff --name-only HEAD~1 HEAD
 変更内容を見て、以下の質問に順に答える:
 
 **Q1**: バックエンド API とフロントエンドの両方が同時に関与するフローか？
+
 - No → Unit/Component テストで対応（E2E 不要）
 
 **Q2**: Component テストや Backend 統合テストで代替できないか？
+
 - Yes（代替できる） → 代替テストを書く（E2E ではない）
 
 **Q3**: 既存の E2E テストと実質同一のフローか？
+
 - Yes → 既存テストに吸収する（新規 E2E 不要）
 
 **Q4**: 追加後も時間予算（CI 5分以内・テスト数 30件以下）に収まるか？
+
 - No → 他の E2E を削減してから追加する
 
 **全て通過した場合のみ E2E テストを追加する**
@@ -124,7 +129,7 @@ git diff --name-only HEAD~1 HEAD
 #### E2E 禁止パターンの変換
 
 | 検証内容 | 変換先 | 実装例 |
-|---------|--------|--------|
+| --- | --- | --- |
 | フォームバリデーション | Unit テスト | Zod スキーマのテスト |
 | ボタンの表示/非表示 | Unit テスト | `renderHook(() => usePermission())` |
 | レスポンシブレイアウト | Component テスト | `Object.defineProperty(window, 'matchMedia', ...)` |
@@ -226,7 +231,7 @@ Q4: 上限内 → [Yes/No（現在[N]件/上限30件）]
 ## E2E 禁止パターン早見表
 
 | ❌ E2E にしてはいけないケース | ✅ 変換先 |
-|---------------------------|---------|
+| --- | --- |
 | フォームバリデーション（空欄・文字数・パターン） | Unit テスト（Zod スキーマ） |
 | ボタンの表示/非表示（usePermission フック） | Unit テスト（renderHook） |
 | レスポンシブレイアウト（カード↔テーブル） | Component テスト（matchMedia モック） |

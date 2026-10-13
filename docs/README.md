@@ -32,7 +32,7 @@ AI 向けの操作手順・ワークフロー手順書は `.claude/skills/` に�
 ## ドキュメント配置ルール
 
 | 種類 | 配置先 | 例 |
-|------|--------|-----|
+| --- | --- | --- |
 | 人間向け知識（アーキテクチャ、ADR、ポリシー） | `docs/` | C4 図、API 設計ガイドライン、セキュリティポリシー |
 | AI 操作手順（スクリプト実行、ワークフロー） | `.claude/skills/<skill>/SKILL.md` | /generate-api, /run-docker |
 | AI クロスカッティングルール | `CLAUDE.md` / `backend/CLAUDE.md` / `frontend/CLAUDE.md` | .gitignore 階層、空実装ルール |

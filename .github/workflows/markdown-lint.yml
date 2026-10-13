@@ -39,17 +39,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Markdown linting
-        continue-on-error: true  # Phase 1: warning-only
-        working-directory: .
-        run: |
-          cd frontend
-          pnpm lint:md
+        working-directory: frontend
+        run: pnpm lint:md
 
       - name: Generate summary
-        if: always()
+        if: failure()
         run: |
-          echo "## ⚠️ Markdown Linting (Warning Mode)" >> $GITHUB_STEP_SUMMARY
+          echo "## ❌ Markdown Linting Failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Currently in **Phase 1** (warning-only mode)." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Run \`pnpm lint:md:fix\` to auto-fix most issues." >> $GITHUB_STEP_SUMMARY
+          echo "Run \`cd frontend && pnpm lint:md:fix\` to auto-fix most issues." >> $GITHUB_STEP_SUMMARY

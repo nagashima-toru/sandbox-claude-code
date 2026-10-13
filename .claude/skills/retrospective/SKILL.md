@@ -83,7 +83,7 @@ Epic または Story の振り返りの場合、対応する Epic ディレク�
 **保存場所の決定**:
 
 | 対象 | 保存場所 | ファイル名例 |
-|------|---------|-------------|
+| --- | --- | --- |
 | Epic 全体 | `.retrospectives/[epic-dir]/` | `epic-20260208-150000.md` |
 | Story | `.retrospectives/[epic-dir]/` | `story1-user-registration-20260208-150000.md` |
 | 一般タスク | `.retrospectives/` | `docker-setup-20260208-150000.md` |

@@ -30,7 +30,7 @@ docker compose -f docker-compose.yml up
 ## モードの違い
 
 | 項目 | 開発モード | 本番モード |
-|-----|-----------|----------|
+| --- | --- | --- |
 | コマンド | `docker compose up` | `docker compose -f docker-compose.yml up` |
 | 設定ファイル | `docker-compose.yml` + `docker-compose.override.yml` | `docker-compose.yml` のみ |
 | ビルドターゲット | `development` | `production` |
@@ -42,7 +42,7 @@ docker compose -f docker-compose.yml up
 ## ポート一覧（開発モード）
 
 | サービス | ポート |
-|---------|--------|
+| --- | --- |
 | Frontend | 3000 |
 | Backend | 8080 |
 | Nginx | 80 |
@@ -106,7 +106,7 @@ docker exec sandbox-frontend pnpm install
 ## トラブルシューティング
 
 | 症状 | 解決策 |
-|-----|--------|
+| --- | --- |
 | ホットリロードが効かない | 開発モードで起動確認、`WATCHPACK_POLLING: "true"` 設定確認 |
 | API 接続エラー（開発） | `NEXT_PUBLIC_API_URL: http://localhost:8080` を確認 |
 | API 接続エラー（本番） | Nginx 経由（`:80`）でアクセス、`:3000` は公開なし |

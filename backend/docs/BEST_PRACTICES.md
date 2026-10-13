@@ -25,7 +25,7 @@ com.sandbox.api
 ### レイヤー間依存ルール
 
 | 依存元 | 依存先 | 可否 |
-|--------|--------|------|
+| --- | --- | --- |
 | domain | application / infrastructure / presentation | ❌ 禁止 |
 | application | domain | ✅ 許可 |
 | application | infrastructure / presentation | ❌ 禁止 |
@@ -56,7 +56,7 @@ application または domain パッケージを変更したら必ず `./mvnw tes
 ### レイヤー別テスト対応表
 
 | レイヤー | テスト種別 | ツール | カバレッジ目標 | 主な観点 |
-|---------|-----------|--------|--------------|---------|
+| --- | --- | --- | --- | --- |
 | Domain | Pure Unit | JUnit 5 | 90%+ | ビジネスロジック、バリデーション、等価性 |
 | Application / UseCase | Unit + Mockito | JUnit 5 + Mockito | 85%+ | ユースケースフロー、異常系、境界値 |
 | Infrastructure / Mapper | Integration | Testcontainers | 80%+ | SQL実行、型マッピング、トランザクション |
@@ -169,7 +169,7 @@ public interface MessageMapper {
 ### DTO の配置場所
 
 | 種別 | 配置場所 | 用途 |
-|------|---------|------|
+| --- | --- | --- |
 | リクエスト/レスポンス DTO | `presentation/generated/model/` | OpenAPI から自動生成 |
 | UseCase 入出力 DTO | `application/dto/` | レイヤー間のデータ転送 |
 
@@ -358,6 +358,7 @@ log.info("User {} deleted message {}", currentUserId, messageId);
 ```
 
 **記録してはいけない情報**:
+
 - パスワード（平文・ハッシュ問わず）
 - JWT トークン
 - Cookie の値
