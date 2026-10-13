@@ -12,6 +12,7 @@ disable-model-invocation: true
 他のスキルやエージェント（Task ツール）から呼び出してはいけません。
 
 **禁止理由**:
+
 - 複数フェーズにわたる長時間の作業を含む（Issue 調査・仕様読み込み・ドキュメント生成・レビュー）
 - ユーザーとの対話（AskUserQuestion）を前提とする（Story 分割・技術選定の確認）
 - `.epic/` ディレクトリへのファイル作成という副作用を含む
@@ -214,7 +215,7 @@ find frontend/src -name "*.stories.*" | head -10
 **判定テーブル**:
 
 | 確認結果 | Story への含め方 |
-|---------|----------------|
+| --- | --- |
 | Backend 実装が存在する + Frontend 実装が存在する | Story 不要（既存機能の修正のみ） |
 | Backend 実装が存在しない | **Backend 実装 Story を必ず追加**（Controller/UseCase/Mapper/テスト） |
 | Frontend 実装が存在しない | **Frontend 実装 Story を追加**（APIクライアント再生成/Hook/Component/Story） |
@@ -784,6 +785,7 @@ master
 - [ ] Task 2.1: [タスク名]
 - [ ] Task 2.2: [タスク名]
 ...
+
 ```
 
 **ファイル出力**:

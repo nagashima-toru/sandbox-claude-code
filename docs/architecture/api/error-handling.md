@@ -24,7 +24,7 @@ Content-Type: `application/problem+json`
 ### フィールド説明
 
 | フィールド | 型 | 必須 | 説明 |
-|-----------|-----|------|------|
+| --- | --- | --- | --- |
 | `type` | string (URI) | ✅ | エラータイプを識別する URI。デフォルト: `about:blank` |
 | `title` | string | ✅ | エラーの概要（人間が読める形式） |
 | `status` | integer | ✅ | HTTP ステータスコード |
@@ -297,7 +297,7 @@ public ResponseEntity<ErrorResponse> handleGeneralException(
 ```
 
 | フィールド | 型 | 説明 |
-|-----------|-----|------|
+| --- | --- | --- |
 | `field` | string | エラーが発生したフィールド名 |
 | `rejectedValue` | any | 拒否された値（null 可） |
 | `message` | string | エラーメッセージ |

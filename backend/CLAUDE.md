@@ -176,7 +176,8 @@ When writing integration tests, follow these guidelines to avoid common pitfalls
 
 #### Test Data Setup
 
-- **Use `ON CONFLICT DO UPDATE` for test data**: Instead of `ON CONFLICT DO NOTHING`, use `ON CONFLICT DO UPDATE` to ensure test data is always fresh. This prevents issues where stale data from previous test runs causes authentication or validation failures.
+- **Use `ON CONFLICT DO UPDATE` for test data**: Instead of `ON CONFLICT DO NOTHING`, use `ON CONFLICT DO UPDATE` to ensure test data is always fresh.
+  This prevents issues where stale data from previous test runs causes authentication or validation failures.
 
   ```java
   // ✅ Good: Updates existing data
@@ -213,7 +214,7 @@ When writing integration tests, follow these guidelines to avoid common pitfalls
 #### Common Issues and Solutions
 
 | Issue | Cause | Solution |
-|-------|-------|----------|
+| --- | --- | --- |
 | Login fails in integration test | Stale password hash from previous run | Use `ON CONFLICT DO UPDATE` |
 | Authentication randomly fails | Reused password hash variable | Generate fresh hash per user |
 | Database pollution between tests | No automatic cleanup | Add `@Transactional` to test class |

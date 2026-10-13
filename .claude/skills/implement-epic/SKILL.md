@@ -12,6 +12,7 @@ disable-model-invocation: true
 他のスキルやエージェント（Task ツール）から呼び出してはいけません。
 
 **禁止理由**:
+
 - 複数フェーズ・複数 Story にわたる長時間の作業を含む
 - ユーザーとの対話（AskUserQuestion）を前提とする（Epic・Story 選択・実装方針確認）
 - Git ブランチ作成・コミット・プッシュ・GitHub PR 作成などの副作用を含む
@@ -232,6 +233,7 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
    - `.epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md` を読む
    - 全タスクの内容と受け入れ条件を理解する
    - **開始日時の記録**（未記載の場合）: tasklist.md の「進捗」セクションに開始日時を Edit ツールで記録する
+
      ```
      - 開始日時: YYYY-MM-DD
      ```
@@ -389,12 +391,13 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
    ```
 
    **Backend 完了条件チェックリスト**:
-   - [ ] 新規クラスに対応するテストクラスが存在する
-   - [ ] テスト構造が AAA パターンに従っている
-   - [ ] `./mvnw test` が成功している
-   - [ ] `./mvnw verify` が成功している（ArchitectureTest 含む）
-   - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §2 参照）
-   - [ ] `import` が Clean Architecture 依存ルールに違反していない
+
+- [ ] 新規クラスに対応するテストクラスが存在する
+- [ ] テスト構造が AAA パターンに従っている
+- [ ] `./mvnw test` が成功している
+- [ ] `./mvnw verify` が成功している（ArchitectureTest 含む）
+- [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §2 参照）
+- [ ] `import` が Clean Architecture 依存ルールに違反していない
 
    **Frontend テスト実行と完了条件**:
 
@@ -410,18 +413,19 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
    ```
 
    **Frontend 完了条件チェックリスト**:
-   - [ ] named export になっている
-   - [ ] Context 型に `| undefined` が含まれている（Context 実装時）
-   - [ ] 新規コンポーネントに Storybook が作成されている
-   - [ ] 画面を実装した場合、`specs/ui/` の承認済み画面 Story（`tags: ['screen']`）に本実装を接続し、`Frontend VRT` が green（差分 0）。ベースラインは更新しない（デザイン変更は Spec PR 経由、ADR-0002）
-   - [ ] `pnpm type-check` が成功している
-   - [ ] `pnpm test` が成功している
-   - [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §4 参照）
+
+- [ ] named export になっている
+- [ ] Context 型に `| undefined` が含まれている（Context 実装時）
+- [ ] 新規コンポーネントに Storybook が作成されている
+- [ ] 画面を実装した場合、`specs/ui/` の承認済み画面 Story（`tags: ['screen']`）に本実装を接続し、`Frontend VRT` が green（差分 0）。ベースラインは更新しない（デザイン変更は Spec PR 経由、ADR-0002）
+- [ ] `pnpm type-check` が成功している
+- [ ] `pnpm test` が成功している
+- [ ] カバレッジ目標を達成している（BEST_PRACTICES.md §4 参照）
 
    **統合テスト失敗時のトラブルシューティング**:
 
    | 症状 | 原因の可能性 | 確認方法 | 解決策 |
-   |------|-------------|---------|--------|
+   | --- | --- | --- | --- |
    | ログイン認証が失敗 | 古いパスワードハッシュが残っている | ログを確認: "Failed login attempt" | `ON CONFLICT DO UPDATE` を使用 |
    | ランダムに認証失敗 | パスワードハッシュを使い回している | setUp() のコードを確認 | 各ユーザーで個別に `passwordEncoder.encode()` を呼び出す |
    | 前回のテストデータが残る | トランザクションロールバックが無効 | `@Transactional` の有無を確認 | テストクラスに `@Transactional` を追加 |
@@ -609,6 +613,7 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
    Skill ツールを直接呼び出さないこと（メインコンテキストにレビュー処理が蓄積するため）。
 
    事前に変更ファイルリストを取得する:
+
    ```bash
    git diff --name-only [BASE_BRANCH]...[STORY_BRANCH]
    ```
@@ -815,6 +820,7 @@ gh pr create \
 ```
 
 **PR description に含める内容**:
+
 - Epic の目的と完了した Story 一覧
 - ティア（Minor/Micro）と実装方式の説明
 - 変更ファイル一覧

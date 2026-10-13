@@ -20,7 +20,7 @@
 ```
 
 | 種別 | 比率 | ツール | 目的 |
-|------|------|--------|------|
+| --- | --- | --- | --- |
 | Unit | 70% | JUnit 5 / Vitest | ロジック・コンポーネント単体 |
 | Integration | 25% | Testcontainers / MockMvc | レイヤー間結合・DB |
 | E2E | 5% | Playwright | クリティカルなユーザーフロー |
@@ -28,7 +28,7 @@
 ## カバレッジ目標
 
 | 対象 | Line | Branch | 詳細 |
-|------|------|--------|------|
+| --- | --- | --- | --- |
 | Backend 全体 | 80%+ | 75%+ | `./mvnw test jacoco:report` |
 | Frontend 全体 | 80%+ | 70%+ | `pnpm test:coverage` |
 
@@ -56,7 +56,7 @@ E2E テストは Playwright で実装し、**バックエンド・フロント�
 以下は Unit/Component/Backend 統合テストで対応すること:
 
 | 検証内容 | 適切なテスト種別 | 理由 |
-|---------|----------------|------|
+| --- | --- | --- |
 | フォームバリデーション（Zod スキーマ） | Unit テスト | ブラウザ不要 |
 | ボタンの表示/非表示（`usePermission` フック） | Unit テスト | フック単体で検証可能 |
 | レスポンシブレイアウト | Component テスト（`matchMedia` モック） | CSS 検証はブラウザ不要 |
@@ -104,7 +104,7 @@ test('VIEWER は POST /api/messages で 403 を受け取る', async ({ page, req
 ## テスト分担方針
 
 | 検証内容 | 担当 | 理由 |
-|---------|------|------|
+| --- | --- | --- |
 | ビジネスロジック | Backend Unit | ドメイン層が正 |
 | API レスポンス形式 | Backend Integration（MockMvc） | HTTP 層の検証 |
 | 403/401 等の HTTP エラー | Backend Integration（MockMvc） | Backend 責務・ブラウザ不要 |

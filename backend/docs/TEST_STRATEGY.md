@@ -274,6 +274,7 @@ class MessageControllerTest {
 403/401 等の HTTP エラーレスポンスは **MockMvc で実装すること**。Playwright（E2E）で実装してはいけない。
 
 理由:
+
 - 認証・認可はバックエンドの責務であり、フロントエンドを介する必要がない
 - MockMvc の方が高速・安定しており、CI 負荷を削減できる
 - E2E テストでブラウザを起動して JWT トークンを取得してからリクエストする手順は不要
@@ -303,7 +304,7 @@ void createMessage_withViewerRole_returns403() throws Exception {
 ### 既存の構成（活用）
 
 | ツール | 用途 | 対象レイヤー |
-|--------|------|------------|
+| --- | --- | --- |
 | **JUnit 5** | テストフレームワーク | 全レイヤー |
 | **Mockito** | モッキング | Application, Infrastructure |
 | **AssertJ** | 流暢なアサーション | 全レイヤー |
@@ -314,7 +315,7 @@ void createMessage_withViewerRole_returns403() throws Exception {
 ### 推奨追加ツール（必要に応じて）
 
 | ツール | 用途 | 優先度 |
-|--------|------|--------|
+| --- | --- | --- |
 | **JaCoCo** | コードカバレッジ測定 | 高 |
 | **ArchUnit** | アーキテクチャルール検証 | 中 |
 | **Fixture Monkey** | テストデータ生成 | 低 |
@@ -375,7 +376,7 @@ void testName() {
 ### レイヤー別目標
 
 | レイヤー | 目標カバレッジ | 理由 |
-|---------|--------------|------|
+| --- | --- | --- |
 | Domain | 90%+ | ビジネスロジックの核心 |
 | Application | 85%+ | ユースケースのフロー |
 | Infrastructure | 80%+ | 技術的な実装詳細 |

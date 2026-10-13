@@ -126,7 +126,7 @@ export const ErrorState: Story = {
 ## トラブルシューティング
 
 | 症状 | 解決策 |
-|-----|--------|
+| --- | --- |
 | 起動しない | `pnpm storybook --no-manager-cache` でキャッシュクリア |
 | MSW が動かない | `src/mocks/handlers.ts` の存在確認、URL が一致しているか確認 |
 | ストーリーが表示されない | ファイル名 `*.stories.tsx` を確認、Storybook を再起動 |

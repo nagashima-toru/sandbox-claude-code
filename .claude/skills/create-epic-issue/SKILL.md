@@ -12,6 +12,7 @@ disable-model-invocation: true
 他のスキルやエージェント（Task ツール）から呼び出してはいけません。
 
 **禁止理由**:
+
 - ユーザーとの対話（AskUserQuestion）を前提とする（タイトル・背景・目的・スコープの収集）
 - GitHub Issue 作成という副作用を含む
 - 誤った呼び出しで不要な Issue が作成される可能性がある

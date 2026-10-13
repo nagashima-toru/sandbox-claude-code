@@ -243,8 +243,9 @@ com.sandbox.api.infrastructure
 - SQL マッピング
 
 **API エンドポイント**:
+
 | Method | Path | Description |
-|--------|------|-------------|
+| --- | --- | --- |
 | GET | /api/messages | メッセージ一覧取得（ページネーション） |
 | GET | /api/messages/{id} | メッセージ取得 |
 | POST | /api/messages | メッセージ作成 |
@@ -410,7 +411,7 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 ### Protocol & Format
 
 | From | To | Protocol | Format | Auth |
-|------|-----|----------|--------|------|
+| --- | --- | --- | --- | --- |
 | Frontend | Backend | HTTPS | JSON | （将来）JWT |
 | Backend | Database | TCP | PostgreSQL Protocol | Password |
 | Browser | Frontend | HTTPS | HTML/JSON | - |
