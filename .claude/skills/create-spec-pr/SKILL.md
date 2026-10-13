@@ -464,7 +464,7 @@ Based on requirements analysis and implementation investigation:
 - Include positive and negative test scenarios
 - Align with existing API conventions
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+<実行環境が指定する署名行（Co-Authored-By 等）>"
 ```
 
 ---
