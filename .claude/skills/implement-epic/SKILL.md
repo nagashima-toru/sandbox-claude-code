@@ -488,7 +488,7 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
 
    [詳細な変更内容]
 
-   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   <実行環境が指定する署名行（Co-Authored-By 等）>"
    ```
 
 ### Phase 3: Story の完了
@@ -526,7 +526,7 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
    git add .epic/[日付]-[issue番号]-[epic名]/story[N]-[name]/tasklist.md
    git commit -m "docs: update tasklist.md progress for Story [N] (#[issue番号])
 
-   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   <実行環境が指定する署名行（Co-Authored-By 等）>"
    ```
 
 2. **tasklist.md の全チェックボックス確認**（overview.md 更新前に必須）
@@ -604,7 +604,7 @@ Read specs/openapi/openapi.yaml           # OpenAPI 仕様
 
    **推奨項目**:
    - [ ] CI チェックをローカルで実行（`./scripts/ci-check-local.sh`）
-   - [ ] コミットメッセージが適切（Co-Authored-By 含む）
+   - [ ] コミットメッセージが適切（実行環境が指定する署名行を含む）
    - [ ] 変更ファイルが適切にステージングされている
 
 5. **コードレビュー（Task サブエージェント経由）**
