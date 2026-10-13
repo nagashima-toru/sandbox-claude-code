@@ -48,8 +48,7 @@ See [docs/README.md](docs/README.md) for complete documentation index organized 
 Key documents:
 
 - [CLAUDE.md](CLAUDE.md) - Project-wide development guidance
-- [Epic Documents](docs/development/EPIC_DOCUMENTS.md) - Epic-based development workflow
-- [Git Workflow](docs/development/GIT_WORKFLOW.md) - Branch strategy and PR workflow
+- [SDD Guide](docs/development/SDD.md) - Epic-based development workflow, branch strategy and PR workflow
 
 ## Quick Start with Docker
 

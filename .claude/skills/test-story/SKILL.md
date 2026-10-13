@@ -245,8 +245,8 @@ Q4: 上限内 → [Yes/No（現在[N]件/上限30件）]
 
 ## 関連ドキュメント
 
-- [全体テスト戦略](../../docs/quality/TEST_STRATEGY.md) - E2E 選定基準・禁止パターン
-- [Frontend テスト戦略](../../frontend/docs/TEST_STRATEGY.md) - 判断フロー・実装例
-- [Backend テスト戦略](../../backend/docs/TEST_STRATEGY.md) - MockMvc テスト例
+- [全体テスト戦略](../../../docs/quality/TEST_STRATEGY.md) - E2E 選定基準・禁止パターン
+- [Frontend テスト戦略](../../../frontend/docs/TEST_STRATEGY.md) - 判断フロー・実装例
+- [Backend テスト戦略](../../../backend/docs/TEST_STRATEGY.md) - MockMvc テスト例
 - `/implement-epic` - 呼び出し元スキル（Phase 2 Step 4.5）
 - `/review-implementation` - E2E 肥大化チェックを含むレビュー

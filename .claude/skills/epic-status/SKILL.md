@@ -374,7 +374,7 @@ Epic Documents の進捗を最新に保つため、以下のタイミングで�
 
 ## 参考資料
 
-- [CLAUDE.md](../../CLAUDE.md) - 開発プロセス全体
+- [CLAUDE.md](../../../CLAUDE.md) - 開発プロセス全体
 
 ---
 

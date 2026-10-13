@@ -607,7 +607,7 @@ void createMessage_withDuplicateCode_shouldReturn409() {
 ## 関連ドキュメント
 
 - [API 設計ガイドライン](./README.md)
-- [OpenAPI Specification](../../specs/openapi/openapi.yaml)
+- [OpenAPI Specification](../../../specs/openapi/openapi.yaml)
 - [RFC 7807 Specification](https://www.rfc-editor.org/rfc/rfc7807.html)
 
 ---

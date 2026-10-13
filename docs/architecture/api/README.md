@@ -460,9 +460,9 @@ Scenario: 有効なデータでメッセージを作成する
 ## 関連ドキュメント
 
 - [エラーハンドリング仕様](./error-handling.md)
-- [OpenAPI Specification](../../specs/openapi/openapi.yaml)
-- [Acceptance Criteria](../../specs/acceptance/)
-- [Contract Definitions](../../specs/contracts/)
+- [OpenAPI Specification](../../../specs/openapi/openapi.yaml)
+- [Acceptance Criteria](../../../specs/acceptance/)
+- [Contract Definitions](../../../specs/contracts/)
 
 ---
 

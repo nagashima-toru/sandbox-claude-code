@@ -889,7 +889,7 @@ URL: [PR URL]
 
 ## 参考資料
 
-- [backend/docs/BEST_PRACTICES.md](../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
-- [frontend/docs/BEST_PRACTICES.md](../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
-- [backend/docs/TEST_STRATEGY.md](../../backend/docs/TEST_STRATEGY.md) - バックエンドテスト戦略
-- [frontend/docs/TEST_STRATEGY.md](../../frontend/docs/TEST_STRATEGY.md) - フロントエンドテスト戦略
+- [backend/docs/BEST_PRACTICES.md](../../../backend/docs/BEST_PRACTICES.md) - バックエンドベストプラクティス
+- [frontend/docs/BEST_PRACTICES.md](../../../frontend/docs/BEST_PRACTICES.md) - フロントエンドベストプラクティス
+- [backend/docs/TEST_STRATEGY.md](../../../backend/docs/TEST_STRATEGY.md) - バックエンドテスト戦略
+- [frontend/docs/TEST_STRATEGY.md](../../../frontend/docs/TEST_STRATEGY.md) - フロントエンドテスト戦略
