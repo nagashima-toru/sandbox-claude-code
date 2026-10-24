@@ -44,7 +44,7 @@
     "react-dom": "^19.3.0",
     "react-hook-form": "^7.89.0",
     "tailwind-merge": "^3.7.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.5.1",
@@ -53,11 +53,11 @@
     "@next/bundle-analyzer": "^16.4.2",
     "@playwright/test": "^1.64.0",
     "@storybook/addon-a11y": "^10.6.1",
-    "@storybook/addon-docs": "^10.6.1",
-    "@storybook/addon-onboarding": "^10.6.1",
-    "@storybook/addon-themes": "^10.6.1",
-    "@storybook/addon-vitest": "^10.6.1",
-    "@storybook/nextjs-vite": "^10.6.1",
+    "@storybook/addon-docs": "^10.6.3",
+    "@storybook/addon-onboarding": "^10.6.3",
+    "@storybook/addon-themes": "^10.6.3",
+    "@storybook/addon-vitest": "^10.6.3",
+    "@storybook/nextjs-vite": "^10.6.3",
     "@tailwindcss/postcss": "^4.3.3",
     "@tanstack/react-query-devtools": "^5.104.1",
     "@testing-library/jest-dom": "^7.0.1",
@@ -86,8 +86,8 @@
     "orval": "^8.41.0",
     "playwright": "^1.64.0",
     "postcss": "^8.5.29",
-    "prettier": "^3.9.9",
-    "storybook": "^10.6.2",
+    "prettier": "^3.9.10",
+    "storybook": "^10.6.3",
     "tailwindcss": "^4.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.3",
@@ -123,16 +123,14 @@
       "brace-expansion@<1.1.21": "^1.1.21",
       "brace-expansion@>=3.0.0 <5.0.12": "^5.0.12",
       "picomatch@<2.3.2": "^2.3.2",
-      "picomatch@>=4.0.0 <4.0.4": "^4.0.4"
+      "picomatch@>=4.0.0 <4.0.4": "^4.0.4",
+      "undici@>=7.18.0 <7.30.1": ">=7.30.1 <8"
     },
     "auditConfig": {
       "ignoreCves": [
         "CVE-2026-26996",
         "CVE-2026-93687"
       ]
-    },
-    "patchedDependencies": {
-      "@storybook/nextjs-vite@10.6.1": "patches/@storybook__nextjs-vite@10.6.1.patch"
     }
   }
 }
