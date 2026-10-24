@@ -16,6 +16,7 @@ const eslintConfig = [
       'storybook-static/**',
       'playwright-report/**',
       'test-results/**',
+      'public/mockServiceWorker.js',
       '.turbo/**',
       '*.config.js',
       '*.config.mjs',
