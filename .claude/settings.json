@@ -5,15 +5,11 @@
       "Read(**/.env.*)",
       "Edit(**/.env)",
       "Edit(**/.env.*)",
-      "Write(**/.env)",
-      "Write(**/.env.*)",
 
       "Read(**/application-secret.*)",
       "Edit(**/application-secret.*)",
-      "Write(**/application-secret.*)",
       "Read(**/application-local.*)",
       "Edit(**/application-local.*)",
-      "Write(**/application-local.*)",
 
       "Read(**/*.pem)",
       "Read(**/*.key)",
@@ -23,10 +19,6 @@
       "Edit(**/*.key)",
       "Edit(**/*.p12)",
       "Edit(**/*.jks)",
-      "Write(**/*.pem)",
-      "Write(**/*.key)",
-      "Write(**/*.p12)",
-      "Write(**/*.jks)",
 
       "Bash(git push --force *)",
       "Bash(git push -f *)",
