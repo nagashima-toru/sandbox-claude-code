@@ -25,6 +25,8 @@ Spring Boot 4.1.2（Spring Framework 7、Spring Security 7、Jackson 3、Tomcat 
 - `rest-assured` は Boot 4 の BOM に含まれないため、版を明示する
 - OpenAPI バリデータは `com.atlassian.oai:openapi-request-validator-*` へ移行（Java パッケージは同じ）
 
+- 個別に固定していた脆弱性対応の版は、Boot 4.1.2 の管理版が同等以上のため削除した（Tomcat 11.0.27、postgresql 42.7.14、commons-lang3 3.20.0。固定は 10.1.52 / 42.7.14 / 3.18.0）
+
 ## 結果
 
 - 依存ライブラリのメジャー追従が再び可能になる
