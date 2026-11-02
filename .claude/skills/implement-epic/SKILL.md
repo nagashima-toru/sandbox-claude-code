@@ -764,13 +764,28 @@ git status
 
 **ファイルが存在しない場合**: 仕様ファイルが見つからない場合はスキップして次へ進む。
 
-### Step 2: feature ブランチの作成
+**Backend を変更する場合は、着手前のカバレッジを記録する**（完了時に比較する）:
 
 ```bash
-git checkout master
-git pull origin master
-git checkout -b feature/issue-[N]-[name]
+cd backend && ./mvnw test && cd ..
+# backend/target/site/jacoco/jacoco.csv から LINE / BRANCH の実測値と、
+# backend/target/surefire-reports/ からテスト件数を集計し、Story 1 の tasklist.md の進捗メモに記録する
 ```
+
+集計では `ApiApplication` と `presentation/generated/**` を除く（`pom.xml` の JaCoCo 除外設定と同じ）。
+
+### Step 2: feature ブランチの作成
+
+`origin/master` から作成し、作成後にブランチ名を確認してからコミットする（連結コマンドにしない）。
+
+```bash
+git fetch origin master
+git checkout -b feature/issue-[N]-[name] origin/master
+git branch --show-current   # feature/issue-[N]-[name] であることを確認
+```
+
+**作成に失敗した場合**（未コミットの変更がある等）: コミットしない。変更を stash するか、別 worktree
+（`git worktree add -b feature/issue-[N]-[name] <dir> origin/master`）で作業する。
 
 **ブランチが既に存在する場合**:
 
@@ -807,6 +822,9 @@ overview.md の Story 順に、各 Story を同一ブランチで実装する。
 ```
 
 失敗した場合は修正してから次に進む。
+
+Backend を変更した場合は、Step 1 で記録したカバレッジ（LINE / BRANCH）を**下回っていない**ことも確認する。
+下回る場合は、テストの欠落か JaCoCo の除外設定の変化が原因かを調べる。
 
 ### Step 5: Epic PR の作成
 

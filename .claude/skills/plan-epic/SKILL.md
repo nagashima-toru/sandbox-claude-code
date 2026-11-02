@@ -80,6 +80,11 @@ Read frontend/docs/BEST_PRACTICES.md  # §4 テスト戦略（テスト種別対
 レイヤー別テスト種別の誤り（例: UseCase を統合テストにする）や
 カバレッジ目標の未記載、テストタスクの抜け漏れが発生しやすくなる。
 
+**Backend を変更する Epic は、`./mvnw verify` に含まれるゲートも洗い出す**:
+
+`backend/pom.xml` の plugins（SpotBugs / Checkstyle / Spotless / JaCoCo / ArchUnit、`spring-boot-maven-plugin` の start/stop など）を確認し、影響を受けるゲートごとに確認タスクを tasklist に入れる。
+見落とすと、計画レビューで差し戻しになる（#270）。
+
 ---
 
 ### 1. Issue情報の取得と前提条件チェック

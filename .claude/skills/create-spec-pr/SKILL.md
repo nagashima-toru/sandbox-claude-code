@@ -233,13 +233,16 @@ ls frontend/src/components/
 
 ### Step 4: 仕様ブランチの作成
 
-### Step 4: 仕様ブランチの作成
+`origin/master` から作成し、作成後にブランチ名を確認してからコミットする（連結コマンドにしない）。
 
 ```bash
-git checkout master
-git pull origin master
-git checkout -b spec/issue-[N]-[name]
+git fetch origin master
+git checkout -b spec/issue-[N]-[name] origin/master
+git branch --show-current   # spec/issue-[N]-[name] であることを確認
 ```
+
+**作成に失敗した場合**（未コミットの変更がある等）: コミットしない。変更を stash するか、別 worktree
+（`git worktree add -b spec/issue-[N]-[name] <dir> origin/master`）で作業する。
 
 **ブランチ名の形式**:
 
@@ -451,6 +454,14 @@ Step 8（push）の後、Spec PR ブランチで `Frontend VRT` ワークフロ�
 ---
 
 ### Step 7: ファイルのコミット
+
+コミット前に、作成者メールが GitHub の noreply アドレスであることを確認する。
+実メールだと、GitHub のメール非公開設定で push（Step 8）が拒否される。
+
+```bash
+git config user.email   # *@users.noreply.github.com であること
+# 違う場合: git config --local user.email "[ID]+[username]@users.noreply.github.com"
+```
 
 ```bash
 git add specs/openapi/openapi.yaml
