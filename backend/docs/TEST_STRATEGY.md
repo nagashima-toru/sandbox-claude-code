@@ -170,8 +170,8 @@ class MessageRepositoryImplTest {
 @Transactional
 class MessageMapperTest {
     @Container
-    static PostgreSQLContainer<?> postgres =
-        new PostgreSQLContainer<>("postgres:16");
+    static PostgreSQLContainer postgres =
+        new PostgreSQLContainer("postgres:16");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -228,8 +228,8 @@ class MessageMapperTest {
 @Testcontainers
 class MessageControllerTest {
     @Container
-    static PostgreSQLContainer<?> postgres =
-        new PostgreSQLContainer<>("postgres:16");
+    static PostgreSQLContainer postgres =
+        new PostgreSQLContainer("postgres:16");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {

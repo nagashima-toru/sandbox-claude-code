@@ -74,8 +74,8 @@ Infrastructure Layer (Persistence)
 | カテゴリ | 技術 | バージョン |
 | --- | --- | --- |
 | Language | Java | 25 |
-| Framework | Spring Boot | 3.5.10 |
-| ORM | MyBatis | 3.0.4 |
+| Framework | Spring Boot | 4.1.2 |
+| ORM | MyBatis (mybatis-spring-boot-starter) | 4.1.0 |
 | Database | PostgreSQL | 16 |
 | Migration | Flyway | - |
 | Testing | JUnit 5, Testcontainers | - |

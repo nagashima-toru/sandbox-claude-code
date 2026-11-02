@@ -25,7 +25,7 @@ sandbox-claude-code/
 
 Spring Boot API application with PostgreSQL, MyBatis, and Flyway.
 
-- **Tech Stack**: Java 25, Spring Boot 3.4.1, PostgreSQL, MyBatis, Flyway
+- **Tech Stack**: Java 25, Spring Boot 4.1.2, PostgreSQL, MyBatis, Flyway
 - **API**: RESTful CRUD for Message management
 - **Docs**: [backend/CLAUDE.md](backend/CLAUDE.md)
 
