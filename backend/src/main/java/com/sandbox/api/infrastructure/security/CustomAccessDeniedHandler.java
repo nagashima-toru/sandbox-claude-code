@@ -1,6 +1,5 @@
 package com.sandbox.api.infrastructure.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,10 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 /** Custom access denied handler for handling authorization errors */
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
+  private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
 
   private static final Logger logger = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
 
@@ -40,7 +42,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     body.put("detail", "You don't have permission to access this resource");
     body.put("instance", request.getRequestURI());
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), body);
+    JSON_MAPPER.writeValue(response.getOutputStream(), body);
   }
 }
