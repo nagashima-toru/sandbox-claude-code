@@ -83,7 +83,7 @@
     │   └───────────────────────────┘       │
     │                                       │
     │   Technology:                         │
-    │   - Spring Boot 3.5                   │
+    │   - Spring Boot 4.1                   │
     │   - Java 25                           │
     │   - MyBatis                           │
     │   - Flyway                            │
@@ -174,9 +174,9 @@
 **技術スタック**:
 
 - **Runtime**: JVM (Java 25)
-- **Framework**: Spring Boot 3.5.10
+- **Framework**: Spring Boot 4.1.2
 - **Architecture**: Clean Architecture
-- **ORM**: MyBatis 3.0.4
+- **ORM**: MyBatis (mybatis-spring-boot-starter 4.1.0)
 - **Validation**: Bean Validation (Hibernate Validator)
 - **API Generation**: OpenAPI Generator 7.10.0
 

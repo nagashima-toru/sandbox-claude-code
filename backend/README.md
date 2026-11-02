@@ -4,7 +4,7 @@ Spring Boot API application with PostgreSQL, MyBatis, and Flyway.
 
 ## Technology Stack
 
-- **Framework**: Spring Boot 3.4.1
+- **Framework**: Spring Boot 4.1.2
 - **Java Version**: 25
 - **Build Tool**: Maven
 - **Database**: PostgreSQL 16

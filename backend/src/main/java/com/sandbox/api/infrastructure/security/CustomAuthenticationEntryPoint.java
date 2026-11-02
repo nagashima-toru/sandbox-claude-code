@@ -1,6 +1,5 @@
 package com.sandbox.api.infrastructure.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,10 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 /** Custom authentication entry point for handling authentication errors */
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+  private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
 
   private static final Logger logger =
       LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
@@ -41,7 +43,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     body.put("detail", "Authentication is required to access this resource");
     body.put("instance", request.getRequestURI());
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), body);
+    JSON_MAPPER.writeValue(response.getOutputStream(), body);
   }
 }
