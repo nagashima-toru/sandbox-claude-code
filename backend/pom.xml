@@ -19,9 +19,6 @@
 
     <properties>
         <java.version>25</java.version>
-        <!-- Java 25 compatibility -->
-        <mockito.version>5.21.0</mockito.version>
-        <byte-buddy.version>1.17.5</byte-buddy.version>
         <!-- rest-assured is not managed by Spring Boot 4 -->
         <rest-assured.version>6.3.0</rest-assured.version>
     </properties>
@@ -120,8 +117,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
             <scope>test</scope>
         </dependency>
 
