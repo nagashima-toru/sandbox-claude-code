@@ -14,6 +14,10 @@
 #   --verbose            Show detailed output
 #   --help               Show this help message
 #
+# Environment:
+#   POSTGRES_PORT        PostgreSQL port (default 5432). If it is used by another
+#                        process, a throwaway PostgreSQL is started on a free port
+#
 # Exit codes:
 #   0  - All checks passed
 #   1  - Build/test failure
@@ -113,38 +117,90 @@ fi
 # Check PostgreSQL availability
 print_info "Checking PostgreSQL availability..."
 
-# Environment variables for PostgreSQL connection (matching CI)
-export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/sandbox"
-export SPRING_DATASOURCE_USERNAME="sandbox"
-export SPRING_DATASOURCE_PASSWORD="sandbox"
+# Database connection (matching CI). The port follows docker-compose.yml (POSTGRES_PORT).
+DB_PORT="${POSTGRES_PORT:-5432}"
+DB_CONTAINER=""
+
+db_reachable() {
+  PGPASSWORD=sandbox psql -h localhost -p "$DB_PORT" -U sandbox -d sandbox -c "SELECT 1" &> /dev/null
+}
+
+port_in_use() {
+  lsof -iTCP:"$1" -sTCP:LISTEN &> /dev/null
+}
+
+# Remove the throwaway database started by this script (also on failure or Ctrl-C)
+cleanup_db() {
+  if [ -n "$DB_CONTAINER" ]; then
+    docker rm -f "$DB_CONTAINER" &> /dev/null || true
+  fi
+}
+trap cleanup_db EXIT
+
+wait_for_db() {
+  print_info "Waiting for PostgreSQL to be ready..."
+  for i in {1..30}; do
+    if db_reachable; then
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
 
 if command -v psql &> /dev/null; then
-  # Try to connect to PostgreSQL with sandbox credentials (development default)
-  if PGPASSWORD=sandbox psql -h localhost -U sandbox -d sandbox -c "SELECT 1" &> /dev/null; then
-    print_success "PostgreSQL is running (sandbox/sandbox/sandbox)"
+  if db_reachable; then
+    print_success "PostgreSQL is running on port $DB_PORT (sandbox/sandbox/sandbox)"
+  elif port_in_use "$DB_PORT"; then
+    # Another database owns the port: start a throwaway one on a free port
+    print_warning "Port $DB_PORT is used by another process. Starting a throwaway PostgreSQL..."
+
+    if ! command -v docker &> /dev/null; then
+      print_error "Docker not found. Free port $DB_PORT or set POSTGRES_PORT to a PostgreSQL you started"
+      exit 99
+    fi
+
+    FREE_PORT=""
+    for candidate in $(seq 5433 5499); do
+      if ! port_in_use "$candidate"; then
+        FREE_PORT=$candidate
+        break
+      fi
+    done
+    if [ -z "$FREE_PORT" ]; then
+      print_error "No free port found in 5433-5499"
+      exit 99
+    fi
+
+    DB_CONTAINER="sandbox-ci-pg-$$"
+    if ! docker run -d --name "$DB_CONTAINER" -p "$FREE_PORT:5432" \
+      -e POSTGRES_DB=sandbox -e POSTGRES_USER=sandbox -e POSTGRES_PASSWORD=sandbox \
+      postgres:16.4-alpine > /dev/null; then
+      print_error "Failed to start a throwaway PostgreSQL container"
+      exit 99
+    fi
+    DB_PORT="$FREE_PORT"
+
+    if wait_for_db; then
+      print_success "Throwaway PostgreSQL is running on port $DB_PORT (removed when this script exits)"
+    else
+      print_error "Throwaway PostgreSQL did not become ready on port $DB_PORT"
+      exit 99
+    fi
   else
     print_warning "PostgreSQL not accessible. Attempting to start via docker-compose..."
 
     # Try to start PostgreSQL via docker-compose
     if command -v docker-compose &> /dev/null || command -v docker &> /dev/null; then
       cd ..
-      docker-compose up -d postgres
+      POSTGRES_PORT="$DB_PORT" docker-compose up -d postgres
       cd backend
 
-      # Wait for PostgreSQL to be ready
-      print_info "Waiting for PostgreSQL to be ready..."
-      for i in {1..30}; do
-        if PGPASSWORD=sandbox psql -h localhost -U sandbox -d sandbox -c "SELECT 1" &> /dev/null; then
-          print_success "PostgreSQL is now running (sandbox/sandbox/sandbox)"
-          break
-        fi
-        sleep 1
-      done
-
-      # Final check
-      if ! PGPASSWORD=sandbox psql -h localhost -U sandbox -d sandbox -c "SELECT 1" &> /dev/null; then
+      if wait_for_db; then
+        print_success "PostgreSQL is now running on port $DB_PORT (sandbox/sandbox/sandbox)"
+      else
         print_error "Failed to start PostgreSQL. Please start it manually:"
-        print_info "  docker-compose up -d postgres"
+        print_info "  POSTGRES_PORT=$DB_PORT docker-compose up -d postgres"
         exit 99
       fi
     else
@@ -155,6 +211,11 @@ if command -v psql &> /dev/null; then
 else
   print_warning "psql not found. Assuming PostgreSQL is running..."
 fi
+
+# Environment variables for PostgreSQL connection (matching CI; port may have changed above)
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:${DB_PORT}/sandbox"
+export SPRING_DATASOURCE_USERNAME="sandbox"
+export SPRING_DATASOURCE_PASSWORD="sandbox"
 
 print_success "Environment validation passed"
 
