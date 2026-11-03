@@ -34,6 +34,10 @@
 #   # Fast parallel execution
 #   ./scripts/ci-check-local.sh --parallel
 #
+#   # Backend DB on another port (default 5432; if it is used by another
+#   # process, a throwaway PostgreSQL is started on a free port)
+#   POSTGRES_PORT=5433 ./scripts/ci-check-local.sh --backend-only
+#
 # Exit codes:
 #   0   - All checks passed
 #   1-5 - Backend checks failed (see backend/ci-verify.sh)
