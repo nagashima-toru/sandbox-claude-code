@@ -420,6 +420,14 @@ void testName() {
 # レポート: target/site/jacoco/index.html
 ```
 
+**実測値の基準と比較**: 大きな変更（メジャー移行など）の前後で、実測値が下がっていないかを確認する。
+
+```bash
+./mvnw test
+../scripts/backend/coverage-baseline.sh --save <基準値ファイル>     # 着手前
+../scripts/backend/coverage-baseline.sh --compare <基準値ファイル>  # 変更後。LINE / BRANCH が下がると exit 1
+```
+
 ---
 
 ## 7. CI/CDでの統合
