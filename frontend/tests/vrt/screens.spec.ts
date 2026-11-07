@@ -2,6 +2,9 @@ import { expect, test } from '@playwright/test';
 
 // Stories tagged 'screen' are the approved design (ADR-0002) and are pinned by screenshot.
 const SCREEN_TAG = 'screen';
+// Stories also tagged 'mobile' are captured at phone width (below the Tailwind md breakpoint).
+const MOBILE_TAG = 'mobile';
+const MOBILE_VIEWPORT = { width: 375, height: 667 };
 
 interface StoryIndexEntry {
   id: string;
@@ -18,15 +21,18 @@ test('screen stories match approved design baselines', async ({ page, request })
   expect(response.ok()).toBe(true);
   const index = (await response.json()) as StoryIndex;
 
-  const storyIds = Object.values(index.entries)
+  const screenStories = Object.values(index.entries)
     .filter((entry) => entry.type === 'story' && entry.tags?.includes(SCREEN_TAG))
-    .map((entry) => entry.id)
-    .sort();
+    .sort((a, b) => a.id.localeCompare(b.id));
 
-  test.skip(storyIds.length === 0, `No stories tagged '${SCREEN_TAG}'`);
+  test.skip(screenStories.length === 0, `No stories tagged '${SCREEN_TAG}'`);
 
-  for (const id of storyIds) {
+  // Configured in playwright.vrt.config.ts; always set for this project
+  const defaultViewport = page.viewportSize() ?? { width: 1280, height: 800 };
+
+  for (const { id, tags } of screenStories) {
     await test.step(id, async () => {
+      await page.setViewportSize(tags?.includes(MOBILE_TAG) ? MOBILE_VIEWPORT : defaultViewport);
       await page.goto(`/iframe.html?id=${id}&viewMode=story`);
       await page.waitForLoadState('networkidle');
       await page.evaluate(() => document.fonts.ready);
