@@ -768,8 +768,8 @@ git status
 
 ```bash
 cd backend && ./mvnw test && cd ..
-# backend/target/site/jacoco/jacoco.csv から LINE / BRANCH の実測値と、
-# backend/target/surefire-reports/ からテスト件数を集計し、Story 1 の tasklist.md の進捗メモに記録する
+./scripts/backend/coverage-baseline.sh --save .epic/[日付]-[issue番号]-[epic名]/coverage-baseline.json
+# 表示された LINE / BRANCH / テスト件数を、Story 1 の tasklist.md の進捗メモにも記録する
 ```
 
 集計では `ApiApplication` と `presentation/generated/**` を除く（`pom.xml` の JaCoCo 除外設定と同じ）。
@@ -823,8 +823,14 @@ overview.md の Story 順に、各 Story を同一ブランチで実装する。
 
 失敗した場合は修正してから次に進む。
 
-Backend を変更した場合は、Step 1 で記録したカバレッジ（LINE / BRANCH）を**下回っていない**ことも確認する。
-下回る場合は、テストの欠落か JaCoCo の除外設定の変化が原因かを調べる。
+Backend を変更した場合は、Step 1 で記録したカバレッジ（LINE / BRANCH）を**下回っていない**ことも確認する:
+
+```bash
+cd backend && ./mvnw test && cd ..
+./scripts/backend/coverage-baseline.sh --compare .epic/[日付]-[issue番号]-[epic名]/coverage-baseline.json
+```
+
+LINE または BRANCH が下回ると exit 1 になる。下回る場合は、テストの欠落か JaCoCo の除外設定の変化が原因かを調べる。
 
 ### Step 5: Epic PR の作成
 
