@@ -5,19 +5,80 @@ Feature: 言語切り替え機能
   ユーザーが日本語と英語の間でUIの表示言語を切り替えられる機能。
   言語切り替えボタンはすべての画面（ログイン画面・メイン画面）で利用可能。
 
+  言語切り替えボタンは「地球儀アイコン＋現在の言語名」で、押すと言語の一覧メニューが開く。
+  言語名はその言語の表記（日本語 / English）で、現在の言語にチェックが付く。
+  画面幅が 768px 未満（スマホ幅）では、ボタンは地球儀アイコンのみになる。
+  以下の「言語切り替えボタンで「X」を選択する」は、ボタンを押してメニューから「X」を選ぶ操作を指す。
+  デザイン: specs/ui/language-switch/screens.md
+
   Background:
     Given アプリケーションが起動している
 
-  @positive
-  Scenario: ログイン画面に言語切り替えボタンが表示される
-    When ログイン画面 (/login) を開く
-    Then 言語切り替えボタン（日/EN）が表示される
+  @positive @ui-state-web-closed-ja
+  Scenario: ログイン画面の言語切り替えボタンに現在の言語名が表示される
+    When ログイン画面 (/login) を PC 幅で開く
+    Then 言語切り替えボタンが表示される
+    And ボタンに地球儀アイコンと「日本語」が表示される
+
+  @positive @ui-state-web-closed-ja
+  Scenario: メイン画面の言語切り替えボタンに現在の言語名が表示される
+    Given 管理者ユーザーでログイン済みである
+    When メイン画面 (/) を PC 幅で開く
+    Then ヘッダーのログアウトボタンの隣に言語切り替えボタンが表示される
+    And ボタンに地球儀アイコンと「日本語」が表示される
+
+  @positive @ui-state-web-closed-en
+  Scenario: 英語設定時はボタンに「English」が表示される
+    Given ログイン画面 (/login) を PC 幅で開く
+    When 言語切り替えボタンで「English」を選択する
+    Then ボタンに地球儀アイコンと「English」が表示される
+
+  @positive @ui-state-web-open
+  Scenario: ボタンを押すと言語の一覧メニューが開き、現在の言語にチェックが付く
+    Given ログイン画面 (/login) を PC 幅で開く
+    When 言語切り替えボタンを押す
+    Then メニューが開き、「日本語」と「English」が言語名で並ぶ
+    And 現在の言語「日本語」にチェックが付く
+    And 「English」にはチェックが付かない
 
   @positive
-  Scenario: メイン画面に言語切り替えボタンが表示される
-    Given 管理者ユーザーでログイン済みである
-    When メイン画面 (/) を開く
-    Then 言語切り替えボタン（日/EN）が表示される
+  Scenario: メニューから言語を選ぶと切り替わりメニューが閉じる
+    Given ログイン画面 (/login) を PC 幅で開く
+    And 言語切り替えメニューが開いている
+    When メニューの「English」を選ぶ
+    Then 画面の表示が英語に切り替わる
+    And メニューが閉じる
+
+  @positive
+  Scenario: キーボードだけで言語を切り替えられる
+    Given ログイン画面 (/login) を PC 幅で開く
+    When 言語切り替えボタンにフォーカスして Enter を押す
+    Then メニューが開く
+    When 矢印キー（↓）で「English」に移動して Enter を押す
+    Then 画面の表示が英語に切り替わる
+    And メニューが閉じる
+
+  @positive
+  Scenario: Esc でメニューを閉じるとボタンにフォーカスが戻る
+    Given ログイン画面 (/login) を PC 幅で開く
+    And 言語切り替えメニューが開いている
+    When Esc を押す
+    Then メニューが閉じる
+    And フォーカスが言語切り替えボタンに戻る
+
+  @positive @ui-state-mobile-closed
+  Scenario: スマホ幅では言語切り替えボタンが地球儀アイコンのみで表示される
+    When ログイン画面 (/login) をスマホ幅（375px）で開く
+    Then 言語切り替えボタンが表示される
+    And ボタンには地球儀アイコンだけが表示され、言語名は表示されない
+    And ボタンのアクセシブルな名前は「言語 / Language」である
+
+  @positive @ui-state-mobile-open
+  Scenario: スマホ幅でもボタンを押すと同じ言語の一覧メニューが開く
+    Given ログイン画面 (/login) をスマホ幅（375px）で開く
+    When 言語切り替えボタンを押す
+    Then メニューが開き、「日本語」と「English」が言語名で並ぶ
+    And 現在の言語「日本語」にチェックが付く
 
   @positive
   Scenario: 日本語選択時にログイン画面のUIテキストが日本語で表示される
