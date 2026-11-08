@@ -183,6 +183,15 @@ cat frontend/src/api/*
 ls frontend/src/components/
 ```
 
+**同じ UI を扱う既存の `.feature` を探す**（UI 変更がある場合）:
+
+```bash
+# 対象の部品名・data-testid・画面上の文言で、全ての受け入れ条件を検索する
+grep -rln "[部品名 / data-testid / 文言]" specs/acceptance frontend/tests
+```
+
+見つかった `.feature` は、新しい仕様と矛盾しないよう Spec PR で更新する（#284 では `message-ui-improvement/` 配下の旧 `.feature` を見落とし、実装 PR で整合修正した）。
+
 #### 3.3 影響範囲の特定
 
 **調査結果のまとめ**:
@@ -442,7 +451,8 @@ Feature: [機能名]
 #### 6.5.3 画面 Story を作成
 
 - 画面コンポーネントは **props 駆動の表示層** として作る（データ取得の接続は `/implement-epic`）
-- `screens.md` の 1 状態 = 1 Story。`tags: ['screen']` を付ける
+- `screens.md` の 1 状態 = 1 Story。`tags: ['screen']` を付ける。スマホ幅（768px 未満）の状態には `'mobile'` も付ける（VRT が 375×667 で撮る）
+- shadcn MCP が使えない場合は、shadcn 標準の実装を手で `components/ui/` に追加し、PR 本文に明記する
 - API データは Orval 生成の MSW ハンドラー（`src/lib/api/generated/**/*.msw.ts`）を使う
 - Playwright MCP で全 Story を表示し、崩れ・a11y 違反・既存画面との不揃いを自己修正
 
@@ -450,6 +460,7 @@ Feature: [機能名]
 
 Step 8（push）の後、Spec PR ブランチで `Frontend VRT` ワークフローを `update=true` で手動実行する（CI がベースラインを commit）。
 ローカルの画像はコミットしない（OS・フォント差異のため）。
+CI のボットが push するため、その後の PR の CI が「承認待ち（action_required）」で止まる場合がある。PR ページの「Approve and run workflows」をユーザーが押す（空コミットで起動しない）。
 
 ---
 
