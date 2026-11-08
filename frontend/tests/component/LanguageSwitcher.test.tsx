@@ -7,13 +7,13 @@ import jaMessages from '../../messages/ja.json';
 import enMessages from '../../messages/en.json';
 import type { ReactNode } from 'react';
 
-function createJaWrapper() {
+function createJaWrapper(setLocale = vi.fn()) {
   function JaWrapper({ children }: { children: ReactNode }) {
     return (
       <LocaleContext.Provider
         value={{
           locale: 'ja',
-          setLocale: vi.fn(),
+          setLocale,
           messages: jaMessages as Record<string, unknown>,
         }}
       >
@@ -41,18 +41,18 @@ function createEnWrapper(setLocale = vi.fn()) {
   return EnWrapper;
 }
 
+// The menu itself (keyboard, Esc, check mark) is covered by LanguageMenu.test.tsx.
+// These tests cover only the connection to LocaleContext.
 describe('LanguageSwitcher', () => {
   describe('表示', () => {
-    it('日本語設定時に「🌐 日本語」が表示される', () => {
+    it('日本語設定時にボタンに「日本語」が表示される', () => {
       render(<LanguageSwitcher />, { wrapper: createJaWrapper() });
-      expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
-      expect(screen.getByText('🌐 日本語')).toBeInTheDocument();
+      expect(screen.getByTestId('language-switcher')).toHaveTextContent('日本語');
     });
 
-    it('英語設定時に「🌐 English」が表示される', () => {
+    it('英語設定時にボタンに「English」が表示される', () => {
       render(<LanguageSwitcher />, { wrapper: createEnWrapper() });
-      expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
-      expect(screen.getByText('🌐 English')).toBeInTheDocument();
+      expect(screen.getByTestId('language-switcher')).toHaveTextContent('English');
     });
 
     it('data-testid="language-switcher" で要素を取得できる', () => {
@@ -62,41 +62,42 @@ describe('LanguageSwitcher', () => {
     });
   });
 
-  describe('クリック操作', () => {
-    it('日本語設定時にクリックすると setLocale("en") が呼ばれる', async () => {
+  describe('言語の選択', () => {
+    it('日本語設定時にメニューで English を選ぶと setLocale("en") が呼ばれる', async () => {
       const setLocale = vi.fn();
       const user = userEvent.setup();
 
-      const Wrapper = ({ children }: { children: ReactNode }) => (
-        <LocaleContext.Provider
-          value={{
-            locale: 'ja',
-            setLocale,
-            messages: jaMessages as Record<string, unknown>,
-          }}
-        >
-          {children}
-        </LocaleContext.Provider>
-      );
-
-      render(<LanguageSwitcher />, { wrapper: Wrapper });
+      render(<LanguageSwitcher />, { wrapper: createJaWrapper(setLocale) });
 
       await user.click(screen.getByTestId('language-switcher'));
+      await user.click(screen.getByTestId('language-option-en'));
 
       expect(setLocale).toHaveBeenCalledOnce();
       expect(setLocale).toHaveBeenCalledWith('en');
     });
 
-    it('英語設定時にクリックすると setLocale("ja") が呼ばれる', async () => {
+    it('英語設定時にメニューで日本語を選ぶと setLocale("ja") が呼ばれる', async () => {
       const setLocale = vi.fn();
       const user = userEvent.setup();
 
       render(<LanguageSwitcher />, { wrapper: createEnWrapper(setLocale) });
 
       await user.click(screen.getByTestId('language-switcher'));
+      await user.click(screen.getByTestId('language-option-ja'));
 
       expect(setLocale).toHaveBeenCalledOnce();
       expect(setLocale).toHaveBeenCalledWith('ja');
+    });
+
+    it('ボタンを押しただけでは setLocale は呼ばれない', async () => {
+      const setLocale = vi.fn();
+      const user = userEvent.setup();
+
+      render(<LanguageSwitcher />, { wrapper: createJaWrapper(setLocale) });
+
+      await user.click(screen.getByTestId('language-switcher'));
+
+      expect(setLocale).not.toHaveBeenCalled();
     });
   });
 
