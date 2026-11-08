@@ -17,7 +17,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 日本語設定時（ボタンラベルが「🌐 日本語」）
+ * 日本語設定時（ボタンに地球儀アイコンと「日本語」。押すと言語の一覧メニューが開く）
  */
 export const Default: Story = {
   args: {},
@@ -35,7 +35,7 @@ export const Default: Story = {
 };
 
 /**
- * 英語設定時（ボタンラベルが「🌐 English」）
+ * 英語設定時（ボタンに地球儀アイコンと「English」）
  */
 export const English: Story = {
   args: {},

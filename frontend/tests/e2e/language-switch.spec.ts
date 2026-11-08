@@ -10,15 +10,18 @@ async function clearLocale(page: Page) {
   await expect(page.getByTestId('language-switcher')).toBeVisible({ timeout: 10000 });
 }
 
-// Helper: switch to English (click button when in Japanese mode, wait for DOM change)
+// Helper: switch to English (open the language menu in Japanese mode and pick English)
 async function switchToEnglish(page: Page) {
   const switcher = page.getByTestId('language-switcher');
   await expect(switcher).toBeVisible({ timeout: 5000 });
-  // Button shows "🌐 日本語" when locale is 'ja'
-  if ((await switcher.textContent())?.includes('🌐 日本語')) {
+  // Button shows the current language name ("日本語" when locale is 'ja')
+  if ((await switcher.textContent())?.includes('日本語')) {
     await switcher.click();
-    // Wait until the button changes to "🌐 English" (locale is now 'en')
-    await expect(switcher).toHaveText('🌐 English', { timeout: 3000 });
+    const option = page.getByTestId('language-option-en');
+    await option.click();
+    // The menu closes and the button shows "English" (locale is now 'en')
+    await expect(option).toBeHidden({ timeout: 3000 });
+    await expect(switcher).toHaveText('English', { timeout: 3000 });
   }
 }
 
@@ -48,7 +51,7 @@ test.describe('言語切り替え機能', () => {
     await expect(page.getByRole('heading', { name: 'Message Management' })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByTestId('language-switcher')).toHaveText('🌐 English'); // Shows "🌐 English" when in English mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('English');
   });
 
   test('ログアウト後も選択言語が引き継がれる', async ({ page }) => {
@@ -69,6 +72,6 @@ test.describe('言語切り替え機能', () => {
 
     // Login page should still be in English
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByTestId('language-switcher')).toHaveText('🌐 English'); // Shows "🌐 English" when in English mode
+    await expect(page.getByTestId('language-switcher')).toHaveText('English');
   });
 });
