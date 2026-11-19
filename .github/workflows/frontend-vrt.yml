@@ -24,7 +24,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     # Keep in sync with @playwright/test version in frontend/pnpm-lock.yaml
-    container: mcr.microsoft.com/playwright:v1.64.0-noble
+    container: mcr.microsoft.com/playwright:v1.65.1-noble
     permissions:
       contents: write
     env:
