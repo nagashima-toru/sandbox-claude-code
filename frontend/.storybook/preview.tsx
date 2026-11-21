@@ -3,17 +3,13 @@ import { withThemeByClassName } from '@storybook/addon-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NextIntlClientProvider } from 'next-intl';
 import React from 'react';
-import { initialize, mswLoader } from 'msw-storybook-addon';
+import { setupWorker } from 'msw/browser';
+import { mswLoader } from 'msw-storybook-addon/csf3';
 import { handlers } from '../src/mocks/handlers';
 import jaMessages from '../messages/ja.json';
 
 // Import Tailwind CSS
 import '../src/app/globals.css';
-
-// Initialize MSW
-initialize({
-  onUnhandledRequest: 'bypass',
-});
 
 // Create a React Query client for Storybook
 const queryClient = new QueryClient({
@@ -63,7 +59,14 @@ const preview: Preview = {
       </QueryClientProvider>
     ),
   ],
-  loaders: [mswLoader],
+  // Start MSW without warning on unhandled requests (same behavior as before the addon 3.x migration)
+  loaders: [
+    mswLoader(async () => {
+      const worker = setupWorker();
+      await worker.start({ onUnhandledRequest: 'bypass', quiet: true });
+      return worker;
+    }),
+  ],
 };
 
 export default preview;
