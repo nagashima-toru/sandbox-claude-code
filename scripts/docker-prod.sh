@@ -102,7 +102,7 @@ fi
 # Check if Docker daemon is running
 if ! docker info &> /dev/null; then
   print_error "Docker daemon is not running"
-  echo "Please start Docker Desktop or Docker daemon"
+  echo "Please start the Docker Engine (e.g. colima start, sudo systemctl start docker)"
   exit 1
 fi
 

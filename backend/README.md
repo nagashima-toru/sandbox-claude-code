@@ -26,53 +26,52 @@ This project follows **Clean Architecture** principles with the following layers
 ## Requirements
 
 - Java 25
-- Docker (or Colima on macOS)
+- Docker Engine (any distribution: Docker Engine, Colima, Docker Desktop, etc.)
 
 ## Docker Setup
 
+Tests use Testcontainers, which needs a running Docker Engine. Docker Desktop is not required.
+
+Testcontainers finds the engine in this order: `DOCKER_HOST`, `docker.host` in `~/.testcontainers.properties`, then `/var/run/docker.sock`.
+
+`TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock` in `pom.xml` tells Ryuk (container cleanup) which socket path to mount inside the engine. It is required for Colima and harmless for the others.
+
+| OS | Engine | Verified |
+| --- | --- | --- |
+| macOS | Colima | 2026-11, Engine 28.4.0 |
+| macOS | Docker Desktop | 2026-11, Engine 29.6.1 |
+| Linux | Docker Engine | CI (GitHub Actions `ubuntu-latest`) |
+| Windows (WSL2) | Docker Engine in WSL2 | Not verified |
+| Windows | Docker Desktop | Not verified |
+
 ### macOS
 
-Docker Desktop has compatibility issues with Testcontainers. Use Colima instead:
+Docker Desktop: install and start it. No extra configuration is needed.
+
+Colima (no Docker Desktop needed):
 
 ```bash
-# Install Colima
-brew install colima
-
-# Start Colima (stop Docker Desktop first)
+brew install colima docker docker-compose  # follow brew caveats to enable `docker compose`
 colima start
-
-# Set Docker context
-docker context use colima
+export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock  # add to ~/.zshrc
 ```
 
-Create `~/.testcontainers.properties`:
-
-```properties
-docker.host=unix://${HOME}/.colima/default/docker.sock
-```
-
-### Windows
-
-Install Docker Desktop:
-
-1. Download from <https://www.docker.com/products/docker-desktop/>
-2. Run installer and follow instructions
-3. Restart PC if required
+If Docker Desktop is also installed, both can run at the same time. `DOCKER_HOST` decides which one is used.
+Without it, `/var/run/docker.sock` (usually Docker Desktop) is used.
 
 ### Linux
 
+Install Docker Engine: <https://docs.docker.com/engine/install/>
+
 ```bash
-# Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install docker.io docker-compose-plugin
-sudo usermod -aG docker $USER
-
-# Start Docker
-sudo systemctl start docker
-sudo systemctl enable docker
-
-# Log out and log back in for group changes to take effect
+sudo usermod -aG docker $USER  # log out and back in
 ```
+
+### Windows (WSL2)
+
+Install Docker Engine inside the WSL2 distribution (same steps as Linux), clone the repository in the WSL2 file system, and run all commands there.
+
+Native Windows (`mvnw.cmd`) needs an engine that runs Linux containers on Windows, such as Docker Desktop.
 
 ## Build & Run
 
