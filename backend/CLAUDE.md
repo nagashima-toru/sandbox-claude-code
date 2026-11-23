@@ -158,7 +158,7 @@ Tests use Testcontainers to automatically start a PostgreSQL container.
 
 ### macOS Setup
 
-Docker Desktop works as is. Colima is an alternative: see `backend/README.md`.
+Any Docker Engine works (Colima, Docker Desktop, etc.). See `backend/README.md`.
 
 ### Integration Test Best Practices
 
