@@ -46,6 +46,8 @@ Testcontainers finds the engine in this order: `DOCKER_HOST`, `docker.host` in `
 
 ### macOS
 
+Docker Desktop: install and start it. No extra configuration is needed.
+
 Colima (no Docker Desktop needed):
 
 ```bash
