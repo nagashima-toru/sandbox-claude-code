@@ -62,10 +62,11 @@ jobs:
               const isCiCd = issue.labels.some(label => label.name === 'ci-cd');
               const isSecurity = issue.labels.some(label => label.name === 'security');
               const isRefactoring = issue.labels.some(label => label.name === 'refactoring');
+              const isDocumentation = issue.labels.some(label => label.name === 'documentation');
 
-              // CI/CD、セキュリティ、またはリファクタリング関連のIssueは仕様承認チェックをスキップ
-              if (isCiCd || isSecurity || isRefactoring) {
-                console.log(`✅ CI/CD、セキュリティ、またはリファクタリング関連Issue #${issueNumber} のため、仕様承認チェックをスキップします`);
+              // CI/CD、セキュリティ、リファクタリング、またはドキュメント関連のIssueは仕様承認チェックをスキップ
+              if (isCiCd || isSecurity || isRefactoring || isDocumentation) {
+                console.log(`✅ CI/CD、セキュリティ、リファクタリング、またはドキュメント関連Issue #${issueNumber} のため、仕様承認チェックをスキップします`);
                 return;
               }
 
@@ -79,7 +80,7 @@ jobs:
                   `3. 仕様PRをレビュー・マージ\n` +
                   `4. Story #${issueNumber} に 'spec-approved' ラベルを手動で付与\n` +
                   `5. この実装PRを再実行\n\n` +
-                  `**注意:** CI/CD、セキュリティ、またはリファクタリング関連のIssueの場合は、それぞれ 'ci-cd'、'security'、または 'refactoring' ラベルを付与してください。`
+                  `**注意:** CI/CD、セキュリティ、リファクタリング、またはドキュメント関連のIssueの場合は、それぞれ 'ci-cd'、'security'、'refactoring'、または 'documentation' ラベルを付与してください。`
                 );
               } else {
                 console.log('✅ spec-approved label found on parent Story');

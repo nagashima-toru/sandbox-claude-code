@@ -46,6 +46,7 @@ sandbox-claude-code/
 
 PR 作成前: `./scripts/ci-check-local.sh`
 
+- エージェントが回すときは `--yes` を付ける（付けないと Enter 待ちで止まる）。片側だけの変更なら `--backend-only` / `--frontend-only`
 - ブランチは `git fetch` 後の `origin/master` から作る。作成後に `git branch --show-current` で確認してからコミットする（作成に失敗したら、連結コマンドでコミットしない）
 - 調査・版数の根拠は `origin/master`。手元の `master` は古い可能性がある
 - コミット作成者は GitHub の noreply アドレス（`git config user.email`）にする。実メールだと push が拒否される
