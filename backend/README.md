@@ -26,30 +26,33 @@ This project follows **Clean Architecture** principles with the following layers
 ## Requirements
 
 - Java 25
-- Docker (or Colima on macOS)
+- Docker (Docker Desktop on macOS/Windows)
 
 ## Docker Setup
 
 ### macOS
 
-Docker Desktop has compatibility issues with Testcontainers. Use Colima instead:
+Docker Desktop works with Testcontainers. No extra configuration is needed.
+
+Verified (2026-11): Docker Desktop (Engine 29.6.1, API 1.55) + Testcontainers 2.x, `./mvnw test` passes.
+
+If `~/.testcontainers.properties` has a `docker.host` line pointing to Colima, remove it.
+
+#### Alternative: Colima
 
 ```bash
-# Install Colima
 brew install colima
-
-# Start Colima (stop Docker Desktop first)
-colima start
-
-# Set Docker context
+colima start   # stop Docker Desktop first
 docker context use colima
 ```
 
-Create `~/.testcontainers.properties`:
+Add to `~/.testcontainers.properties`:
 
 ```properties
 docker.host=unix://${HOME}/.colima/default/docker.sock
 ```
+
+`TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE` in `pom.xml` is for Colima (the socket path Ryuk mounts inside the VM). Docker Desktop does not need it.
 
 ### Windows
 

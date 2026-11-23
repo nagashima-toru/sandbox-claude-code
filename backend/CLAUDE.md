@@ -29,7 +29,7 @@ Spring Boot REST API application with PostgreSQL, MyBatis, and Flyway.
 # Run (requires PostgreSQL via docker-compose)
 ./mvnw spring-boot:run
 
-# Test (uses Testcontainers - requires Docker/Colima)
+# Test (uses Testcontainers - requires Docker)
 ./mvnw test
 
 # Integration test with OpenAPI generation (IMPORTANT: use verify, not integration-test)
@@ -156,19 +156,9 @@ com.sandbox.api
 
 Tests use Testcontainers to automatically start a PostgreSQL container.
 
-### macOS Setup (Colima required)
+### macOS Setup
 
-```bash
-brew install colima
-colima start
-docker context use colima
-```
-
-Create `~/.testcontainers.properties`:
-
-```properties
-docker.host=unix://${HOME}/.colima/default/docker.sock
-```
+Docker Desktop works as is. Colima is an alternative: see `backend/README.md`.
 
 ### Integration Test Best Practices
 
