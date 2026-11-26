@@ -42,6 +42,8 @@ export const useAuth = (): UseAuthReturn => {
     const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
+    // Read localStorage after mount to avoid an SSR hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAuthState({
       isAuthenticated: !!accessToken,
       isLoading: false,
